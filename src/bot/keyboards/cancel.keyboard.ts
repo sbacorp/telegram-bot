@@ -3,6 +3,6 @@ import {
 } from "grammy";
 
 export const cancel = new Keyboard()
-	.text("cancel")
+	.text("Главное меню")
 	.resized()
 	.oneTime()

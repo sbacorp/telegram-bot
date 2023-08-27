@@ -14,11 +14,20 @@ function getPrivateChatCommands(): BotCommand[] {
 
 function getPrivateChatAdminCommands(): BotCommand[] {
   return [
-    {
-      command: "setcommands",
-      description: "setcommands_command.description",
-    },
-  ];
+		{
+			command: "statistics",
+			description: "статистика",
+		},
+		{
+			command: "setpromo",
+			description: "добавить промокод",
+		},
+		{
+			command: "setcommands",
+			description: "setcommands_command.description",
+		},
+
+	];
 }
 
 export async function setCommandsHandler(ctx: CommandContext<Context>) {
@@ -39,5 +48,5 @@ export async function setCommandsHandler(ctx: CommandContext<Context>) {
     },
   );
 
-  return ctx.reply("admin.commands-updated");
+  return ctx.reply("команды обновлены");
 }

@@ -3,4 +3,4 @@ import {
 } from "grammy";
 
 
-export const adultChildKeyboard = new InlineKeyboard().text("For you", 'adult').text("For child", 'child')
+export const adultChildKeyboard = new InlineKeyboard().text("Себе", 'adult').text("Ребенку", 'child')

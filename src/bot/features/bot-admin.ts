@@ -15,5 +15,21 @@ feature.command(
   chatAction("typing"),
   setCommandsHandler,
 );
+feature.command(
+	"setpromo",
+	logHandle("command-setpromo"),
+	chatAction("typing"),
+	async(ctx)=>{
+    await ctx.reply("Введите промокод");
+  }
+);
+feature.command(
+	"statistics",
+	logHandle("command-statistics"),
+	chatAction("typing"),
+	async (ctx) => {
+		await ctx.reply("Статистика тут");
+	}
+);
 
 export { composer as botAdminFeature };

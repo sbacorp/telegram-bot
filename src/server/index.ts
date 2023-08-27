@@ -8,7 +8,6 @@ export const createServer = async (bot: Bot) => {
   const server = fastify({
     logger,
   });
-
   server.setErrorHandler(async (error, request, response) => {
     if (error instanceof BotError) {
       errorHandler(error);

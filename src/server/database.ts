@@ -1,9 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Sequelize } from "sequelize";
 import * as pg from "pg";
+import { UserModel } from "./models.js";
 
-export const sequelize = new Sequelize("tgUsers", "bogdan","rootPass",  {
-  host: "45.130.8.237",
-  port: 5432,
-  dialect: "postgres",
+export const sequelize = new Sequelize("tgdb", "bogdan", "root", {
+	host: "0.0.0.0",
+	port: 32768,
+	dialect: "postgres",
 });

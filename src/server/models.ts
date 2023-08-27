@@ -13,10 +13,6 @@ export const UserModel = sequelize.define(
 			type: DataTypes.STRING,
 			unique: true,
 		},
-		userBalance: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
-		},
 		sub: {
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
@@ -27,3 +23,19 @@ export const UserModel = sequelize.define(
 		},
 	}
 );
+export const PromocodeModel = sequelize.define(
+	"promocode",
+	{
+		id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		promo: {
+			type: DataTypes.STRING,
+			unique: true,
+		},
+		timesUsed: {
+			type: DataTypes.INTEGER
+		},
+	});

@@ -5,11 +5,13 @@ import { onShutdown } from "node-graceful-shutdown";
 import { createBot } from "#root/bot/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
+import {sequelize } from "#root/server/database.js";
+import { initDB } from "#root/server/utils.js";
 
 try {
   const bot = createBot(config.BOT_TOKEN);
   let runner: undefined | RunnerHandle;
-
+  
   // Graceful shutdown
   onShutdown(async () => {
     logger.info("shutdown");
@@ -17,6 +19,9 @@ try {
     await runner?.stop();
     await bot.stop();
   });
+  (async () => {
+		await initDB(sequelize);
+	})();
 
   if (config.isProd) {
     await bot.init();
