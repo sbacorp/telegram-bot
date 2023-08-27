@@ -23,10 +23,13 @@ function getPrivateChatAdminCommands(): BotCommand[] {
 			description: "добавить промокод",
 		},
 		{
+			command: "createlink",
+			description: "создать ссылку на бота",
+		},
+		{
 			command: "setcommands",
 			description: "setcommands_command.description",
-		},
-
+		}
 	];
 }
 

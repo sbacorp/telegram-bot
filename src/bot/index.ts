@@ -2,6 +2,7 @@ import { autoChatAction } from "@grammyjs/auto-chat-action";
 import { hydrate } from "@grammyjs/hydrate";
 import { sequentialize } from "@grammyjs/runner";
 import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
+import { autoRetry } from "@grammyjs/auto-retry";
 import { BotConfig, StorageAdapter, Bot as TelegramBot, session } from "grammy";
 import {
 	Context,
@@ -30,6 +31,8 @@ import {
 	diagnosticForChildConversation,
 	consultationConversation,
 	CONSULTATION_CONVERSATION,
+	setPromoConversation,
+	createlinkConversation,
 } from "./conversations/index.js";
 
 type Options = {
@@ -45,7 +48,12 @@ export function createBot(token: string, options: Options = {}) {
 
 	// Middlewares
 	bot.api.config.use(parseMode("HTML"));
-
+	bot.api.config.use(
+		autoRetry({
+			maxRetryAttempts: 1, // only repeat requests once
+			maxDelaySeconds: 5, // fail immediately if we have to wait >5 seconds
+		})
+	);
 	if (config.isDev) {
 		bot.use(updateLogger());
 	}
@@ -58,23 +66,23 @@ export function createBot(token: string, options: Options = {}) {
 			storage: sessionStorage,
 		})
 	);
-	// bot.use(
-	// 	sequentialize((ctx) => {
-	// 		const chat = ctx.chat?.id.toString();
-	// 		const user = ctx.from?.id.toString();
-	// 		return [chat, user].filter((con) => con !== undefined);
-	// 	})
-	// );
+	const constraint = (ctx: Context) => String(ctx.chat?.id);
+
+	bot.use(sequentialize(constraint));
+	bot.use(conversations());
+	bot.use(setPromoConversation());
+	bot.use(createlinkConversation())
 	// Handlers
 	bot.use(welcomeFeature);
 	bot.use(botAdminFeature);
 	// Install the conversations plugin.
-	bot.use(conversations());
+
 	bot.hears("Главное меню", async (ctx: Context) => {
 		ctx.conversation.exit();
 		await ctx.reply("<b>Главное меню</b>", {
 			reply_markup: mainMenu,
 		});
+		return ctx.deleteMessage();
 	});
 
 	bot.hears("Сайт", async (ctx: Context) => {
@@ -103,7 +111,6 @@ export function createBot(token: string, options: Options = {}) {
 		await ctx.reply("Карманный нутрициолог");
 		return ctx.deleteMessage();
 	});
-
 	bot.use(diagnosticForChildConversation());
 	bot.use(diagnosticForAdultConversation());
 	bot.use(diagnosticConversation());
