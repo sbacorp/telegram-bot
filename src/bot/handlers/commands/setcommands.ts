@@ -14,23 +14,23 @@ function getPrivateChatCommands(): BotCommand[] {
 
 function getPrivateChatAdminCommands(): BotCommand[] {
   return [
-		{
-			command: "statistics",
-			description: "статистика",
-		},
-		{
-			command: "setpromo",
-			description: "добавить промокод",
-		},
-		{
-			command: "createlink",
-			description: "создать ссылку на бота",
-		},
-		{
-			command: "setcommands",
-			description: "setcommands_command.description",
-		}
-	];
+    {
+      command: "statistics",
+      description: "статистика",
+    },
+    {
+      command: "setpromo",
+      description: "добавить промокод",
+    },
+    {
+      command: "createlink",
+      description: "создать ссылку на бота",
+    },
+    {
+      command: "setcommands",
+      description: "setcommands_command.description",
+    },
+  ];
 }
 
 export async function setCommandsHandler(ctx: CommandContext<Context>) {

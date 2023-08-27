@@ -3,8 +3,8 @@ import { Context as DefaultContext, SessionFlavor, type Api } from "grammy";
 import type { AutoChatActionFlavor } from "@grammyjs/auto-chat-action";
 import type { HydrateFlavor } from "@grammyjs/hydrate";
 import type { ParseModeFlavor } from "@grammyjs/parse-mode";
-import type { Logger } from "#root/logger.js";
 import type { ConversationFlavor } from "@grammyjs/conversations";
+import type { Logger } from "#root/logger.js";
 
 export type SessionData = {
   // field?: string;
@@ -19,7 +19,7 @@ export type Context = ParseModeFlavor<
     DefaultContext &
       ExtendedContextFlavor &
       SessionFlavor<SessionData> &
-       ConversationFlavor &
+      ConversationFlavor &
       AutoChatActionFlavor
   >
 >;

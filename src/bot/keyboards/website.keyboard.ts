@@ -1,11 +1,5 @@
-import {
-	InlineKeyboard,
-} from "grammy";
-
+import { InlineKeyboard } from "grammy";
 
 export const webSiteKeyboard = new InlineKeyboard()
-	.url(
-		"Наш сайт",
-		"telegra.ph"
-	)
-	.row()
+  .url("Наш сайт", "telegra.ph")
+  .row();
