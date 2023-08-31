@@ -18,9 +18,13 @@ export async function findOrCreateUser(chatId: number) {
     const user = await UserModel.findOne({
       where: { chatId: chatId.toString() },
     });
+    if (user) {
+      return true;
+    }
     if (!user) {
       console.log("created");
       await UserModel.create({ chatId });
+      return false;
     }
   } catch (error) {
     console.error(error);

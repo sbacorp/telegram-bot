@@ -10,8 +10,9 @@ const feature = composer.chatType("private");
 
 feature.command("start", logHandle("command-start"), async (ctx) => {
   const chatId = ctx.chat.id;
-  await findOrCreateUser(chatId);
-  await ctx.reply(`
+  const isUser = await findOrCreateUser(chatId);
+  if (!isUser)
+    await ctx.reply(`
 Здравствуйте
 Меня зовут Алла Чеканова.
 Я - семейный и детский  нутрициолог, клинический психолог и эксперт в области превентивной медицины международного уровня.
