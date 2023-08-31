@@ -12,14 +12,9 @@ export function setPromoConversation() {
       } = await conversation.waitFor("message:text");
       await ctx.reply("<b>Введи скидку в процентах</b>");
       const discount = await conversation.form.number();
-      try {
-        await createPromoCode(text, discount);
-      } catch (error) {
-        console.log(error);
-      }
-
-      return ctx.reply("Промокод создан");
+      const response = await createPromoCode(text, discount);
+      return ctx.reply(response);
     },
-    SETPROMO_CONVERSATION,
+    SETPROMO_CONVERSATION
   );
 }

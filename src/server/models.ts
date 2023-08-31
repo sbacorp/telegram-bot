@@ -2,7 +2,16 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "./database.js";
 
-export const UserModel = sequelize.define("user", {
+interface IUserModel extends Model {
+  id: number;
+  chatId: string;
+  sub: boolean;
+  referenceFrom: string;
+  joinedToNutr: boolean;
+  subEndDateTime: number;
+  promoCode: string;
+}
+export const UserModel = sequelize.define<IUserModel>("user", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -16,22 +25,23 @@ export const UserModel = sequelize.define("user", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  referenceFrom: {
+    type: DataTypes.STRING,
+    defaultValue: "",
+  },
   joinedToNutr: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
+  },
+  promoCode: {
+    type: DataTypes.STRING,
+    defaultValue: "",
   },
   subEndDateTime: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
 });
-
-interface Promocode {
-  id: number;
-  promoTitle: string;
-  discount: number;
-  timesUsed: number;
-}
 
 interface IPromocodeModel extends Model {
   id: number;

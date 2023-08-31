@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { chatAction } from "@grammyjs/auto-chat-action";
 import { Composer } from "grammy";
 import type { Context } from "#root/bot/context.js";
@@ -14,6 +15,9 @@ import {
 import {
   SETPROMO_CONVERSATION,
   CREATELINK_CONVERSATION,
+  DELETE_PROMO_CONVERSATION,
+  ACTIVATE_SUBSCRIPTION_CONVERSATION,
+  DELETE_LINK_CONVERSATION
 } from "../conversations/index.js";
 
 const composer = new Composer<Context>();
@@ -24,7 +28,7 @@ feature.command(
   "setcommands",
   logHandle("command-setcommands"),
   chatAction("typing"),
-  setCommandsHandler,
+  setCommandsHandler
 );
 feature.command(
   "setpromo",
@@ -32,7 +36,7 @@ feature.command(
   chatAction("typing"),
   async (ctx) => {
     return ctx.conversation.enter(SETPROMO_CONVERSATION);
-  },
+  }
 );
 feature.command(
   "createlink",
@@ -40,7 +44,31 @@ feature.command(
   chatAction("typing"),
   async (ctx) => {
     return ctx.conversation.enter(CREATELINK_CONVERSATION);
-  },
+  }
+);
+feature.command(
+  "deletepromo",
+  logHandle("command-deletepromo"),
+  chatAction("typing"),
+  async (ctx) => {
+    return ctx.conversation.enter(DELETE_PROMO_CONVERSATION);
+  }
+);
+feature.command(
+  "deletelink",
+  logHandle("command-deletelink"),
+  chatAction("typing"),
+  async (ctx) => {
+    return ctx.conversation.enter(DELETE_LINK_CONVERSATION);
+  }
+);
+feature.command(
+  "activatesubscription",
+  logHandle("command-activeSubscription"),
+  chatAction("typing"),
+  async (ctx) => {
+    return ctx.conversation.enter(ACTIVATE_SUBSCRIPTION_CONVERSATION);
+  }
 );
 feature.command(
   "statistics",
@@ -48,8 +76,8 @@ feature.command(
   chatAction("typing"),
   async (ctx) => {
     await ctx.deleteMessage();
-    await ctx.reply(
-      `Всего пользователей: ${await getTotalUsersCount()}\nВ нутрицологе: ${await getUsersJoinedNutrCount()}\nС подпиской: ${await getSubscribedUsersCount()}`,
+    await ctx.replyWithMarkdownV2(
+      `*Всего пользователей:* ${await getTotalUsersCount()}\n*Зашли в нутрицолога:* ${await getUsersJoinedNutrCount()}\n*Оформили подписку:* ${await getSubscribedUsersCount()}`
     );
     await getPromocodesMessage().then((message) => {
       ctx.reply(message);
@@ -57,7 +85,7 @@ feature.command(
     await getLinksMessage().then((message) => {
       ctx.reply(message);
     });
-  },
+  }
 );
 
 export { composer as botAdminFeature };

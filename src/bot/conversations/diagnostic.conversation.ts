@@ -2,84 +2,59 @@
 /* eslint-disable no-return-await */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
-import { type } from "node:os";
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import { adultChildKeyboard, mainMenu } from "../keyboards/index.js";
+import {
+  diagnosticListKeyboard,
+  mainMenu,
+  yesNo,
+  next,
+  canceldiagnostic,
+} from "../keyboards/index.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
+// eslint-disable-next-line import/no-cycle
+import {
+  diagnosticDeficitConversation,
+  diagnosticInsulinConversation,
+  diagnosticThyroidConversation,
+  diagnosticZhktConversation,
+} from "./diagnostics.js";
 
 export const DIAGNOSTIC_CONVERSATION = "diagnostic";
-export const DIAGNOSTIC_ADULT_CONVERSATION = "diagnosticForAdult";
-export function diagnosticForAdultConversation() {
-  return createConversation(
-    async (conversation: Conversation<Context>, ctx: Context) => {
-      await ctx.reply("<b>Вы выбрали диагностику для себя!</b>", {
-        reply_markup: cancel,
-      });
-      let count = 0;
-      let flag = true;
-      while (flag) {
-        await ctx.reply("Введите ваш возраст: ");
-        ctx = await conversation.wait();
-        count = await Number(ctx.message?.text);
-        if (count > 18 && count < 100 && typeof count === "number") {
-          flag = false;
-        }
-      }
-      await ctx.reply(count.toString());
-      await ctx.reply("<b>Второй вопрос</b>");
-    },
-    DIAGNOSTIC_ADULT_CONVERSATION,
+export async function diagnosticConversation(
+  conversation: Conversation<Context>,
+  ctx: Context
+) {
+  await ctx.reply(
+    "<b>Ответьте на вопросы и узнайте, какие области здоровья нуждаются в вашем внимании!</b>",
+    { reply_markup: cancel }
   );
-}
-
-export const DIAGNOSTIC_CHILD_CONVERSATION = "diagnosticForChild";
-export function diagnosticForChildConversation() {
-  return createConversation(
-    async (conversation: Conversation<Context>, ctx: Context) => {
-      await ctx.reply("<b>Вы выбрали диагностику для ребенка!</b>", {
-        reply_markup: cancel,
-      });
-      let count = 0;
-      let flag = true;
-      while (flag) {
-        if (count > 18 && count < 100 && typeof count === "number") {
-          flag = false;
-        }
-        await ctx.reply("Введите возраст ребенка: ");
-        ctx = await conversation.wait();
-        count = Number(ctx.message?.text);
-      }
-      await ctx.reply(count.toString());
-      await ctx.reply("<b>Второй вопрос</b>");
-    },
-    DIAGNOSTIC_CHILD_CONVERSATION,
+  await ctx.reply(
+    `<b>Какую из сфер здоровья будем проверять?
+При необходимости вы сможете вернуться к этому вопросу и выбрать другую сферу</b>`,
+    {
+      reply_markup: diagnosticListKeyboard,
+    }
   );
-}
-
-export function diagnosticConversation() {
-  return createConversation(
-    async (conversation: Conversation<Context>, ctx: Context) => {
-      await ctx.reply("Диагностика", { reply_markup: cancel });
-      await ctx.reply("<b>Для кого диагностика?</b>", {
-        reply_markup: adultChildKeyboard,
-      });
-      const response = await conversation.waitForCallbackQuery(
-        ["adult", "child"],
-        {
-          otherwise: async (ctx) =>
-            await ctx.reply("Используйте кнопки", {
-              reply_markup: adultChildKeyboard,
-            }),
-        },
-      );
-      if (response.match === "adult") {
-        return response.conversation.enter(DIAGNOSTIC_ADULT_CONVERSATION);
-      }
-      if (response.match === "child") {
-        return response.conversation.enter(DIAGNOSTIC_CHILD_CONVERSATION);
-      }
-    },
-    DIAGNOSTIC_CONVERSATION,
+  const response = await conversation.waitForCallbackQuery(
+    ["zhkt", "deficit", "thyroid", "insulin"],
+    {
+      otherwise: async (ctx) =>
+        await ctx.reply("Используйте кнопки", {
+          reply_markup: diagnosticListKeyboard,
+        }),
+    }
   );
+  if (response.match === "zhkt") {
+    return diagnosticZhktConversation(conversation, ctx);
+  }
+  if (response.match === "deficit") {
+    return diagnosticDeficitConversation(conversation, ctx);
+  }
+  if (response.match === "thyroid") {
+    return diagnosticThyroidConversation(conversation, ctx);
+  }
+  if (response.match === "insulin") {
+    return diagnosticInsulinConversation(conversation, ctx);
+  }
 }

@@ -27,6 +27,18 @@ function getPrivateChatAdminCommands(): BotCommand[] {
       description: "создать ссылку на бота",
     },
     {
+      command: "deletepromo",
+      description: "удалить промокод",
+    },
+    {
+      command: "deletelink",
+      description: "удалить ссылку",
+    },
+    {
+      command: "activatesubscription",
+      description: "активировать подписку по id",
+    },
+    {
       command: "setcommands",
       description: "setcommands_command.description",
     },
@@ -48,7 +60,7 @@ export async function setCommandsHandler(ctx: CommandContext<Context>) {
         type: "chat",
         chat_id: Number(config.BOT_ADMIN_USER_ID),
       },
-    },
+    }
   );
 
   return ctx.reply("команды обновлены");

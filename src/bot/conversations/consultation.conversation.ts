@@ -20,7 +20,7 @@ export function consultationConversation() {
         "<b>Что входит в ĸонсультацию, решение проблем И таĸ далее, прошли ли вы диагностиĸу?</b>",
         {
           reply_markup: yesNoKeyboard,
-        },
+        }
       );
       const response = await conversation.waitForCallbackQuery(["yes", "no"], {
         otherwise: async (ctx) =>
@@ -34,6 +34,6 @@ export function consultationConversation() {
         return response.conversation.enter(DIAGNOSTIC_CONVERSATION);
       }
     },
-    CONSULTATION_CONVERSATION,
+    CONSULTATION_CONVERSATION
   );
 }

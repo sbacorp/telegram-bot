@@ -4,7 +4,7 @@ import { sequentialize } from "@grammyjs/runner";
 import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { autoRetry } from "@grammyjs/auto-retry";
 import { BotConfig, StorageAdapter, Bot as TelegramBot, session } from "grammy";
-import { conversations } from "@grammyjs/conversations";
+import { conversations, createConversation } from "@grammyjs/conversations";
 import {
   Context,
   SessionData,
@@ -27,12 +27,21 @@ import {
 import {
   DIAGNOSTIC_CONVERSATION,
   diagnosticConversation,
-  diagnosticForAdultConversation,
-  diagnosticForChildConversation,
+  diagnosticZhktConversation,
+  diagnosticDeficitConversation,
+  diagnosticThyroidConversation,
+  diagnosticInsulinConversation,
   consultationConversation,
   CONSULTATION_CONVERSATION,
   setPromoConversation,
   createlinkConversation,
+  deletePromoConversation,
+  activateSubscriptionConversation,
+  deleteLinkConversation,
+  DIAGNOSTIC_ZHKT_CONVERSATION,
+  DIAGNOSTIC_DEFICIT_CONVERSATION,
+  DIAGNOSTIC_THYROID_CONVERSATION,
+  DIAGNOSTIC_INSULIN_CONVERSATION,
 } from "./conversations/index.js";
 
 type Options = {
@@ -45,14 +54,13 @@ export function createBot(token: string, options: Options = {}) {
     ...options.config,
     ContextConstructor: createContextConstructor({ logger }),
   });
-
   // Middlewares
   bot.api.config.use(parseMode("HTML"));
   bot.api.config.use(
     autoRetry({
       maxRetryAttempts: 1, // only repeat requests once
       maxDelaySeconds: 5, // fail immediately if we have to wait >5 seconds
-    }),
+    })
   );
   if (config.isDev) {
     bot.use(updateLogger());
@@ -64,7 +72,7 @@ export function createBot(token: string, options: Options = {}) {
     session({
       initial: () => ({}),
       storage: sessionStorage,
-    }),
+    })
   );
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const constraint = (ctx: Context) => String(ctx.chat?.id);
@@ -73,12 +81,15 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(conversations());
   bot.use(setPromoConversation());
   bot.use(createlinkConversation());
+  bot.use(deletePromoConversation());
+  bot.use(deleteLinkConversation());
+  bot.use(activateSubscriptionConversation());
   // Handlers
   bot.use(welcomeFeature);
   bot.use(botAdminFeature);
   // Install the conversations plugin.
 
-  bot.hears("Главное меню", async (ctx: Context) => {
+  bot.hears("🏠 Главное меню", async (ctx: Context) => {
     ctx.conversation.exit();
     await ctx.reply("<b>Главное меню</b>", {
       reply_markup: mainMenu,
@@ -100,23 +111,62 @@ export function createBot(token: string, options: Options = {}) {
     });
     await ctx.deleteMessage();
   });
-  bot.hears("гт ĸанал", async (ctx: Context) => {
-    await ctx.reply("гт ĸанал");
+  bot.hears("Тг-канал", async (ctx: Context) => {
+    await ctx.reply("Тг-канал");
     await ctx.deleteMessage();
   });
   bot.hears("Обо мне", async (ctx: Context) => {
-    await ctx.reply("Обо мне");
+    await ctx.reply(`
+Здравствуйте
+Меня зовут Алла Чеканова.
+Я - семейный и детский  нутрициолог, клинический психолог и эксперт в области превентивной медицины международного уровня.
+
+🌿 8 лет я профессионально помогаю людям обрести здоровье.
+🌿 Я успешно завершила более 200 обучений.
+🌿 Создала 2 программы профессиональной подготовки
+🌿 Подготовила более 3000 специалистов
+🌿 Разработала собственную линейку витаминов
+🌿 Произвожу лечебную магниевую воду с идеальным составом и ценой`);
     return ctx.deleteMessage();
   });
   bot.hears("Карманный нутрициолог", async (ctx: Context) => {
-    await ctx.reply("Карманный нутрициолог");
+    await ctx.reply("Карманный нутрициолог", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Перейти в бота",
+              url: "https://t.me/pocket_nutritionist_test_bot",
+            },
+          ],
+        ],
+      },
+    });
     return ctx.deleteMessage();
   });
-  bot.use(diagnosticForChildConversation());
-  bot.use(diagnosticForAdultConversation());
-  bot.use(diagnosticConversation());
+  bot.use(
+    createConversation(
+      diagnosticDeficitConversation,
+      DIAGNOSTIC_DEFICIT_CONVERSATION
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticThyroidConversation,
+      DIAGNOSTIC_THYROID_CONVERSATION
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticInsulinConversation,
+      DIAGNOSTIC_INSULIN_CONVERSATION
+    )
+  );
+  bot.use(
+    createConversation(diagnosticZhktConversation, DIAGNOSTIC_ZHKT_CONVERSATION)
+  );
+  bot.use(createConversation(diagnosticConversation, DIAGNOSTIC_CONVERSATION));
   bot.use(consultationConversation());
-
   bot.hears("Консультация", async (ctx: Context) => {
     await ctx.conversation.enter(CONSULTATION_CONVERSATION);
     return ctx.deleteMessage();
@@ -125,9 +175,8 @@ export function createBot(token: string, options: Options = {}) {
     await ctx.conversation.enter(DIAGNOSTIC_CONVERSATION);
     return ctx.deleteMessage();
   });
-
   // must be the last handler
-  bot.use(unhandledFeature);
+  // bot.use(unhandledFeature);
 
   if (config.isDev) {
     bot.catch(errorHandler);

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 import { Sequelize } from "sequelize";
 import { LinkModel, PromocodeModel, UserModel } from "./models.js";
@@ -19,7 +20,6 @@ export async function findOrCreateUser(chatId: number) {
     });
     if (!user) {
       console.log("created");
-
       await UserModel.create({ chatId });
     }
   } catch (error) {
@@ -49,25 +49,29 @@ export async function getUsersJoinedNutrCount(): Promise<number> {
 
 export async function createPromoCode(
   code: string,
-  discount: number,
-): Promise<void> {
+  discount: number
+): Promise<string> {
   try {
     await PromocodeModel.create({
       promoTitle: code,
       discount,
     });
+    return `Промокод <code> ${code} </code> на ${discount} % успешно создан`;
   } catch (error) {
     console.log(error);
+    return `Промокод <code> ${code} </code> на ${discount} % не удалось создать`;
   }
 }
 
 export async function getPromocodesMessage() {
   const promocodes = await PromocodeModel.findAll();
 
-  let message = "Список промокодов:\n";
-
+  let message = "<b>Список промокодов -></b>\n";
+  if (promocodes.length === 0) {
+    message = "<b>Список промокодов пуст</b>\n";
+  }
   for (const code of promocodes) {
-    message += `${code.promoTitle} - Использовано: ${code.timesUsed}\n`;
+    message += `<code>${code.promoTitle}</code> - Использовано: ${code.timesUsed}\n`;
   }
 
   return message;
@@ -81,22 +85,75 @@ export const createLink = async (title: string) => {
     await LinkModel.create({
       linkTitle: title,
     });
+    return link;
   } catch {
     link = "не удалось создать ссылку";
     console.log("не удалось создать ссылку");
   }
-  return link;
 };
 
 export async function getLinksMessage() {
   const links = await LinkModel.findAll();
-
-  let message = "Список ссылок:\n";
-
+  if (links.length === 0) {
+    return "<b>Список ссылок пуст</b>";
+  }
+  let message = "<b>Список ссылок:</b>\n";
   // eslint-disable-next-line no-restricted-syntax
   for (const link of links) {
     message += `${link.linkTitle} - Использовано: ${link.timesUsed}\n`;
   }
-
   return message;
+}
+export async function deletePromoCodeFromDB(code: string): Promise<string> {
+  try {
+    const promo = await PromocodeModel.findOne({
+      where: {
+        promoTitle: code,
+      },
+    });
+    if (promo) {
+      await promo.destroy();
+      return `Промокод <code> ${code} </code> удален`;
+    }
+    return `Не удалось удалить промокод ${code}. Возможно такого промокода не существует`;
+  } catch (error) {
+    console.log(error);
+    return `Не удалось удалить промокод ${code}. Возможно такого промокода не существует`;
+  }
+}
+
+export async function deleteLinkFromDB(title: string): Promise<string> {
+  try {
+    const link = await LinkModel.findOne({
+      where: {
+        linkTitle: title,
+      },
+    });
+    if (link) {
+      await link.destroy();
+      return `Ссылка <code> ${title} </code> удалена`;
+    }
+    return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+  } catch (error) {
+    console.log(error);
+    return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+  }
+}
+export async function activateSubscription(userId: number) {
+  try {
+    const user = await UserModel.findOne({
+      where: {
+        chatId: userId.toString(),
+      },
+    });
+    if (user) {
+      user.sub = true;
+      await user.save();
+      return `Подписка для ${userId} обновлена`;
+    }
+    return "Не удалось обновить подписку, возможно такого пользователя не существует";
+  } catch (error) {
+    console.log(error);
+    return "Не удалось обновить подписку, возможно такого пользователя не существует";
+  }
 }

@@ -32,7 +32,7 @@
     "prettier/prettier": [
       "error",
       {
-        "trailingComma": "all"
+        "trailingComma": "es5"
       }
     ],
     "unicorn/no-array-method-this-argument": "off",
