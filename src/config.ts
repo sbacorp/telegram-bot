@@ -29,14 +29,14 @@ const configSchema = z.object({
   BOT_ALLOWED_UPDATES: z
     .preprocess(
       parseJsonSafe("BOT_ALLOWED_UPDATES"),
-      z.array(z.enum(API_CONSTANTS.ALL_UPDATE_TYPES)),
+      z.array(z.enum(API_CONSTANTS.ALL_UPDATE_TYPES))
     )
     .default([]),
   BOT_TOKEN: z.string(),
   BOT_ADMIN_USER_ID: z
     .preprocess(
       parseJsonSafe("BOT_ADMIN_USER_ID"),
-      z.array(z.coerce.number().safe()).or(z.coerce.number().safe()),
+      z.array(z.coerce.number().safe()).or(z.coerce.number().safe())
     )
     .transform((v) => (Array.isArray(v) ? v : [v]))
     .default([]),

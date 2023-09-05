@@ -15,7 +15,6 @@ try {
   // Graceful shutdown
   onShutdown(async () => {
     logger.info("shutdown");
-
     await runner?.stop();
     await bot.stop();
   });

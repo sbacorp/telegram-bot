@@ -3,7 +3,13 @@ import { hydrate } from "@grammyjs/hydrate";
 import { sequentialize } from "@grammyjs/runner";
 import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { autoRetry } from "@grammyjs/auto-retry";
-import { BotConfig, StorageAdapter, Bot as TelegramBot, session } from "grammy";
+import {
+  BotConfig,
+  Keyboard,
+  StorageAdapter,
+  Bot as TelegramBot,
+  session,
+} from "grammy";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import {
   Context,
@@ -21,8 +27,12 @@ import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
 import {
   webSiteKeyboard,
-  educationKeyboard,
   mainMenu,
+  toProjectsMenu,
+  projectsMenu,
+  studyProjectsMenu,
+  budsProjectsMenu,
+  freeProjectsMenu,
 } from "./keyboards/index.js";
 import {
   DIAGNOSTIC_CONVERSATION,
@@ -43,6 +53,7 @@ import {
   DIAGNOSTIC_THYROID_CONVERSATION,
   DIAGNOSTIC_INSULIN_CONVERSATION,
 } from "./conversations/index.js";
+import { cancel } from "./keyboards/cancel.keyboard.js";
 
 type Options = {
   sessionStorage?: StorageAdapter<SessionData>;
@@ -89,6 +100,16 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(botAdminFeature);
   // Install the conversations plugin.
 
+  //! menus
+  // bot.use(studyProjectsMenu);
+  // bot.use(budsProjectsMenu);
+  // bot.use(freeProjectsMenu);
+  bot.use(toProjectsMenu);
+  toProjectsMenu.register(projectsMenu);
+  bot.use(projectsMenu);
+  projectsMenu.register(studyProjectsMenu);
+  projectsMenu.register(freeProjectsMenu);
+  projectsMenu.register(budsProjectsMenu);
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
     ctx.conversation.exit();
     await ctx.reply("<b>Главное меню</b>", {
@@ -97,39 +118,41 @@ export function createBot(token: string, options: Options = {}) {
     return ctx.deleteMessage();
   });
 
-  bot.hears("Сайт", async (ctx: Context) => {
+  bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.reply("Перейдите по ссылке", {
       reply_markup: webSiteKeyboard,
       disable_web_page_preview: true,
     });
     return ctx.deleteMessage();
   });
-
-  bot.hears("Обучение", async (ctx: Context) => {
-    await ctx.reply("Полное описание обучения разбитое на группы", {
-      reply_markup: educationKeyboard,
-    });
-    await ctx.deleteMessage();
-  });
-  bot.hears("Тг-канал", async (ctx: Context) => {
+  bot.hears("🗣 Тг-канал", async (ctx: Context) => {
     await ctx.reply("Тг-канал");
     await ctx.deleteMessage();
   });
-  bot.hears("Обо мне", async (ctx: Context) => {
-    await ctx.reply(`
-Здравствуйте
-Меня зовут Алла Чеканова.
-Я - семейный и детский  нутрициолог, клинический психолог и эксперт в области превентивной медицины международного уровня.
+  bot.hears("💁🏼‍♀️ Обо мне", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    await ctx.reply("💁🏼‍♀️ Обо мне", {
+      reply_markup: cancel,
+    });
+    await ctx.reply(
+      `Я клинический психолог, магистр психологических наук,  дипломированный нутрициолог с целым ящиком дипломов, постоянный спикер на конференциях и эксперт радио и тв.
 
-🌿 8 лет я профессионально помогаю людям обрести здоровье.
-🌿 Я успешно завершила более 200 обучений.
-🌿 Создала 2 программы профессиональной подготовки
-🌿 Подготовила более 3000 специалистов
-🌿 Разработала собственную линейку витаминов
-🌿 Произвожу лечебную магниевую воду с идеальным составом и ценой`);
+И самое главное мое достижение: я автор курса «Детская нутрициология" и «Семейная нутрициология» - это ДПО с невероятной ценностью и эксклюзивной программой.
+
+Моя главная цель - чтобы больше людей были здоровыми. И поэтому я всегда даю вам столько информации бесплатно, потому что я за то, чтобы здоровье было доступно всем!`,
+      {
+        reply_markup: toProjectsMenu,
+      }
+    );
     return ctx.deleteMessage();
   });
-  bot.hears("Карманный нутрициолог", async (ctx: Context) => {
+  bot.hears("🗃 Мои проекты", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    await ctx.reply("🗃 Мои проекты", {
+      reply_markup: projectsMenu,
+    });
+  });
+  bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
     await ctx.reply("Карманный нутрициолог", {
       reply_markup: {
         inline_keyboard: [
@@ -167,16 +190,16 @@ export function createBot(token: string, options: Options = {}) {
   );
   bot.use(createConversation(diagnosticConversation, DIAGNOSTIC_CONVERSATION));
   bot.use(consultationConversation());
-  bot.hears("Консультация", async (ctx: Context) => {
+  bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
     await ctx.conversation.enter(CONSULTATION_CONVERSATION);
     return ctx.deleteMessage();
   });
-  bot.hears("Диагностика", async (ctx: Context) => {
+  bot.hears("📋 Диагностика", async (ctx: Context) => {
     await ctx.conversation.enter(DIAGNOSTIC_CONVERSATION);
     return ctx.deleteMessage();
   });
   // must be the last handler
-  // bot.use(unhandledFeature);
+  bot.use(unhandledFeature);
 
   if (config.isDev) {
     bot.catch(errorHandler);

@@ -12,9 +12,9 @@ export function createlinkConversation() {
       } = await conversation.waitFor("message:text");
       await ctx.reply("Создаю ссылку...");
       return ctx.reply(
-        `Ссылка создана: <code>${await createLink(text)}</code>`,
+        `Ссылка создана: <code>${await createLink(text)}</code>`
       );
     },
-    CREATELINK_CONVERSATION,
+    CREATELINK_CONVERSATION
   );
 }

@@ -1,13 +1,15 @@
 import { Keyboard } from "grammy";
 
 export const mainMenu = new Keyboard()
-  .text("Диагностика")
-  .text("Консультация")
+  .text("📋 Диагностика")
+  .text("👩‍⚕️ Консультация")
   .row()
-  .text("Обучение")
-  .text("Сайт")
-  .text("Тг-канал")
+  .text("🗃 Мои проекты")
+  .text("💁🏼‍♀️ Обо мне")
   .row()
-  .text("Обо мне")
-  .text("Карманный нутрициолог")
-  .resized();
+  .text("🌐 Сайт")
+  .text("🗣 Тг-канал")
+  .row()
+  .text("🤖 Карманный нутрициолог")
+  .resized()
+  .persistent();
