@@ -17,6 +17,7 @@ export const DIAGNOSTIC_ZHKT_CONVERSATION_CHILD = "diagnosticZhktChild";
 interface Question {
   question: string;
   answer: string;
+  keyboard?: typeof InlineKeyboard;
 }
 const questionsZhkt: Question[] = [
   {

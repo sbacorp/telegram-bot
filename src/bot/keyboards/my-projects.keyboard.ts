@@ -263,7 +263,7 @@ export const subscribeToChannel = new Menu<Context>("subscribe-to-channel")
         ctx.session.subscribedToChannel = true;
         ctx.menu.update();
         await ctx.replyWithDocument(
-          "BQACAgIAAxkBAAILA2T4PJtJsmIBPpENrt-AdLphGoRGAAL5LQAC2aLASxaC-5y6TMvnMAQ"
+          "BQACAgIAAxkBAAICXGT5721cDAy6N2hJoPHp3bSXCbJ3AALtNQACR9XRS4xIaNyMVGM4MAQ"
         );
       }
     }
@@ -287,7 +287,7 @@ export const subscribeToChannelVitD = new Menu<Context>("subscribe-to-channel")
         ctx.session.subscribedToChannel = true;
         ctx.menu.update();
         await ctx.replyWithDocument(
-          "BQACAgIAAxkBAAILAWT4OoiCOZlbUBPhTqzIE7zJH5SwAAIHLgAC2aLASy0SMInCDlYuMAQ"
+          "BQACAgIAAxkBAAICYWT58D9zzzMDwLn_OhRdnZEnPXbKAALSOAACxEnRSwRy552S_2Z1MAQ"
         );
       }
     }
@@ -298,7 +298,7 @@ export const freeProjectsMenu = new Menu<Context>("free-projects-menu")
     if (ctx.session.subscribedToChannel) {
       await ctx.reply("Заберите гайд");
       await ctx.replyWithDocument(
-        "BQACAgIAAxkBAAILAWT4OoiCOZlbUBPhTqzIE7zJH5SwAAIHLgAC2aLASy0SMInCDlYuMAQ"
+        "BQACAgIAAxkBAAICYWT58D9zzzMDwLn_OhRdnZEnPXbKAALSOAACxEnRSwRy552S_2Z1MAQ"
       );
     } else {
       await ctx.reply("Подпишитель на канал", {
@@ -311,7 +311,7 @@ export const freeProjectsMenu = new Menu<Context>("free-projects-menu")
     if (ctx.session.subscribedToChannel) {
       await ctx.reply("Заберите гайд");
       await ctx.replyWithDocument(
-        "BQACAgIAAxkBAAILA2T4PJtJsmIBPpENrt-AdLphGoRGAAL5LQAC2aLASxaC-5y6TMvnMAQ"
+        "BQACAgIAAxkBAAICXGT5721cDAy6N2hJoPHp3bSXCbJ3AALtNQACR9XRS4xIaNyMVGM4MAQ"
       );
     } else {
       await ctx.reply("Подпишитель на канал", {
