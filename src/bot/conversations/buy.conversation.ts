@@ -78,10 +78,12 @@ export async function buyConversation(
         }
       );
       const contact = await conversation.waitFor(":contact");
-      await updateUserPhone(
-        ctx.chat!.id,
-        contact.message!.contact.phone_number
-      );
+      await conversation.external(async () => {
+        await updateUserPhone(
+          ctx.chat!.id,
+          contact.message!.contact.phone_number
+        );
+      });
       await ctx.reply("Соглашение принято", {
         reply_markup: cancel,
       });
