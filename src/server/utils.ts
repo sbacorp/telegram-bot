@@ -31,6 +31,21 @@ export async function findOrCreateUser(chatId: number) {
   }
 }
 
+export async function updateUserPhone(chatId: number, phone: string) {
+  try {
+    const user = await UserModel.findOne({
+      where: { chatId: chatId.toString() },
+    });
+    if (user) {
+      user.phoneNumber = phone;
+      await user.save();
+      return true;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function getTotalUsersCount(): Promise<number> {
   return UserModel.count();
 }

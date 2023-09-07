@@ -7,7 +7,8 @@ import type { ConversationFlavor } from "@grammyjs/conversations";
 import type { Logger } from "#root/logger.js";
 
 export type SessionData = {
-  // field?: string;
+  selectedProduct?: string;
+  subscribedToChannel?: boolean;
 };
 
 type ExtendedContextFlavor = {

@@ -6,6 +6,7 @@ interface IUserModel extends Model {
   id: number;
   chatId: string;
   sub: boolean;
+  phoneNumber: string;
   referenceFrom: string;
   joinedToNutr: boolean;
   subEndDateTime: number;
@@ -20,6 +21,10 @@ export const UserModel = sequelize.define<IUserModel>("user", {
   chatId: {
     type: DataTypes.STRING,
     unique: true,
+  },
+  phoneNumber: {
+    type: DataTypes.STRING,
+    defaultValue: "",
   },
   sub: {
     type: DataTypes.BOOLEAN,

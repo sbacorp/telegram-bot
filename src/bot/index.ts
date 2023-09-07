@@ -33,14 +33,34 @@ import {
   studyProjectsMenu,
   budsProjectsMenu,
   freeProjectsMenu,
+  tgChannelKeyboard,
+  projectChildHealth,
+  subscribeToChannel,
+  projectZhkt,
+  guideAptechka,
+  diagnosticMenu,
 } from "./keyboards/index.js";
 import {
-  DIAGNOSTIC_CONVERSATION,
-  diagnosticConversation,
-  diagnosticZhktConversation,
-  diagnosticDeficitConversation,
-  diagnosticThyroidConversation,
-  diagnosticInsulinConversation,
+  DIAGNOSTIC_CONVERSATION_ADULT,
+  DIAGNOSTIC_CONVERSATION_CHILD,
+  diagnosticConversationAdult,
+  diagnosticConversationChild,
+  diagnosticZhktConversationAdult,
+  diagnosticDeficitConversationAdult,
+  diagnosticThyroidConversationAdult,
+  diagnosticInsulinConversationAdult,
+  diagnosticZhktConversationChild,
+  diagnosticDeficitConversationChild,
+  diagnosticThyroidConversationChild,
+  diagnosticInsulinConversationChild,
+  DIAGNOSTIC_ZHKT_CONVERSATION_ADULT,
+  DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT,
+  DIAGNOSTIC_THYROID_CONVERSATION_ADULT,
+  DIAGNOSTIC_INSULIN_CONVERSATION_ADULT,
+  DIAGNOSTIC_DEFICIT_CONVERSATION_CHILD,
+  DIAGNOSTIC_THYROID_CONVERSATION_CHILD,
+  DIAGNOSTIC_INSULIN_CONVERSATION_CHILD,
+  DIAGNOSTIC_ZHKT_CONVERSATION_CHILD,
   consultationConversation,
   CONSULTATION_CONVERSATION,
   setPromoConversation,
@@ -48,12 +68,12 @@ import {
   deletePromoConversation,
   activateSubscriptionConversation,
   deleteLinkConversation,
-  DIAGNOSTIC_ZHKT_CONVERSATION,
-  DIAGNOSTIC_DEFICIT_CONVERSATION,
-  DIAGNOSTIC_THYROID_CONVERSATION,
-  DIAGNOSTIC_INSULIN_CONVERSATION,
 } from "./conversations/index.js";
 import { cancel } from "./keyboards/cancel.keyboard.js";
+import {
+  BUY_CONVERSATION,
+  buyConversation,
+} from "./conversations/buy.conversation.js";
 
 type Options = {
   sessionStorage?: StorageAdapter<SessionData>;
@@ -69,8 +89,8 @@ export function createBot(token: string, options: Options = {}) {
   bot.api.config.use(parseMode("HTML"));
   bot.api.config.use(
     autoRetry({
-      maxRetryAttempts: 1, // only repeat requests once
-      maxDelaySeconds: 5, // fail immediately if we have to wait >5 seconds
+      maxRetryAttempts: 1,
+      maxDelaySeconds: 5,
     })
   );
   if (config.isDev) {
@@ -81,35 +101,29 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(hydrate());
   bot.use(
     session({
-      initial: () => ({}),
+      initial: () => ({
+        selectedProduct: "",
+        subscribedToChannel: false,
+      }),
       storage: sessionStorage,
     })
   );
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const constraint = (ctx: Context) => String(ctx.chat?.id);
-
+  //* middlemares
   bot.use(sequentialize(constraint));
+  //* connect plugin conversations
   bot.use(conversations());
+  //* setting commands conversations
   bot.use(setPromoConversation());
   bot.use(createlinkConversation());
   bot.use(deletePromoConversation());
   bot.use(deleteLinkConversation());
   bot.use(activateSubscriptionConversation());
-  // Handlers
+  //* Handlers welcome and admin
   bot.use(welcomeFeature);
   bot.use(botAdminFeature);
-  // Install the conversations plugin.
-
-  //! menus
-  // bot.use(studyProjectsMenu);
-  // bot.use(budsProjectsMenu);
-  // bot.use(freeProjectsMenu);
-  bot.use(toProjectsMenu);
-  toProjectsMenu.register(projectsMenu);
-  bot.use(projectsMenu);
-  projectsMenu.register(studyProjectsMenu);
-  projectsMenu.register(freeProjectsMenu);
-  projectsMenu.register(budsProjectsMenu);
+  //* main hears
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
     ctx.conversation.exit();
     await ctx.reply("<b>Главное меню</b>", {
@@ -117,7 +131,89 @@ export function createBot(token: string, options: Options = {}) {
     });
     return ctx.deleteMessage();
   });
+  //* buy conversation
+  bot.use(createConversation(buyConversation, BUY_CONVERSATION));
+  //* menus
+  //* channel sub menu
+  bot.use(subscribeToChannel);
+  //* projects menus
+  bot.use(projectChildHealth);
+  bot.use(projectZhkt);
+  bot.use(guideAptechka);
+  bot.use(toProjectsMenu);
+  toProjectsMenu.register(projectsMenu);
+  bot.use(projectsMenu);
+  projectsMenu.register(studyProjectsMenu);
+  projectsMenu.register(freeProjectsMenu);
+  projectsMenu.register(budsProjectsMenu);
 
+  //* conversations diagnostics
+  bot.use(
+    createConversation(
+      diagnosticDeficitConversationAdult,
+      DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticThyroidConversationAdult,
+      DIAGNOSTIC_THYROID_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticInsulinConversationAdult,
+      DIAGNOSTIC_INSULIN_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticZhktConversationAdult,
+      DIAGNOSTIC_ZHKT_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticConversationAdult,
+      DIAGNOSTIC_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticDeficitConversationChild,
+      DIAGNOSTIC_DEFICIT_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticThyroidConversationChild,
+      DIAGNOSTIC_THYROID_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticInsulinConversationChild,
+      DIAGNOSTIC_INSULIN_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticZhktConversationChild,
+      DIAGNOSTIC_ZHKT_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticConversationChild,
+      DIAGNOSTIC_CONVERSATION_CHILD
+    )
+  );
+  //* consultations conversation
+  bot.use(consultationConversation());
+
+  //* duagnostic menu
+  bot.use(diagnosticMenu);
+  //* hears handlers
   bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.reply("Перейдите по ссылке", {
       reply_markup: webSiteKeyboard,
@@ -126,8 +222,10 @@ export function createBot(token: string, options: Options = {}) {
     return ctx.deleteMessage();
   });
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {
-    await ctx.reply("Тг-канал");
     await ctx.deleteMessage();
+    await ctx.reply("Перейдите по ссылке", {
+      reply_markup: tgChannelKeyboard,
+    });
   });
   bot.hears("💁🏼‍♀️ Обо мне", async (ctx: Context) => {
     await ctx.deleteMessage();
@@ -158,7 +256,7 @@ export function createBot(token: string, options: Options = {}) {
         inline_keyboard: [
           [
             {
-              text: "Перейти в бота",
+              text: "Перейти в бота 🤖 ",
               url: "https://t.me/pocket_nutritionist_test_bot",
             },
           ],
@@ -167,40 +265,20 @@ export function createBot(token: string, options: Options = {}) {
     });
     return ctx.deleteMessage();
   });
-  bot.use(
-    createConversation(
-      diagnosticDeficitConversation,
-      DIAGNOSTIC_DEFICIT_CONVERSATION
-    )
-  );
-  bot.use(
-    createConversation(
-      diagnosticThyroidConversation,
-      DIAGNOSTIC_THYROID_CONVERSATION
-    )
-  );
-  bot.use(
-    createConversation(
-      diagnosticInsulinConversation,
-      DIAGNOSTIC_INSULIN_CONVERSATION
-    )
-  );
-  bot.use(
-    createConversation(diagnosticZhktConversation, DIAGNOSTIC_ZHKT_CONVERSATION)
-  );
-  bot.use(createConversation(diagnosticConversation, DIAGNOSTIC_CONVERSATION));
-  bot.use(consultationConversation());
+
   bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
     await ctx.conversation.enter(CONSULTATION_CONVERSATION);
     return ctx.deleteMessage();
   });
   bot.hears("📋 Диагностика", async (ctx: Context) => {
-    await ctx.conversation.enter(DIAGNOSTIC_CONVERSATION);
+    await ctx.reply("📋 Диагностика", {
+      reply_markup: diagnosticMenu,
+    });
     return ctx.deleteMessage();
   });
-  // must be the last handler
+  //* must be the last handler
   bot.use(unhandledFeature);
-
+  //* error handler
   if (config.isDev) {
     bot.catch(errorHandler);
   }

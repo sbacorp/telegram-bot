@@ -5,11 +5,10 @@ export const mainMenu = new Keyboard()
   .text("👩‍⚕️ Консультация")
   .row()
   .text("🗃 Мои проекты")
-  .text("💁🏼‍♀️ Обо мне")
   .row()
   .text("🌐 Сайт")
   .text("🗣 Тг-канал")
+  .text("💁🏼‍♀️ Обо мне")
   .row()
   .text("🤖 Карманный нутрициолог")
-  .resized()
-  .persistent();
+  .resized();

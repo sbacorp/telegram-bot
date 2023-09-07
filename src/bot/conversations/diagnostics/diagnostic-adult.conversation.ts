@@ -10,28 +10,29 @@ import {
   yesNo,
   next,
   canceldiagnostic,
-} from "../keyboards/index.js";
-import { cancel } from "../keyboards/cancel.keyboard.js";
+} from "../../keyboards/index.js";
+import { cancel } from "../../keyboards/cancel.keyboard.js";
 // eslint-disable-next-line import/no-cycle
 import {
-  diagnosticDeficitConversation,
-  diagnosticInsulinConversation,
-  diagnosticThyroidConversation,
-  diagnosticZhktConversation,
-} from "./diagnostics.js";
+  diagnosticDeficitConversationAdult,
+  diagnosticInsulinConversationAdult,
+  diagnosticThyroidConversationAdult,
+  diagnosticZhktConversationAdult,
+} from "./diagnostics-adult.js";
 
-export const DIAGNOSTIC_CONVERSATION = "diagnostic";
-export async function diagnosticConversation(
+export const DIAGNOSTIC_CONVERSATION_ADULT = "diagnosticAdult";
+
+export async function diagnosticConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
   await ctx.reply(
-    "<b>Ответьте на вопросы и узнайте, какие области здоровья нуждаются в вашем внимании!</b>",
+    "Ответьте на вопросы и узнайте, какие области здоровья нуждаются в вашем внимании!",
     { reply_markup: cancel }
   );
   await ctx.reply(
-    `<b>Какую из сфер здоровья будем проверять?
-При необходимости вы сможете вернуться к этому вопросу и выбрать другую сферу</b>`,
+    `Какую из сфер здоровья будем проверять?
+При необходимости вы сможете вернуться к этому вопросу и выбрать другую сферу`,
     {
       reply_markup: diagnosticListKeyboard,
     }
@@ -46,15 +47,15 @@ export async function diagnosticConversation(
     }
   );
   if (response.match === "zhkt") {
-    return diagnosticZhktConversation(conversation, ctx);
+    return diagnosticZhktConversationAdult(conversation, ctx);
   }
   if (response.match === "deficit") {
-    return diagnosticDeficitConversation(conversation, ctx);
+    return diagnosticDeficitConversationAdult(conversation, ctx);
   }
   if (response.match === "thyroid") {
-    return diagnosticThyroidConversation(conversation, ctx);
+    return diagnosticThyroidConversationAdult(conversation, ctx);
   }
   if (response.match === "insulin") {
-    return diagnosticInsulinConversation(conversation, ctx);
+    return diagnosticInsulinConversationAdult(conversation, ctx);
   }
 }

@@ -1,9 +1,11 @@
-export * from "./diagnostic.conversation.js";
+export * from "./diagnostics/diagnostic-adult.conversation.js";
 // eslint-disable-next-line import/no-cycle
+export * from "./diagnostics/diagnostic-child.conversation.js";
+export * from "./diagnostics/diagnostics-adult.js";
+export * from "./diagnostics/diagnostics-child.js";
 export * from "./consultation.conversation.js";
 export * from "./setpromo.conversation.js";
 export * from "./createlink.conversation.js";
 export * from "./deletepromo.conversation.js";
 export * from "./activatesub.conversation.js";
 export * from "./deletelink.conversation.js";
-export * from "./diagnostics.js";

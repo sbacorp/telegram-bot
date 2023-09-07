@@ -1,16 +1,23 @@
+/* eslint-disable no-else-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
 import { type Conversation, createConversation } from "@grammyjs/conversations";
+import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { mainMenu, yesNo, next, canceldiagnostic } from "../keyboards/index.js";
-import { cancel } from "../keyboards/cancel.keyboard.js";
-import { diagnosticConversation } from "./diagnostic.conversation.js";
+import {
+  mainMenu,
+  yesNo,
+  next,
+  canceldiagnostic,
+} from "../../keyboards/index.js";
+import { cancel } from "../../keyboards/cancel.keyboard.js";
+import { diagnosticConversationAdult } from "./diagnostic-adult.conversation.js";
 
-export const DIAGNOSTIC_DEFICIT_CONVERSATION = "diagnosticDeficit";
-export const DIAGNOSTIC_THYROID_CONVERSATION = "diagnosticThyroid";
-export const DIAGNOSTIC_INSULIN_CONVERSATION = "diagnosticInsulin";
-export const DIAGNOSTIC_ZHKT_CONVERSATION = "diagnosticZhkt";
+export const DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT = "diagnosticDeficitAdult";
+export const DIAGNOSTIC_THYROID_CONVERSATION_ADULT = "diagnosticThyroidAdult";
+export const DIAGNOSTIC_INSULIN_CONVERSATION_ADULT = "diagnosticInsulinAdult";
+export const DIAGNOSTIC_ZHKT_CONVERSATION_ADULT = "diagnosticZhktAdult";
 
 interface Question {
   question: string;
@@ -140,12 +147,6 @@ const questionsZhkt: Question[] = [
     question: "Вы едите более 4 раз в день, включая перекусы?",
     answer:
       "Частое питание приводит к сбоям в гормональной системе, нарушениям углеводного обмена (Привет, инсулинорезистентность!), а также дисбиозу кишечника!",
-  },
-  {
-    question: `Вы не видите разницы между вредной и полезной едой?
-В магазине вы не обращаете внимания на состав продуктов?
-Вы часто покупаете полуфабрикаты или готовую еду?`,
-    answer: "Ну все, пиздец",
   },
 ];
 const questionsDeficit: Question[] = [
@@ -346,12 +347,8 @@ const questionsInsulin: Question[] = [
     question: "Заметили за собой снижение когнитивных функций?",
     answer: `Таков печальный симптом нескольких состояний - проблем с щитовидной железой, кандидоза, некоторых дефицитов и инсулинорезистентности.`,
   },
-  {
-    question: "Вы едите более 4 раз в день, включая перекусы?",
-    answer: `?`,
-  },
 ];
-export async function diagnosticZhktConversation(
+export async function diagnosticZhktConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
@@ -367,10 +364,10 @@ export async function diagnosticZhktConversation(
     answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
       otherwise: async (ctx) => {
         if (ctx.message?.text === "🔁 Начать сначала") {
-          await ctx.conversation.reenter(DIAGNOSTIC_ZHKT_CONVERSATION);
+          return diagnosticZhktConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversation(conversation, ctx);
+          return diagnosticConversationAdult(conversation, ctx);
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -382,10 +379,10 @@ export async function diagnosticZhktConversation(
       const nextAnswer = await conversation.waitForCallbackQuery("next", {
         otherwise: async (ctx) => {
           if (ctx.message?.text === "🔁 Начать сначала") {
-            await ctx.conversation.reenter(DIAGNOSTIC_ZHKT_CONVERSATION);
+            return diagnosticZhktConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversation(conversation, ctx);
+            return diagnosticConversationAdult(conversation, ctx);
           }
           // eslint-disable-next-line no-return-await
           else
@@ -404,19 +401,30 @@ export async function diagnosticZhktConversation(
       continue;
     }
   }
-  return ctx.reply(
-    "<b>Вопросы закончились</b><br>Возвращаемся в главное меню",
+
+  await ctx.reply(
+    `Бот проанализировал ваши ответы.
+Есть риски образования, развития и усугубления заболеваний, связанных с ЖКТ. Чтобы помочь себе и своему организму решить проблемы с ЖКТ, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: mainMenu,
+      reply_markup: InlineKeyboard.from([
+        [{ text: "Забрать гайд", callback_data: "guide" }],
+      ]),
     }
   );
+  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+
+  if (guideAnswer.match === "guide") {
+    return ctx.reply("Гайд", {
+      reply_markup: cancel,
+    });
+  }
 }
-export async function diagnosticDeficitConversation(
+export async function diagnosticDeficitConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
   let answer;
-  await ctx.reply("<b>Вы выбрали диагностику ЖКТ</b>", {
+  await ctx.reply("<b>Вы выбрали диагностику Дифицитов</b>", {
     reply_markup: canceldiagnostic,
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
@@ -427,10 +435,10 @@ export async function diagnosticDeficitConversation(
     answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
       otherwise: async (ctx) => {
         if (ctx.message?.text === "🔁 Начать сначала") {
-          await ctx.conversation.reenter(DIAGNOSTIC_DEFICIT_CONVERSATION);
+          return diagnosticDeficitConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversation(conversation, ctx);
+          return diagnosticConversationAdult(conversation, ctx);
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -442,10 +450,10 @@ export async function diagnosticDeficitConversation(
       const nextAnswer = await conversation.waitForCallbackQuery("next", {
         otherwise: async (ctx) => {
           if (ctx.message?.text === "🔁 Начать сначала") {
-            await ctx.conversation.reenter(DIAGNOSTIC_DEFICIT_CONVERSATION);
+            return diagnosticDeficitConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversation(conversation, ctx);
+            return diagnosticConversationAdult(conversation, ctx);
           }
           // eslint-disable-next-line no-return-await
           else
@@ -464,19 +472,29 @@ export async function diagnosticDeficitConversation(
       continue;
     }
   }
-  return ctx.reply(
-    "<b>Вопросы закончились</b><br>Возвращаемся в главное меню",
+  await ctx.reply(
+    `Бот проанализировал ваши ответы.
+Есть риски появления и усугубления болезней на фоне дефицитов разных групп витамин. Чтобы помочь себе и своему организму решить проблемы с дефицитами, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: mainMenu,
+      reply_markup: InlineKeyboard.from([
+        [{ text: "Забрать гайд", callback_data: "guide" }],
+      ]),
     }
   );
+  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+
+  if (guideAnswer.match === "guide") {
+    return ctx.reply("Гайд", {
+      reply_markup: cancel,
+    });
+  }
 }
-export async function diagnosticThyroidConversation(
+export async function diagnosticThyroidConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
   let answer;
-  await ctx.reply("<b>Вы выбрали диагностику ЖКТ</b>", {
+  await ctx.reply("<b>Вы выбрали диагностику Щитовидки и гормонов</b>", {
     reply_markup: canceldiagnostic,
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
@@ -487,10 +505,10 @@ export async function diagnosticThyroidConversation(
     answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
       otherwise: async (ctx) => {
         if (ctx.message?.text === "🔁 Начать сначала") {
-          await ctx.conversation.reenter(DIAGNOSTIC_THYROID_CONVERSATION);
+          return diagnosticThyroidConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversation(conversation, ctx);
+          return diagnosticConversationAdult(conversation, ctx);
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -502,10 +520,10 @@ export async function diagnosticThyroidConversation(
       const nextAnswer = await conversation.waitForCallbackQuery("next", {
         otherwise: async (ctx) => {
           if (ctx.message?.text === "🔁 Начать сначала") {
-            await ctx.conversation.reenter(DIAGNOSTIC_THYROID_CONVERSATION);
+            return diagnosticThyroidConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversation(conversation, ctx);
+            return diagnosticConversationAdult(conversation, ctx);
           }
           // eslint-disable-next-line no-return-await
           else
@@ -524,19 +542,29 @@ export async function diagnosticThyroidConversation(
       continue;
     }
   }
-  return ctx.reply(
-    "<b>Вопросы закончились</b><br>Возвращаемся в главное меню",
+  await ctx.reply(
+    `Бот проанализировал ваши ответы.
+Есть риски образования, развития и усугубления заболеваний, связанных с гормонами и щитовидной железой. Чтобы помочь себе и своему организму решить эти проблемы, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: mainMenu,
+      reply_markup: InlineKeyboard.from([
+        [{ text: "Забрать гайд", callback_data: "guide" }],
+      ]),
     }
   );
+  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+
+  if (guideAnswer.match === "guide") {
+    return ctx.reply("Гайд", {
+      reply_markup: cancel,
+    });
+  }
 }
-export async function diagnosticInsulinConversation(
+export async function diagnosticInsulinConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
   let answer;
-  await ctx.reply("<b>Вы выбрали диагностику ЖКТ</b>", {
+  await ctx.reply("<b>Вы выбрали диагностику Инсулина</b>", {
     reply_markup: canceldiagnostic,
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
@@ -547,10 +575,10 @@ export async function diagnosticInsulinConversation(
     answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
       otherwise: async (ctx) => {
         if (ctx.message?.text === "🔁 Начать сначала") {
-          await ctx.conversation.reenter(DIAGNOSTIC_INSULIN_CONVERSATION);
+          return diagnosticInsulinConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversation(conversation, ctx);
+          return diagnosticConversationAdult(conversation, ctx);
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -562,10 +590,10 @@ export async function diagnosticInsulinConversation(
       const nextAnswer = await conversation.waitForCallbackQuery("next", {
         otherwise: async (ctx) => {
           if (ctx.message?.text === "🔁 Начать сначала") {
-            await ctx.conversation.reenter(DIAGNOSTIC_INSULIN_CONVERSATION);
+            return diagnosticInsulinConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversation(conversation, ctx);
+            return diagnosticConversationAdult(conversation, ctx);
           }
           // eslint-disable-next-line no-return-await
           else
@@ -584,10 +612,20 @@ export async function diagnosticInsulinConversation(
       continue;
     }
   }
-  return ctx.reply(
-    "<b>Вопросы закончились</b><br>Возвращаемся в главное меню",
+  await ctx.reply(
+    `Бот проанализировал ваши ответы.
+Есть риски образования, развития и усугубления заболеваний на фоне инсулинорезистентности. Чтобы помочь себе и своему организму решить эту проблему, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: mainMenu,
+      reply_markup: InlineKeyboard.from([
+        [{ text: "Забрать гайд", callback_data: "guide" }],
+      ]),
     }
   );
+  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+
+  if (guideAnswer.match === "guide") {
+    return ctx.reply("Гайд", {
+      reply_markup: cancel,
+    });
+  }
 }
