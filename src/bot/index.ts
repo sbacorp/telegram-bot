@@ -5,6 +5,7 @@ import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { autoRetry } from "@grammyjs/auto-retry";
 import {
   BotConfig,
+  InlineKeyboard,
   Keyboard,
   StorageAdapter,
   Bot as TelegramBot,
@@ -39,6 +40,7 @@ import {
   projectZhkt,
   guideAptechka,
   diagnosticMenu,
+  groupProject,
 } from "./keyboards/index.js";
 import {
   DIAGNOSTIC_CONVERSATION_ADULT,
@@ -51,14 +53,12 @@ import {
   diagnosticInsulinConversationAdult,
   diagnosticZhktConversationChild,
   diagnosticDeficitConversationChild,
-  diagnosticThyroidConversationChild,
   diagnosticInsulinConversationChild,
   DIAGNOSTIC_ZHKT_CONVERSATION_ADULT,
   DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT,
   DIAGNOSTIC_THYROID_CONVERSATION_ADULT,
   DIAGNOSTIC_INSULIN_CONVERSATION_ADULT,
   DIAGNOSTIC_DEFICIT_CONVERSATION_CHILD,
-  DIAGNOSTIC_THYROID_CONVERSATION_CHILD,
   DIAGNOSTIC_INSULIN_CONVERSATION_CHILD,
   DIAGNOSTIC_ZHKT_CONVERSATION_CHILD,
   consultationConversation,
@@ -68,6 +68,10 @@ import {
   deletePromoConversation,
   activateSubscriptionConversation,
   deleteLinkConversation,
+  diagnosticParazitConversationChild,
+  DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD,
+  diagnosticAmmiakConversationChild,
+  DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD,
 } from "./conversations/index.js";
 import { cancel } from "./keyboards/cancel.keyboard.js";
 import {
@@ -140,6 +144,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(projectChildHealth);
   bot.use(projectZhkt);
   bot.use(guideAptechka);
+  bot.use(groupProject);
   bot.use(toProjectsMenu);
   toProjectsMenu.register(projectsMenu);
   bot.use(projectsMenu);
@@ -186,12 +191,6 @@ export function createBot(token: string, options: Options = {}) {
   );
   bot.use(
     createConversation(
-      diagnosticThyroidConversationChild,
-      DIAGNOSTIC_THYROID_CONVERSATION_CHILD
-    )
-  );
-  bot.use(
-    createConversation(
       diagnosticInsulinConversationChild,
       DIAGNOSTIC_INSULIN_CONVERSATION_CHILD
     )
@@ -200,6 +199,18 @@ export function createBot(token: string, options: Options = {}) {
     createConversation(
       diagnosticZhktConversationChild,
       DIAGNOSTIC_ZHKT_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticParazitConversationChild,
+      DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticAmmiakConversationChild,
+      DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD
     )
   );
   bot.use(
@@ -267,8 +278,23 @@ export function createBot(token: string, options: Options = {}) {
   });
 
   bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
-    await ctx.conversation.enter(CONSULTATION_CONVERSATION);
-    return ctx.deleteMessage();
+    await ctx.deleteMessage();
+    return ctx.reply(
+      `Вам нужен проводник в мир здоровья и энергии? - приходите ко мне на консультацию!
+
+Формат единоразовой консультации включает в себя:
+ - полную оценку вашего организма со стороны эндокринной системы,
+ - анализ комплексного состояния ЖКТ,
+ - выявление дефицитов витаминов,
+ - выявление дефицитов микронутриентов,
+ - возможности корректировки всего состояния организма.`,
+      {
+        reply_markup: new InlineKeyboard().url(
+          "Узнать подробности на сайте",
+          "https://ya.ru"
+        ),
+      }
+    );
   });
   bot.hears("📋 Диагностика", async (ctx: Context) => {
     await ctx.reply("📋 Диагностика", {

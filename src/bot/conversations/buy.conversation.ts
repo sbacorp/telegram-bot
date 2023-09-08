@@ -30,6 +30,11 @@ export const products: IProduct[] = [
     name: "Гайд Аптечка для детей и взрослых",
     price: 5000,
   },
+  {
+    id: 4,
+    name: "Групповое ведение",
+    price: 5000,
+  },
 ];
 
 export const userSuggestions = new InlineKeyboard()

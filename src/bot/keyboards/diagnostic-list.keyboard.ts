@@ -16,3 +16,12 @@ export const diagnosticListKeyboard = new InlineKeyboard()
   .row()
   .text("Щитовидка и гормоны", "thyroid")
   .text("Инсулин", "insulin");
+
+export const diagnosticListChildKeyboard = new InlineKeyboard()
+  .text("ЖКТ", "zhkt")
+  .text("Дефициты", "deficit")
+  .row()
+  .text("Паразиты", "parazit")
+  .text("Инсулин", "insulin")
+  .row()
+  .text("Аммиак", "ammiak");

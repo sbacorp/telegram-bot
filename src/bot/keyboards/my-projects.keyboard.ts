@@ -37,13 +37,46 @@ export const toProjectsMenu = new Menu<Context>("to-projects").submenu(
   "Подробнее о проектах ➡️",
   "projects-menu"
 );
+export const groupProject = new Menu<Context>("group-project")
+  .url("Узнать подробности на сайте", "https://ya.ru/")
+  .row()
+  .text("Купить - 5000р", async (ctx) => {
+    ctx.session.selectedProduct = "Групповое ведение";
+    await ctx.conversation.enter(BUY_CONVERSATION);
+  });
 
 export const projectsMenu = new Menu<Context>("projects-menu")
   .submenu("Платные образовательные продукты", "study-projects-menu")
   .row()
   .submenu("Мои БАДы", "buds-projects-menu")
   .row()
-  .submenu(`Бесплатные образовательные продукты`, "free-projects-menu");
+  .submenu(`Бесплатные образовательные продукты`, "free-projects-menu")
+  .row()
+  .text("Групповое ведение", async (ctx) => {
+    await ctx.reply(
+      `Запустите процесс устойчивой трансформации жизни, подтяните здоровье, разберете хронические заболевания и предотвратите риски других болезней всего за 3 недели!
+Если вы хотите разобраться в своем организме, распутать клубочки, которые тянутся из далекого прошлого - вам ко мне!`,
+      {
+        reply_markup: cancel,
+      }
+    );
+    setTimeout(async () => {
+      await ctx.reply(
+        `
+В течение программы вы сможете:
+➡️ Понять свой организм
+➡️ Продлить молодость
+➡️ Сохранить здоровье
+➡️ Улучшить сон
+➡️ Изменить качество тела
+➡️ Избавиться от пищевых зависимостей
+➡️ Победить стресс`,
+        {
+          reply_markup: guideAptechka,
+        }
+      );
+    }, 2000);
+  });
 
 export const studyProjectsMenu = new Menu<Context>("study-projects-menu")
   .text(`Проект  "Детское здоровье"`, async (ctx) => {

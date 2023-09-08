@@ -348,6 +348,7 @@ const questionsInsulin: Question[] = [
     answer: `Таков печальный симптом нескольких состояний - проблем с щитовидной железой, кандидоза, некоторых дефицитов и инсулинорезистентности.`,
   },
 ];
+
 export async function diagnosticZhktConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context

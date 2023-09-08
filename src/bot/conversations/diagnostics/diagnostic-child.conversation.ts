@@ -4,13 +4,14 @@
 /* eslint-disable no-await-in-loop */
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import { diagnosticListKeyboard } from "../../keyboards/index.js";
+import { diagnosticListChildKeyboard } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 // eslint-disable-next-line import/no-cycle
 import {
+  diagnosticAmmiakConversationChild,
   diagnosticDeficitConversationChild,
   diagnosticInsulinConversationChild,
-  diagnosticThyroidConversationChild,
+  diagnosticParazitConversationChild,
   diagnosticZhktConversationChild,
 } from "./diagnostics-child.js";
 
@@ -28,15 +29,15 @@ export async function diagnosticConversationChild(
     `Какую из сфер здоровья будем проверять?
 При необходимости вы сможете вернуться к этому вопросу и выбрать другую сферу`,
     {
-      reply_markup: diagnosticListKeyboard,
+      reply_markup: diagnosticListChildKeyboard,
     }
   );
   const response = await conversation.waitForCallbackQuery(
-    ["zhkt", "deficit", "thyroid", "insulin"],
+    ["zhkt", "deficit", "parazit", "insulin", "ammiak"],
     {
       otherwise: async (ctx) =>
         await ctx.reply("Используйте кнопки", {
-          reply_markup: diagnosticListKeyboard,
+          reply_markup: diagnosticListChildKeyboard,
         }),
     }
   );
@@ -46,10 +47,13 @@ export async function diagnosticConversationChild(
   if (response.match === "deficit") {
     return diagnosticDeficitConversationChild(conversation, ctx);
   }
-  if (response.match === "thyroid") {
-    return diagnosticThyroidConversationChild(conversation, ctx);
-  }
   if (response.match === "insulin") {
     return diagnosticInsulinConversationChild(conversation, ctx);
+  }
+  if (response.match === "ammiak") {
+    return diagnosticAmmiakConversationChild(conversation, ctx);
+  }
+  if (response.match === "parazit") {
+    return diagnosticParazitConversationChild(conversation, ctx);
   }
 }
