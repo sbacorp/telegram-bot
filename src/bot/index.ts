@@ -26,6 +26,7 @@ import { errorHandler } from "#root/bot/handlers/index.js";
 import { updateLogger } from "#root/bot/middlewares/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
+import { fillConsultations } from "#root/server/fill-consultations.js";
 import {
   webSiteKeyboard,
   mainMenu,
@@ -41,6 +42,10 @@ import {
   guideAptechka,
   diagnosticMenu,
   groupProject,
+  consultationAboutMenu,
+  consultationAbout2Menu,
+  consultationConditionsMenu,
+  consultationMenu,
 } from "./keyboards/index.js";
 import {
   DIAGNOSTIC_CONVERSATION_ADULT,
@@ -137,6 +142,10 @@ export function createBot(token: string, options: Options = {}) {
   });
   //* buy conversation
   bot.use(createConversation(buyConversation, BUY_CONVERSATION));
+  //* consultations conversation
+  bot.use(
+    createConversation(consultationConversation, CONSULTATION_CONVERSATION)
+  );
   //* menus
   //* channel sub menu
   bot.use(subscribeToChannel);
@@ -151,6 +160,14 @@ export function createBot(token: string, options: Options = {}) {
   projectsMenu.register(studyProjectsMenu);
   projectsMenu.register(freeProjectsMenu);
   projectsMenu.register(budsProjectsMenu);
+  //* consultations menus
+  bot.use(consultationConditionsMenu);
+  bot.use(consultationAboutMenu);
+  bot.use(consultationAbout2Menu);
+  bot.use(consultationMenu);
+
+  consultationConditionsMenu.register(consultationAboutMenu);
+  consultationAboutMenu.register(consultationAbout2Menu);
 
   //* conversations diagnostics
   bot.use(
@@ -219,8 +236,6 @@ export function createBot(token: string, options: Options = {}) {
       DIAGNOSTIC_CONVERSATION_CHILD
     )
   );
-  //* consultations conversation
-  bot.use(consultationConversation());
 
   //* duagnostic menu
   bot.use(diagnosticMenu);
@@ -232,11 +247,37 @@ export function createBot(token: string, options: Options = {}) {
     });
     return ctx.deleteMessage();
   });
+
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {
     await ctx.deleteMessage();
-    await ctx.reply("Перейдите по ссылке", {
-      reply_markup: tgChannelKeyboard,
-    });
+    await ctx.reply(
+      `Здесь вы найдете кладезь ценной бесплатной информации о том, как улучшить свое здоровье, повысить энергию и достичь гармонии с собой через правильное питание и биохаки
+Подборка моих лучших постов:
+
+<a href="https://t.me/alla_dietolog/709">Главный женский гормон</a>
+
+<a href="https://t.me/alla_dietolog/693">Что может сказать кал о нашем ЖКТ</a>
+
+<a href="https://t.me/alla_dietolog/599">Как пережить анестезию и наркоз</a>
+
+<a href="https://t.me/alla_dietolog/552">Риски прогестероновой беременности</a>
+
+<a href="https://t.me/alla_dietolog/465">Рекомендации родителям деток с АтД</a>
+
+<a href="https://t.me/alla_dietolog/384">Почему нельзя ждать, если в 2 года у ребенка нет речи </a>
+
+<a href="https://t.me/alla_dietolog/373">Поддержка иммунитета в межсезонье</a>
+
+<a href="https://t.me/alla_dietolog/381">Почему желчь так важна в организме</a>
+
+<a href="https://t.me/alla_dietolog/401">Отравление у ребенка: что делать</a>
+  Надеюсь, мы подружимся!
+    `,
+      {
+        reply_markup: tgChannelKeyboard,
+        disable_web_page_preview: true,
+      }
+    );
   });
   bot.hears("💁🏼‍♀️ Обо мне", async (ctx: Context) => {
     await ctx.deleteMessage();
@@ -289,10 +330,7 @@ export function createBot(token: string, options: Options = {}) {
  - выявление дефицитов микронутриентов,
  - возможности корректировки всего состояния организма.`,
       {
-        reply_markup: new InlineKeyboard().url(
-          "Узнать подробности на сайте",
-          "https://ya.ru"
-        ),
+        reply_markup: consultationMenu,
       }
     );
   });

@@ -8,3 +8,4 @@ export {
 export { yesNo, next, canceldiagnostic } from "./yes-no.keyboard.js";
 export * from "./my-projects.keyboard.js";
 export * from "./tg-channel.keyboard.js";
+export * from "./consultation.keyboard.js";

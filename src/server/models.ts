@@ -94,3 +94,91 @@ export const LinkModel = sequelize.define<ILinkModel>("link", {
     defaultValue: 0,
   },
 });
+
+export interface IConsultationModel {
+  id: number;
+  date: string;
+  time10: boolean;
+  time11: boolean;
+  time12: boolean;
+  time13: boolean;
+  time14: boolean;
+  time15: boolean;
+  time16: boolean;
+  time17: boolean;
+  time18: boolean;
+  time19: boolean;
+  time20: boolean;
+}
+export interface IConsultationModelModel extends Model {
+  id: number;
+  date: string;
+  time10: boolean;
+  time11: boolean;
+  time12: boolean;
+  time13: boolean;
+  time14: boolean;
+  time15: boolean;
+  time16: boolean;
+  time17: boolean;
+  time18: boolean;
+  time19: boolean;
+  time20: boolean;
+}
+export const ConsultationModel = sequelize.define<IConsultationModelModel>(
+  "consultation",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    date: {
+      type: DataTypes.STRING,
+    },
+    time10: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time11: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time12: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time13: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time14: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time15: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time16: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time17: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time18: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time19: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    time20: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+  }
+);
