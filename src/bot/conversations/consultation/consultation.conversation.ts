@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/no-null */
+/* eslint-disable unicorn/prefer-ternary */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-const */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-continue */
@@ -13,6 +16,19 @@ import { ConsultationModel, IConsultationModel } from "#root/server/models.js";
 import { updateUserPhone } from "#root/server/utils.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import { createDatePicker } from "./calendar.js";
+import {
+  briefMaleConversation,
+  questions as maleQuestions,
+} from "./brief-male.conv.js";
+import {
+  briefFemaleConversation,
+  questions as femaleQuestions,
+} from "./brief-female.conv.js";
+import {
+  chooseDateConversation,
+  IConsultationObject,
+} from "./choose-date.conv.js";
+import { BuyConsultationConversation } from "./buy-consult.conv.js";
 
 export const yesNoKeyboard = new InlineKeyboard()
   .text("Ознакомиться", "no")
@@ -43,84 +59,26 @@ const conditions = async (ctx: Context) => {
     );
   }, 3000);
 };
-
-const createConsultationTimeKeyboard = async (date: string) => {
-  const consultation = await ConsultationModel.findOne({
-    where: {
-      date,
-    },
-  });
-  const keyboard = new InlineKeyboard();
-  if (consultation) {
-    if (consultation.time10) {
-      keyboard.text("10:00", "10:00");
-      keyboard.row();
-    }
-    if (consultation.time11) {
-      keyboard.text("11:00", "11:00");
-      keyboard.row();
-    }
-    if (consultation.time12) {
-      keyboard.text("12:00", "12:00");
-      keyboard.row();
-    }
-    if (consultation.time13) {
-      keyboard.text("13:00", "13:00");
-      keyboard.row();
-    }
-    if (consultation.time14) {
-      keyboard.text("14:00", "14:00");
-      keyboard.row();
-    }
-    if (consultation.time15) {
-      keyboard.text("15:00", "15:00");
-      keyboard.row();
-    }
-    if (consultation.time16) {
-      keyboard.text("16:00", "16:00");
-      keyboard.row();
-    }
-    if (consultation.time17) {
-      keyboard.text("17:00", "17:00");
-      keyboard.row();
-    }
-    if (consultation.time18) {
-      keyboard.text("18:00", "18:00");
-      keyboard.row();
-    }
-    if (consultation.time19) {
-      keyboard.text("19:00", "19:00");
-      keyboard.row();
-    }
-    if (consultation.time20) {
-      keyboard.text("20:00", "20:00");
-      keyboard.row();
-    }
-    keyboard.text("⬅️Выбрать дату", "back");
-  } else {
-    return new InlineKeyboard().text("Нет свободного времени");
-    keyboard.row().text("⬅️Выбрать дату", "back");
-  }
-  return keyboard;
-};
-
 export const CONSULTATION_CONVERSATION = "consultation";
 export async function consultationConversation(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
-  let day: string;
-  let date: Date;
-  let dateString: string;
-  let time: string;
-  let consultationTimeKeyboard: InlineKeyboard;
-  let year: number = new Date().getFullYear();
-  let month: number = new Date().getMonth();
-  let calendar: InlineKeyboard;
-  let phoneNumber: string;
-  let fio: string;
+  let consultationObject: IConsultationObject = {
+    day: "",
+    dateString: "",
+    time: "",
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    phoneNumber: "",
+    fio: "",
+    sex: "",
+    answers: [],
+    massanger: "",
+  };
+  conversation.session.consultationStep = 0;
   await ctx.reply("Запись на консультацию", { reply_markup: cancel });
-  const message = await ctx.reply(
+  let message = await ctx.reply(
     "Перед тем, как записаться ко мне на консультацию, необходимо ознакомиться с условиями",
     {
       reply_markup: yesNoKeyboard,
@@ -149,189 +107,121 @@ export async function consultationConversation(
       continue;
     }
   } while (!(ctx.update.callback_query?.data === "start"));
-  calendar = await conversation.external(
-    async () => await createDatePicker(year, month)
+  conversation.session.consultationStep = 1;
+  consultationObject = await chooseDateConversation(
+    conversation,
+    ctx,
+    consultationObject,
+    message
   );
-  await ctx.editMessageText(`Выберите свободную дату  *московское время`);
-  await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
-    reply_markup: calendar,
-  });
+  conversation.session.consultationStep = 2;
+  ctx = await BuyConsultationConversation(
+    conversation,
+    ctx,
+    message,
+    consultationObject
+  );
+  await ctx.editMessageText(`Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ. От этого этапа будет зависеть список назначенных анализов.
+Обязательно ответьте на вопросы в течение суток.`);
 
-  do {
-    ctx = await conversation.wait();
-    if (ctx.update.callback_query?.data === "nextMonth") {
-      month += 1;
-      if (month === 12) {
-        month = 0;
-        year += 1;
-      }
-      calendar = await conversation.external(
-        async () => await createDatePicker(year, month)
-      );
-      await ctx.api.editMessageReplyMarkup(
-        message.chat.id,
-        message.message_id,
-        {
-          reply_markup: calendar,
-        }
-      );
-    }
-    if (ctx.update.callback_query?.data === "prevMonth") {
-      if (month === 0) {
-        month = 12;
-        year -= 1;
-      }
-      if (
-        month === new Date().getMonth() &&
-        year === new Date().getFullYear()
-      ) {
-        await ctx.answerCallbackQuery("Нельзя выбрать прошедшую дату");
-        continue;
-      } else {
-        month -= 1;
-      }
-      calendar = await conversation.external(
-        async () => await createDatePicker(year, month)
-      );
-      await ctx.api.editMessageReplyMarkup(
-        message.chat.id,
-        message.message_id,
-        {
-          reply_markup: calendar,
-        }
-      );
-    }
-  } while (!ctx.update.callback_query?.data?.match(/^\d+$/));
-  day = ctx.update.callback_query?.data;
-  date = new Date(year, month, Number(day));
-  dateString = `${year}${month < 9 ? "0" : ""}${month + 1}${
-    Number(day) < 10 ? "0" : ""
-  }${day}`;
-  consultationTimeKeyboard = await conversation.external(
-    async () => await createConsultationTimeKeyboard(dateString)
-  );
-  await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
-    reply_markup: consultationTimeKeyboard,
+  await ctx.reply("Пожалуйста, укажите ваш пол", {
+    reply_markup: new InlineKeyboard()
+      .text("Мужской", "male")
+      .text("Женский", "female"),
   });
   ctx = await conversation.wait();
-  while (!ctx.update.callback_query?.data?.match(/^\d+:\d+$/)) {
-    if (ctx.update.callback_query?.data === "back") {
-      year = new Date().getFullYear();
-      month = new Date().getMonth();
-      calendar = await conversation.external(
-        async () => await createDatePicker(year, month)
-      );
-      await ctx.editMessageText(`Выберите свободную дату  *московское время`);
-      await ctx.api.editMessageReplyMarkup(
-        message.chat.id,
-        message.message_id,
-        {
-          reply_markup: calendar,
-        }
-      );
-      do {
-        ctx = await conversation.wait();
-        if (ctx.update.callback_query?.data === "nextMonth") {
-          month += 1;
-          if (month === 12) {
-            month = 0;
-            year += 1;
-          }
-          calendar = await conversation.external(
-            async () => await createDatePicker(year, month)
-          );
-          await ctx.api.editMessageReplyMarkup(
-            message.chat.id,
-            message.message_id,
-            {
-              reply_markup: calendar,
-            }
-          );
-        }
-        if (ctx.update.callback_query?.data === "prevMonth") {
-          if (month === 0) {
-            month = 12;
-            year -= 1;
-          }
-          if (
-            month === new Date().getMonth() &&
-            year === new Date().getFullYear()
-          ) {
-            await ctx.answerCallbackQuery("Нельзя выбрать прошедшую дату");
-            continue;
-          } else {
-            month -= 1;
-          }
-          calendar = await conversation.external(
-            async () => await createDatePicker(year, month)
-          );
-          await ctx.api.editMessageReplyMarkup(
-            message.chat.id,
-            message.message_id,
-            {
-              reply_markup: calendar,
-            }
-          );
-        }
-      } while (!ctx.update.callback_query?.data?.match(/^\d+$/));
-      continue;
-    }
-    day = ctx.update.callback_query?.data as string;
-    date = new Date(year, month, Number(day));
-    dateString = `${year}${month < 9 ? "0" : ""}${month + 1}${
-      Number(day) < 10 ? "0" : ""
-    }${day}`;
-    consultationTimeKeyboard = await conversation.external(
-      async () => await createConsultationTimeKeyboard(dateString)
-    );
-    await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
-      reply_markup: consultationTimeKeyboard,
-    });
+  while (!ctx.update.callback_query?.data?.match(/^(male|female)$/)) {
+    await ctx.answerCallbackQuery("Используйте кнопки");
     ctx = await conversation.wait();
   }
-  time = ctx.update.callback_query?.data;
-
+  if (ctx.update.callback_query?.data === "male") {
+    conversation.session.sex = "male";
+  }
+  if (ctx.update.callback_query?.data === "female") {
+    conversation.session.sex = "female";
+  }
+  await ctx.reply("Отлично, теперь перейдем к опроснику", {
+    reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
+  });
+  if (conversation.session.sex === "male") {
+    consultationObject.answers = await briefMaleConversation(conversation, ctx);
+  } else if (conversation.session.sex === "female") {
+    consultationObject.answers = await briefFemaleConversation(
+      conversation,
+      ctx
+    );
+  }
   await ctx.reply(
-    `Выбранная дата: ${date.toLocaleDateString("ru-RU", {
+    `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.
+ Подскажите, в какой социальной сети вам удобно продолжить общение?`,
+    {
+      reply_markup: new Keyboard()
+        .text("Telegram")
+        .row()
+        .text("WhatsApp")
+        .row()
+        .oneTime(),
+    }
+  );
+  const messanger = await conversation.waitFor("message:text");
+  if (messanger.message.text === "Telegram") {
+    consultationObject.massanger = "Telegram";
+  }
+  if (messanger.message.text === "WhatsApp") {
+    consultationObject.massanger = "WhatsApp";
+  }
+  ctx.chatAction = "typing";
+  await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
+  let answerQuestions: string;
+  if (conversation.session.sex === "male") {
+    answerQuestions = consultationObject.answers
+      .map((answer) => {
+        return `Вопрос :${
+          maleQuestions[consultationObject.answers.indexOf(answer)].text
+        }
+      Ответ: ${answer}
+      `;
+      })
+      .join("\n");
+  } else {
+    answerQuestions = consultationObject.answers
+      .map((answer) => {
+        return `
+        
+Вопрос :${femaleQuestions[consultationObject.answers.indexOf(answer)].text}
+Ответ: ${answer}
+      `;
+      })
+      .join("\n");
+  }
+  await ctx.api.sendMessage(
+    "1856156198",
+    `
+Новая запись на консультацию:
+Имя: ${conversation.session.fio}
+Телефон: ${conversation.session.phoneNumber}
+Дата : ${conversation.session.consultation.dateString}
+Время: ${conversation.session.consultation.time}
+Пол: ${conversation.session.sex}
+Предпочтительная соцсеть: ${consultationObject.massanger}
+Тестирование :
+${answerQuestions}`
+  );
+  ctx.chatAction = null;
+  ctx.reply(
+    `Запись на консультацию прошла успешно!
+    Ожидайте моего сообщения ${new Date(
+      consultationObject.year,
+      consultationObject.month,
+      Number(consultationObject.day)
+    ).toLocaleDateString("ru-RU", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-    })}
-    Время: ${time}
-    `
-  );
-  await ctx.reply("Введите ФИО");
-  fio = await conversation.form.text();
-  await ctx.reply("Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️", {
-    reply_markup: new Keyboard().requestContact("Отправить контакт").resized(),
-  });
-  const contact = await conversation.waitFor(":contact");
-  await conversation.external(async () => {
-    await updateUserPhone(ctx.chat!.id, contact.message!.contact.phone_number);
-  });
-  phoneNumber = contact.message!.contact.phone_number;
-  await ctx.reply(
-    `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
-  );
-  await ctx.reply(
-    `<b>Можете приступать к оплате.</b>
-В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
+    })} в ${consultationObject.time}`,
     {
-      reply_markup: new InlineKeyboard().text("Оплатить", "pay"),
-    }
-  );
-  await conversation.waitFor("callback_query:data");
-  await ctx.reply("Оплата прошла успешно");
-  await ctx.reply(
-    `Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ. От этого этапа будет зависеть список назначенных анализов.
-
-Обязательно ответьте на вопросы в течение суток.`,
-    {
-      reply_markup: new InlineKeyboard().webApp(
-        "Перейти к брифу",
-        "https://docs.google.com/forms/d/e/1FAIpQLSdqhT84cJVApcgyDLLC-kLfRr4shGS7_S_OwsR7OTqH5C5MSg/viewform?usp=sf_link"
-      ),
+      reply_markup: new Keyboard().text("🏠 Главное меню"),
     }
   );
 }

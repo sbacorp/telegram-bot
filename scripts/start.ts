@@ -1,34 +1,39 @@
-#!/usr/bin/env tsx
-
-import { run, RunnerHandle } from "@grammyjs/runner";
+// #!/usr/bin/env tsx
 import { onShutdown } from "node-graceful-shutdown";
+import { RunnerHandle, run } from "@grammyjs/runner";
 import { createBot } from "#root/bot/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
-import { sequelize } from "#root/server/database.js";
+import { createServer } from "#root/server/index.js";
 import { initDB } from "#root/server/utils.js";
+import { sequelize } from "#root/server/database.js";
 
 try {
   const bot = createBot(config.BOT_TOKEN);
+  const server = await createServer(bot);
   let runner: undefined | RunnerHandle;
-
   // Graceful shutdown
   onShutdown(async () => {
     logger.info("shutdown");
-    await runner?.stop();
+
+    await server.close();
     await bot.stop();
   });
-  // eslint-disable-next-line unicorn/prefer-top-level-await
-  (async () => {
-    await initDB(sequelize);
-  })();
 
   if (config.isProd) {
+    // to prevent receiving updates before the bot is ready
     await bot.init();
-    logger.info({
-      msg: "bot running...",
-      username: bot.botInfo.username,
+    await initDB(sequelize);
+    await server.listen({
+      host: config.BOT_SERVER_HOST,
+      port: config.BOT_SERVER_PORT,
     });
+
+    await bot.api.setWebhook(config.BOT_WEBHOOK, {
+      allowed_updates: config.BOT_ALLOWED_UPDATES,
+    });
+  } else if (config.isDev) {
+    await initDB(sequelize);
     runner = run(bot, {
       runner: {
         fetch: {
@@ -36,17 +41,17 @@ try {
         },
       },
     });
-  } else if (config.isDev) {
-    await bot.start({
-      allowed_updates: config.BOT_ALLOWED_UPDATES,
-      onStart: ({ username }) =>
-        logger.info({
-          msg: "bot running...",
-          username,
-        }),
-    });
+    // await bot.start({
+    //   allowed_updates: config.BOT_ALLOWED_UPDATES,
+    //   onStart: ({ username }) =>
+    //     logger.info({
+    //       msg: "bot running...",
+    //       username,
+    //     }),
+    // });
   }
 } catch (error) {
   logger.error(error);
+  // eslint-disable-next-line unicorn/no-process-exit
   process.exit(1);
 }

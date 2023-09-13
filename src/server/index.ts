@@ -8,6 +8,7 @@ export const createServer = async (bot: Bot) => {
   const server = fastify({
     logger,
   });
+
   server.setErrorHandler(async (error, request, response) => {
     if (error instanceof BotError) {
       errorHandler(error);
@@ -15,13 +16,9 @@ export const createServer = async (bot: Bot) => {
       await response.code(200).send({});
     } else {
       logger.error(error);
+
       await response.status(500).send({ error: "Oops! Something went wrong." });
     }
-  });
-
-  server.post("/test", async (request, response) => {
-    logger.info(request.body);
-    await response.code(200).send({});
   });
 
   server.get("/", () => ({ status: true }));

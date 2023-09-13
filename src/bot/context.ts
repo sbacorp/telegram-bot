@@ -9,6 +9,30 @@ import type { Logger } from "#root/logger.js";
 export type SessionData = {
   selectedProduct?: string;
   subscribedToChannel?: boolean;
+  phoneNumber?: string;
+  fio: string;
+  sex: "male" | "female" | "";
+  consultationStep: number;
+  consultation: {
+    questionsAnswered: number;
+    dateString: string;
+    time: string;
+    answers: string[];
+  };
+};
+export const sessionDataDefaults: SessionData = {
+  selectedProduct: "",
+  subscribedToChannel: false,
+  phoneNumber: "",
+  fio: "",
+  sex: "",
+  consultationStep: 0,
+  consultation: {
+    questionsAnswered: 0,
+    dateString: "",
+    time: "",
+    answers: [],
+  },
 };
 
 type ExtendedContextFlavor = {

@@ -33,6 +33,7 @@ const configSchema = z.object({
     )
     .default([]),
   BOT_TOKEN: z.string(),
+  BOT_WEBHOOK: z.string().url(),
   BOT_ADMIN_USER_ID: z
     .preprocess(
       parseJsonSafe("BOT_ADMIN_USER_ID"),

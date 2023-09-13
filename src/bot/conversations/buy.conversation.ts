@@ -74,21 +74,25 @@ export async function buyConversation(
             .text(" ✅ Ознакомлен"),
         }
       );
-      await ctx.reply(
-        "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
-        {
-          reply_markup: new Keyboard()
-            .requestContact("Отправить контакт")
-            .resized(),
-        }
-      );
-      const contact = await conversation.waitFor(":contact");
-      await conversation.external(async () => {
-        await updateUserPhone(
-          ctx.chat!.id,
-          contact.message!.contact.phone_number
+      if (conversation.session.phoneNumber === "") {
+        await ctx.reply(
+          "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
+          {
+            reply_markup: new Keyboard()
+              .requestContact("Отправить контакт")
+              .resized(),
+          }
         );
-      });
+        const contact = await conversation.waitFor(":contact");
+        conversation.session.phoneNumber =
+          contact.message!.contact.phone_number;
+        await conversation.external(async () => {
+          await updateUserPhone(
+            ctx.chat!.id,
+            contact.message!.contact.phone_number
+          );
+        });
+      }
       await ctx.reply("Соглашение принято", {
         reply_markup: cancel,
       });

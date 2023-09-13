@@ -16,6 +16,7 @@ import {
   Context,
   SessionData,
   createContextConstructor,
+  sessionDataDefaults,
 } from "#root/bot/context.js";
 import {
   botAdminFeature,
@@ -26,7 +27,6 @@ import { errorHandler } from "#root/bot/handlers/index.js";
 import { updateLogger } from "#root/bot/middlewares/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
-import { fillConsultations } from "#root/server/fill-consultations.js";
 import {
   webSiteKeyboard,
   mainMenu,
@@ -110,13 +110,11 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(hydrate());
   bot.use(
     session({
-      initial: () => ({
-        selectedProduct: "",
-        subscribedToChannel: false,
-      }),
+      initial: () => ({ ...sessionDataDefaults }),
       storage: sessionStorage,
     })
   );
+  // bot.use(deleteMessage());
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const constraint = (ctx: Context) => String(ctx.chat?.id);
   //* middlemares
@@ -236,16 +234,14 @@ export function createBot(token: string, options: Options = {}) {
       DIAGNOSTIC_CONVERSATION_CHILD
     )
   );
-
   //* duagnostic menu
   bot.use(diagnosticMenu);
   //* hears handlers
   bot.hears("🌐 Сайт", async (ctx: Context) => {
-    await ctx.reply("Перейдите по ссылке", {
+    await ctx.deleteMessage();
+    return ctx.reply("Перейдите по ссылке", {
       reply_markup: webSiteKeyboard,
-      disable_web_page_preview: true,
     });
-    return ctx.deleteMessage();
   });
 
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {
@@ -254,24 +250,25 @@ export function createBot(token: string, options: Options = {}) {
       `Здесь вы найдете кладезь ценной бесплатной информации о том, как улучшить свое здоровье, повысить энергию и достичь гармонии с собой через правильное питание и биохаки
 Подборка моих лучших постов:
 
-<a href="https://t.me/alla_dietolog/709">Главный женский гормон</a>
+<a href="https://t.me/alla_dietolog/709">1️⃣ Главный женский гормон</a>
 
-<a href="https://t.me/alla_dietolog/693">Что может сказать кал о нашем ЖКТ</a>
+<a href="https://t.me/alla_dietolog/693">2️⃣ Что может сказать кал о нашем ЖКТ</a>
 
-<a href="https://t.me/alla_dietolog/599">Как пережить анестезию и наркоз</a>
+<a href="https://t.me/alla_dietolog/599">3️⃣ Как пережить анестезию и наркоз</a>
 
-<a href="https://t.me/alla_dietolog/552">Риски прогестероновой беременности</a>
+<a href="https://t.me/alla_dietolog/552">4️⃣ Риски прогестероновой беременности</a>
 
-<a href="https://t.me/alla_dietolog/465">Рекомендации родителям деток с АтД</a>
+<a href="https://t.me/alla_dietolog/465">5️⃣ Рекомендации родителям деток с АтД</a>
 
-<a href="https://t.me/alla_dietolog/384">Почему нельзя ждать, если в 2 года у ребенка нет речи </a>
+<a href="https://t.me/alla_dietolog/384">6️⃣ Почему нельзя ждать, если в 2 года у ребенка нет речи </a>
 
-<a href="https://t.me/alla_dietolog/373">Поддержка иммунитета в межсезонье</a>
+<a href="https://t.me/alla_dietolog/373">7️⃣ Поддержка иммунитета в межсезонье</a>
 
-<a href="https://t.me/alla_dietolog/381">Почему желчь так важна в организме</a>
+<a href="https://t.me/alla_dietolog/381">8️⃣ Почему желчь так важна в организме</a>
 
-<a href="https://t.me/alla_dietolog/401">Отравление у ребенка: что делать</a>
-  Надеюсь, мы подружимся!
+<a href="https://t.me/alla_dietolog/401">9️⃣ Отравление у ребенка: что делать</a>
+
+<b>Надеюсь, мы подружимся!</b>
     `,
       {
         reply_markup: tgChannelKeyboard,
