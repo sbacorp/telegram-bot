@@ -3,7 +3,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
 import { type Conversation, createConversation } from "@grammyjs/conversations";
-import { InlineKeyboard } from "grammy";
+import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { yesNo, next, canceldiagnostic } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -676,8 +676,6 @@ export async function diagnosticAmmiakConversationChild(
   });
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.reply("Гайд");
   }
 }

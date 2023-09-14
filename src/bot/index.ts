@@ -27,6 +27,7 @@ import { errorHandler } from "#root/bot/handlers/index.js";
 import { updateLogger } from "#root/bot/middlewares/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
+import { fillConsultations } from "#root/server/fill-consultations.js";
 import {
   webSiteKeyboard,
   mainMenu,
@@ -35,9 +36,12 @@ import {
   studyProjectsMenu,
   budsProjectsMenu,
   freeProjectsMenu,
+  subscribeToChannel,
+  subscribeToChannelRecommendations,
+  subscribeToChannelVitD,
+  subscribeToChannelNavigator,
   tgChannelKeyboard,
   projectChildHealth,
-  subscribeToChannel,
   projectZhkt,
   guideAptechka,
   diagnosticMenu,
@@ -147,6 +151,9 @@ export function createBot(token: string, options: Options = {}) {
   //* menus
   //* channel sub menu
   bot.use(subscribeToChannel);
+  bot.use(subscribeToChannelRecommendations);
+  bot.use(subscribeToChannelVitD);
+  bot.use(subscribeToChannelNavigator);
   //* projects menus
   bot.use(projectChildHealth);
   bot.use(projectZhkt);
@@ -244,6 +251,71 @@ export function createBot(token: string, options: Options = {}) {
     });
   });
 
+  bot.hears("🗃 Мои проекты", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    await ctx.reply("🗃 Мои проекты", {
+      reply_markup: projectsMenu,
+    });
+  });
+  bot.hears("Хочу комплексно решить проблему", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    await ctx.reply("🗃 Мои проекты", {
+      reply_markup: projectsMenu,
+    });
+  });
+  bot.hears("📋 Диагностика", async (ctx: Context) => {
+    await ctx.reply("📋 Диагностика", {
+      reply_markup: diagnosticMenu,
+    });
+    return ctx.deleteMessage();
+  });
+  bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    return ctx.reply(
+      `Вам нужен проводник в мир здоровья и энергии? - приходите ко мне на консультацию!
+
+Формат единоразовой консультации включает в себя:
+ - полную оценку вашего организма со стороны эндокринной системы,
+ - анализ комплексного состояния ЖКТ,
+ - выявление дефицитов витаминов,
+ - выявление дефицитов микронутриентов,
+ - возможности корректировки всего состояния организма.`,
+      {
+        reply_markup: consultationMenu,
+      }
+    );
+  });
+  bot.hears("👩‍⚕️ Записаться на консультацию", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    return ctx.reply(
+      `Вам нужен проводник в мир здоровья и энергии? - приходите ко мне на консультацию!
+
+Формат единоразовой консультации включает в себя:
+ - полную оценку вашего организма со стороны эндокринной системы,
+ - анализ комплексного состояния ЖКТ,
+ - выявление дефицитов витаминов,
+ - выявление дефицитов микронутриентов,
+ - возможности корректировки всего состояния организма.`,
+      {
+        reply_markup: consultationMenu,
+      }
+    );
+  });
+  bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
+    await ctx.reply("Карманный нутрициолог", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Перейти в бота 🤖 ",
+              url: "https://t.me/pocket_nutritionist_test_bot",
+            },
+          ],
+        ],
+      },
+    });
+    return ctx.deleteMessage();
+  });
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {
     await ctx.deleteMessage();
     await ctx.reply(
@@ -293,51 +365,10 @@ export function createBot(token: string, options: Options = {}) {
     );
     return ctx.deleteMessage();
   });
-  bot.hears("🗃 Мои проекты", async (ctx: Context) => {
-    await ctx.deleteMessage();
-    await ctx.reply("🗃 Мои проекты", {
-      reply_markup: projectsMenu,
-    });
-  });
-  bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
-    await ctx.reply("Карманный нутрициолог", {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "Перейти в бота 🤖 ",
-              url: "https://t.me/pocket_nutritionist_test_bot",
-            },
-          ],
-        ],
-      },
-    });
-    return ctx.deleteMessage();
-  });
-
-  bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
-    await ctx.deleteMessage();
-    return ctx.reply(
-      `Вам нужен проводник в мир здоровья и энергии? - приходите ко мне на консультацию!
-
-Формат единоразовой консультации включает в себя:
- - полную оценку вашего организма со стороны эндокринной системы,
- - анализ комплексного состояния ЖКТ,
- - выявление дефицитов витаминов,
- - выявление дефицитов микронутриентов,
- - возможности корректировки всего состояния организма.`,
-      {
-        reply_markup: consultationMenu,
-      }
-    );
-  });
-  bot.hears("📋 Диагностика", async (ctx: Context) => {
-    await ctx.reply("📋 Диагностика", {
-      reply_markup: diagnosticMenu,
-    });
-    return ctx.deleteMessage();
-  });
   //* must be the last handler
+  bot.hears("asdf", async () => {
+    await fillConsultations();
+  });
   bot.use(unhandledFeature);
   //* error handler
   if (config.isDev) {

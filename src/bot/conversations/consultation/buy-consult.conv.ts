@@ -100,12 +100,16 @@ export async function BuyConsultationConversation(
   } while (!(ctx.update.callback_query?.data === "paid"));
 
   //! check payment loop
-  await ctx.editMessageText("<b>Оплата прошла успешно</b>");
+  //! if paid
   await conversation.external(async () => {
     await disableConsultationByDateTime(
       consultationObject.dateString,
       consultationObject.time
     );
+  });
+  conversation.session.consultationStep = 3;
+  await ctx.reply("<b>Оплата прошла успешно</b>", {
+    reply_markup: cancel,
   });
   return ctx;
 }

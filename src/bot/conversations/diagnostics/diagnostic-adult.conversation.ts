@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 import { type Conversation, createConversation } from "@grammyjs/conversations";
+import { Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
   diagnosticListKeyboard,
@@ -47,15 +48,24 @@ export async function diagnosticConversationAdult(
     }
   );
   if (response.match === "zhkt") {
-    return diagnosticZhktConversationAdult(conversation, ctx);
+    await diagnosticZhktConversationAdult(conversation, ctx);
   }
   if (response.match === "deficit") {
-    return diagnosticDeficitConversationAdult(conversation, ctx);
+    await diagnosticDeficitConversationAdult(conversation, ctx);
   }
   if (response.match === "thyroid") {
-    return diagnosticThyroidConversationAdult(conversation, ctx);
+    await diagnosticThyroidConversationAdult(conversation, ctx);
   }
   if (response.match === "insulin") {
-    return diagnosticInsulinConversationAdult(conversation, ctx);
+    await diagnosticInsulinConversationAdult(conversation, ctx);
   }
+  return ctx.reply("Вам так же будет полезно :", {
+    reply_markup: new Keyboard()
+      .text("👩‍⚕️ Записаться на консультацию")
+      .row()
+      .text("🏠 Главное меню")
+      .row()
+      .text("Хочу комплексно решить проблему")
+      .oneTime(),
+  });
 }

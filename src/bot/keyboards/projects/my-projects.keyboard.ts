@@ -2,12 +2,9 @@ import { Menu } from "@grammyjs/menu";
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { cancel } from "./cancel.keyboard.js";
+import { cancel } from "../cancel.keyboard.js";
 // eslint-disable-next-line import/no-cycle
-import {
-  BUY_CONVERSATION,
-  buyConversation,
-} from "../conversations/buy.conversation.js";
+import { BUY_CONVERSATION } from "../../conversations/buy.conversation.js";
 
 export const projectChildHealth = new Menu<Context>("project-child-health")
   .url("Узнать подробности на сайте", "https://ya.ru/")
@@ -72,7 +69,7 @@ export const projectsMenu = new Menu<Context>("projects-menu")
 ➡️ Избавиться от пищевых зависимостей
 ➡️ Победить стресс`,
         {
-          reply_markup: guideAptechka,
+          reply_markup: groupProject,
         }
       );
     }, 2000);
@@ -140,7 +137,7 @@ export const studyProjectsMenu = new Menu<Context>("study-projects-menu")
     );
     const keyboard = new InlineKeyboard().url(
       "Узнать подробности на сайте",
-      "https://ya.ru/"
+      "https://lp-edpro.ru/lk/22/nutriciologia/child_nutrition/?utm_source=advcake&utm_medium=cpa&utm_campaign=affiliate&utm_content=academymarket&utm_term=6250eb57edd1584af7711424c13d4a53&erid=LdtCKV66K&_gl=1*1htskc1*_ga*MTEyMzgyODY4LjE2OTM4NDA0ODQ.*_ga_PBZBSS23X9*MTY5NDI5MTQwMS4yLjAuMTY5NDI5MTQwMS42MC4wLjA"
     );
     setTimeout(async () => {
       await ctx.reply(
@@ -166,7 +163,7 @@ export const studyProjectsMenu = new Menu<Context>("study-projects-menu")
     );
     const keyboard = new InlineKeyboard().url(
       "Узнать подробности на сайте",
-      "https://ya.ru/"
+      "https://lp-edpro.ru/lk/23/nutriciologia/family_nutrition/?utm_source=advcake&utm_medium=cpa&utm_campaign=affiliate&utm_content=academymarket&utm_term=6250eb57edd1584af7711424c13d4a53&erid=LdtCKV66K&_gl=1*kr70ev*_ga*MTEyMzgyODY4LjE2OTM4NDA0ODQ.*_ga_PBZBSS23X9*MTY5NDI5MTQwMS4yLjEuMTY5NDI5MTQ0OC4xMy4wLjA"
     );
     setTimeout(async () => {
       await ctx.reply(
@@ -224,9 +221,12 @@ export const budsProjectsMenu = new Menu<Context>("buds-projects-menu")
       }
     );
     const keyboard = new InlineKeyboard()
-      .url("Заказать на ОЗОН", "https://www.ozon.ru/")
+      .url("Заказать на ОЗОН", "https://www.ozon.ru/t/Zb5NaXa")
       .row()
-      .url("Заказать на ВБ", "https://www.wildberries.ru/");
+      .url(
+        "Заказать на ВБ",
+        "https://www.wildberries.ru/catalog/170514661/detail.aspx?targetUrl=GP&size=283113374"
+      );
     setTimeout(async () => {
       await ctx.reply(
         `
@@ -260,7 +260,7 @@ export const budsProjectsMenu = new Menu<Context>("buds-projects-menu")
     );
     const keyboard = new InlineKeyboard().url(
       "Заказать на ОЗОН",
-      "https://www.ozon.ru/"
+      "https://www.ozon.ru/t/pAAGzYZ"
     );
     setTimeout(async () => {
       await ctx.reply(
@@ -273,84 +273,6 @@ export const budsProjectsMenu = new Menu<Context>("buds-projects-menu")
         }
       );
     }, 2000);
-  })
-  .row()
-  .back("⬅️ Назад");
-
-export const subscribeToChannel = new Menu<Context>("subscribe-to-channel")
-  .url("Ссылка на канал", "https://t.me/alla_dietolog")
-  .row()
-  .text(
-    (ctx) =>
-      `Проверить статус ${ctx.session.subscribedToChannel ? "✅" : "❌"} `,
-    async (ctx) => {
-      const inPublic = await ctx.api.getChatMember(
-        "@alla_dietolog",
-        ctx.chat!.id
-      );
-      if (
-        inPublic.status === "member" ||
-        inPublic.status === "creator" ||
-        inPublic.status === "administrator"
-      ) {
-        ctx.session.subscribedToChannel = true;
-        ctx.menu.update();
-        await ctx.replyWithDocument(
-          "BQACAgIAAxkBAAICXGT5721cDAy6N2hJoPHp3bSXCbJ3AALtNQACR9XRS4xIaNyMVGM4MAQ"
-        );
-      }
-    }
-  );
-export const subscribeToChannelVitD = new Menu<Context>("subscribe-to-channel")
-  .url("Ссылка на канал", "https://t.me/alla_dietolog")
-  .row()
-  .text(
-    (ctx) =>
-      `Проверить статус ${ctx.session.subscribedToChannel ? "✅" : "❌"} `,
-    async (ctx) => {
-      const inPublic = await ctx.api.getChatMember(
-        "@alla_dietolog",
-        ctx.chat!.id
-      );
-      if (
-        inPublic.status === "member" ||
-        inPublic.status === "creator" ||
-        inPublic.status === "administrator"
-      ) {
-        ctx.session.subscribedToChannel = true;
-        ctx.menu.update();
-        await ctx.replyWithDocument(
-          "BQACAgIAAxkBAAICYWT58D9zzzMDwLn_OhRdnZEnPXbKAALSOAACxEnRSwRy552S_2Z1MAQ"
-        );
-      }
-    }
-  );
-
-export const freeProjectsMenu = new Menu<Context>("free-projects-menu")
-  .text("Гайд по витамину Д", async (ctx) => {
-    if (ctx.session.subscribedToChannel) {
-      await ctx.reply("Заберите гайд");
-      await ctx.replyWithDocument(
-        "BQACAgIAAxkBAAICYWT58D9zzzMDwLn_OhRdnZEnPXbKAALSOAACxEnRSwRy552S_2Z1MAQ"
-      );
-    } else {
-      await ctx.reply("Подпишитель на канал", {
-        reply_markup: subscribeToChannelVitD,
-      });
-    }
-  })
-  .row()
-  .text("Гайд по расшифровке анализов", async (ctx) => {
-    if (ctx.session.subscribedToChannel) {
-      await ctx.reply("Заберите гайд");
-      await ctx.replyWithDocument(
-        "BQACAgIAAxkBAAICXGT5721cDAy6N2hJoPHp3bSXCbJ3AALtNQACR9XRS4xIaNyMVGM4MAQ"
-      );
-    } else {
-      await ctx.reply("Подпишитель на канал", {
-        reply_markup: subscribeToChannel,
-      });
-    }
   })
   .row()
   .back("⬅️ Назад");

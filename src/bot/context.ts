@@ -9,7 +9,7 @@ import type { Logger } from "#root/logger.js";
 export type SessionData = {
   selectedProduct?: string;
   subscribedToChannel?: boolean;
-  phoneNumber?: string;
+  phoneNumber: string;
   fio: string;
   sex: "male" | "female" | "";
   consultationStep: number;
@@ -18,6 +18,7 @@ export type SessionData = {
     dateString: string;
     time: string;
     answers: string[];
+    messanger: string;
   };
 };
 export const sessionDataDefaults: SessionData = {
@@ -32,6 +33,7 @@ export const sessionDataDefaults: SessionData = {
     dateString: "",
     time: "",
     answers: [],
+    messanger: "",
   },
 };
 

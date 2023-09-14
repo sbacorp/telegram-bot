@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 import { type Conversation } from "@grammyjs/conversations";
+import { Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { diagnosticListChildKeyboard } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -42,18 +43,27 @@ export async function diagnosticConversationChild(
     }
   );
   if (response.match === "zhkt") {
-    return diagnosticZhktConversationChild(conversation, ctx);
+    await diagnosticZhktConversationChild(conversation, ctx);
   }
   if (response.match === "deficit") {
-    return diagnosticDeficitConversationChild(conversation, ctx);
+    await diagnosticDeficitConversationChild(conversation, ctx);
   }
   if (response.match === "insulin") {
-    return diagnosticInsulinConversationChild(conversation, ctx);
+    await diagnosticInsulinConversationChild(conversation, ctx);
   }
   if (response.match === "ammiak") {
-    return diagnosticAmmiakConversationChild(conversation, ctx);
+    await diagnosticAmmiakConversationChild(conversation, ctx);
   }
   if (response.match === "parazit") {
-    return diagnosticParazitConversationChild(conversation, ctx);
+    await diagnosticParazitConversationChild(conversation, ctx);
   }
+  return ctx.reply("Вам так же будет полезно :", {
+    reply_markup: new Keyboard()
+      .text("👩‍⚕️ Записаться на консультацию")
+      .row()
+      .text("🏠 Главное меню")
+      .row()
+      .text("Хочу комплексно решить проблему")
+      .oneTime(),
+  });
 }
