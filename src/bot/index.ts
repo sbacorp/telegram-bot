@@ -148,6 +148,11 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(
     createConversation(consultationConversation, CONSULTATION_CONVERSATION)
   );
+  bot.hears("Начать запись заново", async (ctx: Context) => {
+    await ctx.conversation.exit();
+    ctx.session.consultationStep = 1;
+    await ctx.conversation.enter(CONSULTATION_CONVERSATION);
+  });
   //* menus
   //* channel sub menu
   bot.use(subscribeToChannel);

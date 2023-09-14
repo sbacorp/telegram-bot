@@ -152,19 +152,17 @@ export async function consultationConversation(
     await ctx.reply("Отлично, теперь перейдем к опроснику", {
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     });
-    if (conversation.session.sex === "male") {
-      consultationObject.answers = await briefMaleConversation(
-        conversation,
-        ctx
-      );
-    } else if (conversation.session.sex === "female") {
-      consultationObject.answers = await briefFemaleConversation(
-        conversation,
-        ctx
-      );
-    }
+    conversation.session.consultationStep = 4;
   }
   if (conversation.session.consultationStep < 5) {
+    if (conversation.session.sex === "male") {
+      await briefMaleConversation(conversation, ctx);
+    } else if (conversation.session.sex === "female") {
+      await briefFemaleConversation(conversation, ctx);
+    }
+    conversation.session.consultationStep = 5;
+  }
+  if (conversation.session.consultationStep < 6) {
     await ctx.reply(
       `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.
  Подскажите, в какой социальной сети вам удобно продолжить общение?`,
@@ -226,6 +224,7 @@ export async function consultationConversation(
 Тестирование :
 ${answerQuestions}`
     );
+    conversation.session.consultationStep = 6;
     ctx.chatAction = null;
   }
   return ctx.reply(

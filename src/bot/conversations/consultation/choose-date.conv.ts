@@ -97,9 +97,7 @@ export async function chooseDateConversation(
     async () =>
       await createDatePicker(consultationObject.year, consultationObject.month)
   );
-
-  await ctx.editMessageText(`Выберите свободную дату  *московское время`);
-  await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
+  message = await ctx.reply(`Выберите свободную дату  *московское время`, {
     reply_markup: consultationObject.calendar,
   });
 

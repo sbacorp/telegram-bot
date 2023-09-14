@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable unicorn/no-for-loop */
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
@@ -9,7 +11,7 @@ import { cancel } from "../../keyboards/cancel.keyboard.js";
 interface IBriefQuestion {
   text: string;
   keyboard?: Keyboard | InlineKeyboard;
-  type?: "select" | "withPhoto";
+  type?: "select" | "withPhoto" | "withMultiAnswer";
 }
 export const questions: IBriefQuestion[] = [
   {
@@ -242,6 +244,7 @@ export const questions: IBriefQuestion[] = [
   //! баллы как то реализовать новый тип и клавиатуры
   {
     text: `Ваше самочувствие и энергия в течение дня. Поставьте 10 баллов в то время, когда Вы чувствуете бодрость и энергию и работоспособность. И 0, когда совершенно нет сил.`,
+    type: "withMultiAnswer",
   },
   {
     text: `В последнее время Вы часто забываете не очень важные вещи, сложно вспомнить какие-то элементарные вещи?`,
@@ -435,31 +438,42 @@ export async function briefFemaleConversation(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
-  const answers: string[] = [];
+  const answersCount = conversation.session.consultation.answers.length;
   await ctx.deleteMessage();
   // eslint-disable-next-line no-restricted-syntax
-  for (const e of questions) {
-    if (!e.type) {
-      await ctx.reply(e.text);
+  for (let i = answersCount; i < questions.length; i++) {
+    if (!questions[i].type) {
+      await ctx.reply(questions[i].text);
       const answer = await conversation.waitFor("message:text");
-      answers.push(answer.message.text);
+      conversation.session.consultation.answers.push(answer.message.text);
       continue;
-    } else if (e.type === "select" && e.keyboard) {
-      await ctx.reply(e.text, {
-        reply_markup: e.keyboard,
+    } else if (questions[i].type === "select" && questions[i].keyboard) {
+      await ctx.reply(questions[i].text, {
+        reply_markup: questions[i].keyboard,
       });
       const answer = await conversation.waitFor("message:text");
-      answers.push(answer.message.text);
+      conversation.session.consultation.answers.push(answer.message.text);
       continue;
-    } else if (e.type === "withPhoto") {
-      await ctx.reply(e.text);
+    } else if (questions[i].type === "withPhoto") {
+      await ctx.reply(questions[i].text);
       await ctx.replyWithPhoto(
         "AgACAgIAAxkBAAIH5mUBo_wEF_qf8ueeUfSvBDPeybnBAAKRzTEbrDsRSBmhSt-tkbJiAQADAgADbQADMAQ"
       );
       const answer = await conversation.waitFor("message:text");
-      answers.push(answer.message.text);
+      conversation.session.consultation.answers.push(answer.message.text);
       continue;
+    } else if (questions[i].type === "withMultiAnswer") {
+      let answer: string;
+      await ctx.reply(questions[i].text);
+      await ctx.reply("Утром :");
+      answer = `Утром : ${await conversation.form.text()}`;
+      await ctx.reply("Днем :");
+      answer += `\nДнем : ${await conversation.form.text()}`;
+      await ctx.reply("Вечером :");
+      answer += `\nВечером : ${await conversation.form.text()}`;
+      await ctx.reply("Ночью :");
+      answer += `\nНочью : ${await conversation.form.text()}`;
+      conversation.session.consultation.answers.push(answer);
     }
   }
-  return answers;
 }
