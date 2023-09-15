@@ -19,10 +19,13 @@ export async function findOrCreateUser(chatId: number) {
       where: { chatId: chatId.toString() },
     });
     if (user) {
+      if (user.status === "left") {
+        user.status = "active";
+        await user.save();
+      }
       return true;
     }
     if (!user) {
-      console.log("created");
       await UserModel.create({ chatId });
       return false;
     }

@@ -12,7 +12,11 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { ConsultationModel } from "#root/server/models.js";
+import {
+  ConsultationAppointmentModel,
+  ConsultationModel,
+  UserModel,
+} from "#root/server/models.js";
 import { updateUserPhone } from "#root/server/utils.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -62,6 +66,12 @@ export async function consultationConversation(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
+  const chatId = ctx.chat!.id.toString();
+  const user = await UserModel.findOne({
+    where: {
+      chatId: ctx.chat!.id,
+    },
+  });
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -119,18 +129,25 @@ export async function consultationConversation(
     );
     conversation.session.consultationStep = 2;
   }
-  if (conversation.session.consultationStep < 3) {
-    ctx = await BuyConsultationConversation(
+  if (
+    conversation.session.consultationStep < 3 &&
+    !user!.consultationPaidStatus
+  ) {
+    ctx = (await BuyConsultationConversation(
       conversation,
       ctx,
       message,
       consultationObject
-    );
+    )) as Context;
   }
-  if (conversation.session.consultationStep < 4) {
+  if (
+    conversation.session.consultationStep < 4 &&
+    conversation.session.sex === ""
+  ) {
     await ctx.editMessageText(`Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
 От этого этапа будет зависеть список назначенных анализов.
-Обязательно ответьте на вопросы в течение суток.`);
+Обязательно ответьте на вопросы до 00:00 текущего дня.
+В противном вам придется выбрать другую дату`);
     await ctx.reply("Пожалуйста, укажите ваш пол", {
       reply_markup: new InlineKeyboard()
         .text("Мужской", "male")
@@ -152,7 +169,16 @@ export async function consultationConversation(
     });
     conversation.session.consultationStep = 4;
   }
-  if (conversation.session.consultationStep < 5) {
+
+  if (
+    conversation.session.consultationStep < 5 &&
+    ((conversation.session.sex === "male" &&
+      conversation.session.consultation.questionsAnswered !==
+        maleQuestions.length) ||
+      (conversation.session.sex === "female" &&
+        conversation.session.consultation.questionsAnswered !==
+          femaleQuestions.length))
+  ) {
     if (conversation.session.sex === "male") {
       await briefMaleConversation(conversation, ctx);
     } else if (conversation.session.sex === "female") {
@@ -165,25 +191,24 @@ export async function consultationConversation(
       `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.
  Подскажите, в какой социальной сети вам удобно продолжить общение?`,
       {
-        reply_markup: new Keyboard()
-          .text("Telegram")
+        reply_markup: new InlineKeyboard()
+          .text("Telegram", "Telegram")
           .row()
-          .text("WhatsApp")
-          .row()
-          .oneTime(),
+          .text("WhatsApp", "WhatsApp")
+          .row(),
       }
     );
-    const messanger = await conversation.waitFor("message:text");
-    if (messanger.message.text === "Telegram") {
+    ctx = await conversation.waitFor("callback_query:data");
+    if (ctx.update.callback_query?.data === "Telegram") {
       consultationObject.massanger = "Telegram";
     }
-    if (messanger.message.text === "WhatsApp") {
+    if (ctx.update.callback_query?.data === "WhatsApp") {
       consultationObject.massanger = "WhatsApp";
     }
     await ctx.reply("Напишите контакт для связи в этом мессенджере");
-    ctx = await conversation.wait();
-    if (ctx.message?.text)
-      conversation.session.consultation.messanger = `${consultationObject.massanger} ${ctx.message.text}`;
+    ctx = await conversation.waitFor("message:text");
+    while (!ctx.message?.text) ctx = await conversation.waitFor("message:text");
+    conversation.session.consultation.messanger = `${consultationObject.massanger} ${ctx.message.text}`;
 
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
@@ -222,6 +247,11 @@ export async function consultationConversation(
 Тестирование :
 ${answerQuestions}`
     );
+    await ConsultationAppointmentModel.create({
+      chatId,
+      date: conversation.session.consultation.dateString,
+      time: conversation.session.consultation.time,
+    });
     conversation.session.consultationStep = 6;
     ctx.chatAction = null;
   }

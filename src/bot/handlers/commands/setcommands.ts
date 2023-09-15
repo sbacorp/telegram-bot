@@ -7,7 +7,11 @@ function getPrivateChatCommands(): BotCommand[] {
   return [
     {
       command: "start",
-      description: "начать использование",
+      description: "Перезагрузка",
+    },
+    {
+      command: "help",
+      description: "Помошь",
     },
   ];
 }
@@ -41,6 +45,14 @@ function getPrivateChatAdminCommands(): BotCommand[] {
     {
       command: "setcommands",
       description: "setcommands_command.description",
+    },
+    {
+      command: "newsletter",
+      description: "рассылка",
+    },
+    {
+      command: "changeshedule",
+      description: "изменить расписание",
     },
   ];
 }

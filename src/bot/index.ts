@@ -82,12 +82,15 @@ import {
   DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD,
   diagnosticAmmiakConversationChild,
   DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD,
+  newsletterConversation,
 } from "./conversations/index.js";
 import { cancel } from "./keyboards/cancel.keyboard.js";
 import {
   BUY_CONVERSATION,
   buyConversation,
 } from "./conversations/buy.conversation.js";
+// eslint-disable-next-line import/order
+import { UserModel } from "#root/server/models.js";
 
 type Options = {
   sessionStorage?: StorageAdapter<SessionData>;
@@ -126,6 +129,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(conversations());
   //* setting commands conversations
   bot.use(setPromoConversation());
+  bot.use(newsletterConversation());
   bot.use(createlinkConversation());
   bot.use(deletePromoConversation());
   bot.use(deleteLinkConversation());
@@ -135,7 +139,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(botAdminFeature);
   //* main hears
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
-    ctx.conversation.exit();
+    await ctx.conversation.exit();
     await ctx.reply("<b>Главное меню</b>", {
       reply_markup: mainMenu,
     });
@@ -373,6 +377,20 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("asdf", async () => {
     await fillConsultations();
   });
+  bot.on("my_chat_member", async (ctx: Context) => {
+    if (ctx.update.my_chat_member?.new_chat_member?.status === "kicked") {
+      const chatId = ctx.update.my_chat_member?.chat.id.toString();
+      const user = await UserModel.findOne({
+        where: {
+          chatId,
+        },
+      });
+      if (!user) return;
+      user.status = "left";
+      await user.save();
+    }
+  });
+
   bot.use(unhandledFeature);
   //* error handler
   if (config.isDev) {

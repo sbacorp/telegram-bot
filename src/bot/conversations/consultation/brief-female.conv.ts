@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable unicorn/prevent-abbreviations */
@@ -175,9 +176,9 @@ export const questions: IBriefQuestion[] = [
       .row()
       .text("Умеренная")
       .row()
-      .text("Сильная, спасают обезболивающие, только с ними могу работать")
+      .text("Сильная, спасают обезболивающие")
       .row()
-      .text("Очень сильная, не могу работать, даже если выпиваю обезболивающее")
+      .text("Очень сильная, не спасают обезболивающие")
       .oneTime(),
   },
   {
@@ -436,6 +437,22 @@ export async function briefFemaleConversation(
 ) {
   const answersCount = conversation.session.consultation.answers.length;
   await ctx.deleteMessage();
+  if (
+    conversation.session.consultation.dateString.split("-")[2] !==
+    new Date().getDate().toString()
+  ) {
+    conversation.session.consultationStep = 1;
+    await ctx.reply("Вы не успели выполнить тестирование", {
+      reply_markup: new Keyboard()
+        .text("Перейти к выбору даты")
+        .row()
+        .text("🏠 Главное меню"),
+    });
+    ctx = await conversation.wait();
+    if (ctx.message?.text === "Перейти к выбору даты") {
+      return ctx.conversation.enter("consultation");
+    }
+  }
   // eslint-disable-next-line no-restricted-syntax
   for (let i = answersCount; i < questions.length; i++) {
     if (!questions[i].type) {
@@ -471,5 +488,6 @@ export async function briefFemaleConversation(
       answer += `\nНочью : ${await conversation.form.text()}`;
       conversation.session.consultation.answers.push(answer);
     }
+    conversation.session.consultation.questionsAnswered += 1;
   }
 }

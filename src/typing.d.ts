@@ -27,12 +27,17 @@ export interface IProduct {
 export interface IUserModel extends Model {
   id: number;
   chatId: string;
+  status: string;
   sub: boolean;
   phoneNumber: string;
+  fio: string;
+  sex: string;
   referenceFrom: string;
   joinedToNutr: boolean;
   subEndDateTime: number;
   promoCode: string;
+  boughtProducts?: string;
+  consultationPaidStatus: boolean;
 }
 export interface IPromocodeModel extends Model {
   id: number;

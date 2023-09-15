@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 /* eslint-disable import/no-cycle */
 import { DataTypes, Model } from "sequelize";
 import {
@@ -18,7 +19,19 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     type: DataTypes.STRING,
     unique: true,
   },
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "active",
+  },
   phoneNumber: {
+    type: DataTypes.STRING,
+    defaultValue: "",
+  },
+  fio: {
+    type: DataTypes.STRING,
+    defaultValue: "",
+  },
+  sex: {
     type: DataTypes.STRING,
     defaultValue: "",
   },
@@ -41,6 +54,14 @@ export const UserModel = sequelize.define<IUserModel>("user", {
   subEndDateTime: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
+  },
+  boughtProducts: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+  },
+  consultationPaidStatus: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
 });
 
@@ -136,3 +157,29 @@ export const ConsultationModel = sequelize.define<IConsultationModelModel>(
     },
   }
 );
+export interface IConsultationAppointment extends Model {
+  id: number;
+  date: string;
+  time: string;
+}
+export const ConsultationAppointmentModel =
+  sequelize.define<IConsultationAppointment>("consultationAppointment", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    date: {
+      type: DataTypes.STRING,
+    },
+    time: {
+      type: DataTypes.STRING,
+    },
+    chatId: {
+      type: DataTypes.STRING,
+      references: {
+        model: "user",
+        key: "chatId",
+      },
+    },
+  });

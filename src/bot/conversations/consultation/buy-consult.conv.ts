@@ -9,7 +9,7 @@ import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
 import { updateUserPhone } from "#root/server/utils.js";
-import { ConsultationModel } from "#root/server/models.js";
+import { ConsultationModel, UserModel } from "#root/server/models.js";
 import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 
@@ -52,9 +52,22 @@ export async function BuyConsultationConversation(
 ) {
   await ctx.deleteMessage();
   if (conversation.session.fio === "") {
-    await ctx.reply("Введите ФИО");
+    await ctx.reply("Введите ФИО", {
+      reply_markup: new Keyboard()
+        .text("⬅️ К выбору даты")
+        .text("🏠 Главное меню")
+        .resized(),
+    });
     ctx = await conversation.waitFor("message:text");
     while (!ctx.message?.text?.match(/^(?:[ЁА-Я][а-яё]+ ){2}[ЁА-Я][а-яё]+$/)) {
+      if (ctx.message?.text === "⬅️ К выбору даты") {
+        conversation.session.consultationStep -= 1;
+        return ctx.conversation.reenter("consultation");
+      }
+      if (ctx.message?.text === "🏠 Главное меню") {
+        return ctx.conversation.exit();
+      }
+
       await ctx.reply("Введите ФИО");
       ctx = await conversation.waitFor("message:text");
     }
@@ -82,13 +95,12 @@ export async function BuyConsultationConversation(
     `<b>Можете приступать к оплате.</b>
 В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
     {
-      reply_markup: new Keyboard().webApp(
-        "Оплатить",
-        "https://payform.ru/992L3rc/"
-      ),
+      reply_markup: new Keyboard()
+        .webApp("Оплатить", "https://payform.ru/992L3rc/")
+        .add("⬅️ К выбору даты")
+        .resized(),
     }
   );
-
   await ctx.reply("Подтвердите оплату", {
     reply_markup: new InlineKeyboard().text("Оплатил", "paid"),
   });
@@ -96,6 +108,10 @@ export async function BuyConsultationConversation(
     ctx = await conversation.wait();
     if (ctx.update.callback_query?.data === "paid") {
       break;
+    }
+    if (ctx.message?.text === "⬅️ К выбору даты") {
+      conversation.session.consultationStep -= 1;
+      return ctx.conversation.reenter("consultation");
     }
   } while (!(ctx.update.callback_query?.data === "paid"));
 
@@ -106,6 +122,15 @@ export async function BuyConsultationConversation(
       consultationObject.dateString,
       consultationObject.time
     );
+  });
+  await conversation.external(async () => {
+    const user = await UserModel.findOne({
+      where: {
+        chatId: ctx.chat!.id,
+      },
+    });
+    user!.consultationPaidStatus = true;
+    user!.save();
   });
   conversation.session.consultationStep = 3;
   await ctx.reply("<b>Оплата прошла успешно</b>", {

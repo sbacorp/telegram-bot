@@ -91,7 +91,7 @@ export const createCalendar = (
         // eslint-disable-next-line unicorn/prefer-ternary
         if (datesSet.has(dateString)) {
           day =
-            date < new Date().getDate() &&
+            date < new Date().getDate() + 3 &&
             month === new Date().getMonth() &&
             year === new Date().getFullYear()
               ? { text: " ✖️ ", callback_data: "empty" }

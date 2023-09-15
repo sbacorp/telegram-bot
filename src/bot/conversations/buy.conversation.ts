@@ -167,4 +167,9 @@ export async function buyConversation(
 
   //! check payment loop
   await ctx.editMessageText("<b>Оплата прошла успешно</b>");
+  return product?.type === "doc"
+    ? ctx.replyWithDocument(product.docId!, {
+        reply_markup: cancel,
+      })
+    : ctx.reply(product!.answer!);
 }

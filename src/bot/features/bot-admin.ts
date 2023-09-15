@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-param-reassign */
 /* eslint-disable prettier/prettier */
 import { chatAction } from "@grammyjs/auto-chat-action";
 import { Composer } from "grammy";
@@ -17,7 +20,7 @@ import {
   CREATELINK_CONVERSATION,
   DELETE_PROMO_CONVERSATION,
   ACTIVATE_SUBSCRIPTION_CONVERSATION,
-  DELETE_LINK_CONVERSATION
+  DELETE_LINK_CONVERSATION,
 } from "../conversations/index.js";
 
 const composer = new Composer<Context>();
@@ -68,6 +71,16 @@ feature.command(
   chatAction("typing"),
   async (ctx) => {
     return ctx.conversation.enter(ACTIVATE_SUBSCRIPTION_CONVERSATION);
+  }
+);
+feature.command("newsletter", logHandle("command-newsletter"), async (ctx) => {
+  return ctx.conversation.enter("newsletterConversation");
+});
+feature.command(
+  "changeshedule",
+  logHandle("command-change-shedule"),
+  async (ctx) => {
+    return ctx.conversation.enter("changeSheduleConversation");
   }
 );
 feature.command(

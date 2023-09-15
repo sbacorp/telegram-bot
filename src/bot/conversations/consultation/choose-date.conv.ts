@@ -81,10 +81,9 @@ export async function chooseDateConversation(
     async () =>
       await createDatePicker(consultationObject.year, consultationObject.month)
   );
-  message = await ctx.reply(`Выберите свободную дату  *московское время`, {
+  message = await ctx.reply(`Выберите свободное время  *московское время`, {
     reply_markup: consultationObject.calendar,
   });
-
   do {
     ctx = await conversation.wait();
     if (ctx.update.callback_query?.data === "nextMonth") {
