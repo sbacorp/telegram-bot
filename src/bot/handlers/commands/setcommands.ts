@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import { BotCommand } from "@grammyjs/types";
 import { CommandContext } from "grammy";
 import { config } from "#root/config.js";
@@ -64,13 +66,21 @@ export async function setCommandsHandler(ctx: CommandContext<Context>) {
       type: "all_private_chats",
     },
   });
-  // set private chat commands for owner
   await ctx.api.setMyCommands(
     [...getPrivateChatCommands(), ...getPrivateChatAdminCommands()],
     {
       scope: {
         type: "chat",
-        chat_id: Number(config.BOT_ADMIN_USER_ID),
+        chat_id: config.BOT_ADMIN_USER_ID[0],
+      },
+    }
+  );
+  await ctx.api.setMyCommands(
+    [...getPrivateChatCommands(), ...getPrivateChatAdminCommands()],
+    {
+      scope: {
+        type: "chat",
+        chat_id: config.BOT_ADMIN_USER_ID[1],
       },
     }
   );
