@@ -6,13 +6,9 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
+import { IBriefQuestion } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 
-interface IBriefQuestion {
-  text: string;
-  keyboard?: Keyboard | InlineKeyboard;
-  type?: "select" | "withPhoto" | "withMultiAnswer";
-}
 export const questions: IBriefQuestion[] = [
   {
     text: "Ваша дата рождения",

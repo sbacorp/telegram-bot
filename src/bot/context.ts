@@ -5,22 +5,8 @@ import type { HydrateFlavor } from "@grammyjs/hydrate";
 import type { ParseModeFlavor } from "@grammyjs/parse-mode";
 import type { ConversationFlavor } from "@grammyjs/conversations";
 import type { Logger } from "#root/logger.js";
+import { SessionData } from "#root/typing.js";
 
-export type SessionData = {
-  selectedProduct?: string;
-  subscribedToChannel?: boolean;
-  phoneNumber: string;
-  fio: string;
-  sex: "male" | "female" | "";
-  consultationStep: number;
-  consultation: {
-    questionsAnswered: number;
-    dateString: string;
-    time: string;
-    answers: string[];
-    messanger: string;
-  };
-};
 export const sessionDataDefaults: SessionData = {
   selectedProduct: "",
   subscribedToChannel: false,

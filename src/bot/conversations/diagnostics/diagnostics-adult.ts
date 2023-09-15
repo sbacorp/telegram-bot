@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 /* eslint-disable no-else-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-shadow */
@@ -13,16 +14,13 @@ import {
 } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import { diagnosticConversationAdult } from "./diagnostic-adult.conversation.js";
+import { Question } from "#root/typing.js";
 
 export const DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT = "diagnosticDeficitAdult";
 export const DIAGNOSTIC_THYROID_CONVERSATION_ADULT = "diagnosticThyroidAdult";
 export const DIAGNOSTIC_INSULIN_CONVERSATION_ADULT = "diagnosticInsulinAdult";
 export const DIAGNOSTIC_ZHKT_CONVERSATION_ADULT = "diagnosticZhktAdult";
 
-interface Question {
-  question: string;
-  answer: string;
-}
 const questionsZhkt: Question[] = [
   {
     question: "Страдаете от повышенной потливости?",

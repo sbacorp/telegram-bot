@@ -1,17 +1,13 @@
 /* eslint-disable import/no-cycle */
 import { DataTypes, Model } from "sequelize";
+import {
+  IConsultationModelModel,
+  ILinkModel,
+  IPromocodeModel,
+  IUserModel,
+} from "#root/typing.js";
 import { sequelize } from "./database.js";
 
-interface IUserModel extends Model {
-  id: number;
-  chatId: string;
-  sub: boolean;
-  phoneNumber: string;
-  referenceFrom: string;
-  joinedToNutr: boolean;
-  subEndDateTime: number;
-  promoCode: string;
-}
 export const UserModel = sequelize.define<IUserModel>("user", {
   id: {
     type: DataTypes.INTEGER,
@@ -48,12 +44,6 @@ export const UserModel = sequelize.define<IUserModel>("user", {
   },
 });
 
-interface IPromocodeModel extends Model {
-  id: number;
-  promoTitle: string;
-  discount: number;
-  timesUsed: number;
-}
 export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
   id: {
     type: DataTypes.INTEGER,
@@ -73,12 +63,6 @@ export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
   },
 });
 
-interface ILinkModel extends Model {
-  id: number;
-  linkTitle: string;
-  timesUsed: number;
-}
-
 export const LinkModel = sequelize.define<ILinkModel>("link", {
   id: {
     type: DataTypes.INTEGER,
@@ -95,36 +79,6 @@ export const LinkModel = sequelize.define<ILinkModel>("link", {
   },
 });
 
-export interface IConsultationModel {
-  id: number;
-  date: string;
-  time10: boolean;
-  time11: boolean;
-  time12: boolean;
-  time13: boolean;
-  time14: boolean;
-  time15: boolean;
-  time16: boolean;
-  time17: boolean;
-  time18: boolean;
-  time19: boolean;
-  time20: boolean;
-}
-export interface IConsultationModelModel extends Model {
-  id: number;
-  date: string;
-  time10: boolean;
-  time11: boolean;
-  time12: boolean;
-  time13: boolean;
-  time14: boolean;
-  time15: boolean;
-  time16: boolean;
-  time17: boolean;
-  time18: boolean;
-  time19: boolean;
-  time20: boolean;
-}
 export const ConsultationModel = sequelize.define<IConsultationModelModel>(
   "consultation",
   {

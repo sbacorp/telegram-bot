@@ -10,8 +10,8 @@ import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
 import { updateUserPhone } from "#root/server/utils.js";
 import { ConsultationModel } from "#root/server/models.js";
+import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
-import { IConsultationObject } from "./choose-date.conv.js";
 
 export type timeAttributeType =
   | `time10`

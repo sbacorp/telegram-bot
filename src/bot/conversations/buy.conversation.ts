@@ -8,16 +8,9 @@ import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { updateUserPhone } from "#root/server/utils.js";
+import { IProduct } from "#root/typing.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
 
-export interface IProduct {
-  id: number;
-  name: string;
-  price: number;
-  answer?: string;
-  docId?: string;
-  type: "link" | "doc";
-}
 export const products: IProduct[] = [
   {
     id: 1,

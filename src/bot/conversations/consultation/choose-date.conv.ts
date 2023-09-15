@@ -6,27 +6,11 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { ConsultationModel, IConsultationModel } from "#root/server/models.js";
+import { ConsultationModel } from "#root/server/models.js";
 import { updateUserPhone } from "#root/server/utils.js";
+import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import { createDatePicker } from "./calendar.js";
-
-export interface IConsultationObject {
-  day: string;
-  date?: Date;
-  dateString: string;
-  time: string;
-  consultationTimeKeyboard?: InlineKeyboard;
-  year: number;
-  month: number;
-  calendar?: InlineKeyboard;
-  phoneNumber: string;
-  fio: string;
-  sex: string;
-  consultation?: IConsultationModel;
-  answers: string[];
-  massanger: string;
-}
 
 const createConsultationTimeKeyboard = async (date: string) => {
   const consultation = await ConsultationModel.findOne({

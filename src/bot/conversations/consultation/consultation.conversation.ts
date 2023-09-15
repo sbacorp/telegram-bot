@@ -12,8 +12,9 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { ConsultationModel, IConsultationModel } from "#root/server/models.js";
+import { ConsultationModel } from "#root/server/models.js";
 import { updateUserPhone } from "#root/server/utils.js";
+import { IConsultationObject, IConsultationModel } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import { createDatePicker } from "./calendar.js";
 import {
@@ -24,10 +25,7 @@ import {
   briefFemaleConversation,
   questions as femaleQuestions,
 } from "./brief-female.conv.js";
-import {
-  chooseDateConversation,
-  IConsultationObject,
-} from "./choose-date.conv.js";
+import { chooseDateConversation } from "./choose-date.conv.js";
 import { BuyConsultationConversation } from "./buy-consult.conv.js";
 
 export const yesNoKeyboard = new InlineKeyboard()

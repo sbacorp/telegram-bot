@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 import { autoChatAction } from "@grammyjs/auto-chat-action";
 import { hydrate } from "@grammyjs/hydrate";
 import { sequentialize } from "@grammyjs/runner";
@@ -14,7 +15,6 @@ import {
 import { conversations, createConversation } from "@grammyjs/conversations";
 import {
   Context,
-  SessionData,
   createContextConstructor,
   sessionDataDefaults,
 } from "#root/bot/context.js";
@@ -28,6 +28,7 @@ import { updateLogger } from "#root/bot/middlewares/index.js";
 import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
 import { fillConsultations } from "#root/server/fill-consultations.js";
+import { SessionData } from "#root/typing.js";
 import {
   webSiteKeyboard,
   mainMenu,
@@ -118,8 +119,6 @@ export function createBot(token: string, options: Options = {}) {
       storage: sessionStorage,
     })
   );
-  // bot.use(deleteMessage());
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   const constraint = (ctx: Context) => String(ctx.chat?.id);
   //* middlemares
   bot.use(sequentialize(constraint));
