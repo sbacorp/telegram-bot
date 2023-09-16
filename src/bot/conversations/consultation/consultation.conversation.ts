@@ -104,7 +104,6 @@ export async function consultationConversation(
       ctx = await conversation.wait();
       if (ctx.update.callback_query?.data === "no") {
         message = await conditions(conversation, ctx);
-        continue;
       }
     } while (!(ctx.update.callback_query?.data === "yes"));
     await ctx.editMessageText(
