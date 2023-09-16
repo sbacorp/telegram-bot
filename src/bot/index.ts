@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { autoChatAction } from "@grammyjs/auto-chat-action";
 import { hydrate } from "@grammyjs/hydrate";
@@ -6,6 +7,8 @@ import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { autoRetry } from "@grammyjs/auto-retry";
 import {
   BotConfig,
+  GrammyError,
+  HttpError,
   InlineKeyboard,
   Keyboard,
   StorageAdapter,
@@ -91,6 +94,7 @@ import {
 } from "./conversations/buy.conversation.js";
 // eslint-disable-next-line import/order
 import { UserModel } from "#root/server/models.js";
+import { changeSheduleConversation } from "./conversations/admin/change-shedule.conversation.js";
 
 type Options = {
   sessionStorage?: StorageAdapter<SessionData>;
@@ -125,6 +129,14 @@ export function createBot(token: string, options: Options = {}) {
   const constraint = (ctx: Context) => String(ctx.chat?.id);
   //* middlemares
   bot.use(sequentialize(constraint));
+  bot.command("help", async (ctx: Context) => {
+    await ctx.reply("Возникли проблемы с работой бота?", {
+      reply_markup: new InlineKeyboard().url(
+        "Техническая поддержкуа",
+        "https://t.me/@frontsDev"
+      ),
+    });
+  });
   //* connect plugin conversations
   bot.use(conversations());
   //* setting commands conversations
@@ -134,6 +146,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(deletePromoConversation());
   bot.use(deleteLinkConversation());
   bot.use(activateSubscriptionConversation());
+  bot.use(createConversation(changeSheduleConversation, "changeShedule"));
   //* Handlers welcome and admin
   bot.use(welcomeFeature);
   bot.use(botAdminFeature);
@@ -178,7 +191,6 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(consultationAboutMenu);
   bot.use(consultationAbout2Menu);
   bot.use(consultationMenu);
-
   consultationConditionsMenu.register(consultationAboutMenu);
   consultationAboutMenu.register(consultationAbout2Menu);
 
@@ -390,13 +402,23 @@ export function createBot(token: string, options: Options = {}) {
       await user.save();
     }
   });
-
   bot.use(unhandledFeature);
   //* error handler
   if (config.isDev) {
     bot.catch(errorHandler);
   }
-
+  // bot.catch((error) => {
+  //   const { ctx } = error;
+  //   console.error(`Error while handling update ${ctx.update.update_id}:`);
+  //   const error_ = error.error;
+  //   if (error_ instanceof GrammyError) {
+  //     console.error("Error in request:", error_.description);
+  //   } else if (error_ instanceof HttpError) {
+  //     console.error("Could not contact Telegram:", error_);
+  //   } else {
+  //     console.error("Unknown error:", error_);
+  //   }
+  // });
   return bot;
 }
 

@@ -82,6 +82,9 @@ export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  product: {
+    type: DataTypes.STRING,
+  },
 });
 
 export const LinkModel = sequelize.define<ILinkModel>("link", {

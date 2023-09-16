@@ -41,6 +41,7 @@ const configSchema = z.object({
     )
     .transform((v) => (Array.isArray(v) ? v : [v]))
     .default([]),
+  DATABASE_IP: z.string().default("localhost"),
 });
 
 const parseConfig = (environment: NodeJS.ProcessEnv) => {

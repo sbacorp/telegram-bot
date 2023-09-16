@@ -10,7 +10,9 @@ export function activateSubscriptionConversation() {
       await ctx.reply("<b>Введи ID пользователя</b>");
       const id = await conversation.form.number();
       const message = await ctx.reply("Обновляю подписку...");
-      const response = await activateSubscription(id);
+      const response = await conversation.external(async () =>
+        activateSubscription(id)
+      );
       await ctx.api.deleteMessage(ctx.chat!.id, message.message_id);
       return ctx.reply(response);
     },

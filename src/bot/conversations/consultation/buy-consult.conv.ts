@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable no-console */
 /* eslint-disable unicorn/prefer-optional-catch-binding */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -8,7 +9,10 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import { updateUserPhone } from "#root/server/utils.js";
+import {
+  findPromoCodeByTitleAndProduct,
+  updateUserPhone,
+} from "#root/server/utils.js";
 import { ConsultationModel, UserModel } from "#root/server/models.js";
 import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -50,6 +54,11 @@ export async function BuyConsultationConversation(
   message: any,
   consultationObject: IConsultationObject
 ) {
+  const product = {
+    id: 5,
+    name: "Консультация",
+    price: 10_000,
+  };
   await ctx.deleteMessage();
   if (conversation.session.fio === "") {
     await ctx.reply("Введите ФИО", {
@@ -87,6 +96,33 @@ export async function BuyConsultationConversation(
       await updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number);
     });
     conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
+  }
+  let promo;
+  let promoTitle;
+  await ctx.reply("Введите промокод", {
+    reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
+  });
+  while (!promo || ctx.update.callback_query?.data === "skip") {
+    promoTitle = await conversation.form.text();
+    if (promoTitle) {
+      promo = await conversation.external(async () => {
+        return findPromoCodeByTitleAndProduct(
+          "Консультация",
+          promoTitle!,
+          ctx.chat!.id.toString()
+        );
+      });
+      await ctx.reply("Промокод не найден, попробуйте снова!", {
+        reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
+      });
+    }
+  }
+  if (promo) {
+    await ctx.reply("Промокод принят");
+    await ctx.reply(`Скидка составляет ${promo.discount}%
+Итоговая цена: ${10_000 - 10_000 * promo.discount!}`);
+    product!.price =
+      product!.price! - product!.price! * (promo.discount! / 100);
   }
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`

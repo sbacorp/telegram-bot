@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable prefer-const */
 /* eslint-disable no-useless-return */
 /* eslint-disable no-shadow */
@@ -7,7 +8,10 @@
 import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { updateUserPhone } from "#root/server/utils.js";
+import {
+  findPromoCodeByTitleAndProduct,
+  updateUserPhone,
+} from "#root/server/utils.js";
 import { IProduct } from "#root/typing.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
 
@@ -60,6 +64,7 @@ export async function buyConversation(
 ) {
   const selectedProduct = ctx.session?.selectedProduct;
   let product: IProduct | undefined;
+  let promoTitle: string | undefined;
   if (!selectedProduct) {
     return ctx.reply("Выберите продукт");
   }
@@ -143,21 +148,41 @@ export async function buyConversation(
       await ctx.answerCallbackQuery("Переходим к оплате");
     }
   }
+  let promo;
+  await ctx.reply("Введите промокод");
+  while (!promo || ctx.update.callback_query?.data === "skip") {
+    promoTitle = await conversation.form.text();
+    if (promoTitle) {
+      promo = await conversation.external(async () => {
+        return findPromoCodeByTitleAndProduct(
+          product!.name,
+          promoTitle!,
+          ctx.chat!.id.toString()
+        );
+      });
+      if (!promo)
+        await ctx.reply("Промокод не найден, попробуйте снова!", {
+          reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
+        });
+    }
+  }
+  if (promo) {
+    await ctx.reply("Промокод принят");
+    await ctx.reply(`Скидка составляет ${promo.discount}%
+Итоговая цена: ${product!.price! - product!.price! * (promo.discount! / 100)}`);
+    product!.price =
+      product!.price! - product!.price! * (promo.discount! / 100);
+  }
   //! create link to perchase
   await ctx.reply(
     `<b>Можете приступать к оплате.</b>
 В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
     {
-      reply_markup: new Keyboard().webApp(
-        "Оплатить",
-        "https://payform.ru/d42Lwlz/"
-      ),
+      reply_markup: new InlineKeyboard()
+        .webApp("Оплатить", "https://payform.ru/d42Lwlz/")
+        .text("Оплатил", "paid"),
     }
   );
-
-  await ctx.reply("Подтвердите оплату", {
-    reply_markup: new InlineKeyboard().text("Оплатил", "paid"),
-  });
   do {
     ctx = await conversation.wait();
     if (ctx.update.callback_query?.data === "paid") {

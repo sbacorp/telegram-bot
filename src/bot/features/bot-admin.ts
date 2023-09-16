@@ -80,7 +80,7 @@ feature.command(
   "changeshedule",
   logHandle("command-change-shedule"),
   async (ctx) => {
-    return ctx.conversation.enter("changeSheduleConversation");
+    return ctx.conversation.enter("changeShedule");
   }
 );
 feature.command(

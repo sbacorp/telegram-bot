@@ -11,9 +11,10 @@ export function deletePromoConversation() {
         msg: { text },
       } = await conversation.waitFor("message:text");
       await ctx.reply("Удаляю...");
-      return deletePromoCodeFromDB(text).then((response) =>
-        ctx.reply(response)
+      const response = await conversation.external(async () =>
+        deletePromoCodeFromDB(text)
       );
+      return ctx.reply(response);
     },
     DELETE_PROMO_CONVERSATION
   );

@@ -11,7 +11,10 @@ export function deleteLinkConversation() {
         msg: { text },
       } = await conversation.waitFor("message:text");
       await ctx.reply("Удаляю...");
-      return deleteLinkFromDB(text).then((response) => ctx.reply(response));
+      const response = await conversation.external(async () =>
+        deleteLinkFromDB(text)
+      );
+      return ctx.reply(response);
     },
     DELETE_LINK_CONVERSATION
   );

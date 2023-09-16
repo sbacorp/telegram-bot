@@ -11,9 +11,12 @@ export function createlinkConversation() {
         msg: { text },
       } = await conversation.waitFor("message:text");
       await ctx.reply("Создаю ссылку...");
-      return ctx.reply(
-        `Ссылка создана: <code>${await createLink(text)}</code>`
+      const response = await conversation.external(async () =>
+        createLink(text)
       );
+      return response
+        ? ctx.reply(`Ссылка создана: <code>${response}</code>`)
+        : ctx.reply("Ссылка не создана");
     },
     CREATELINK_CONVERSATION
   );

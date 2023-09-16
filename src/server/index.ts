@@ -1,5 +1,5 @@
 import fastify from "fastify";
-import { BotError, webhookCallback } from "grammy";
+import { BotError, GrammyError, webhookCallback } from "grammy";
 import type { Bot } from "#root/bot/index.js";
 import { errorHandler } from "#root/bot/handlers/index.js";
 import { logger } from "#root/logger.js";
@@ -14,9 +14,12 @@ export const createServer = async (bot: Bot) => {
       errorHandler(error);
 
       await response.code(200).send({});
+    }
+    if (error instanceof GrammyError) {
+      console.error("Error in request:", error.description);
+      await response.code(200).send({});
     } else {
       logger.error(error);
-
       await response.status(500).send({ error: "Oops! Something went wrong." });
     }
   });

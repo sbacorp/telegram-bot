@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { LinkModel, PromocodeModel, UserModel } from "./models.js";
 
 export async function initDB(sequelize: Sequelize) {
@@ -71,12 +71,14 @@ export async function getUsersJoinedNutrCount(): Promise<number> {
 
 export async function createPromoCode(
   code: string,
-  discount: number
+  discount: number,
+  product: string
 ): Promise<string> {
   try {
     await PromocodeModel.create({
       promoTitle: code,
       discount,
+      product,
     });
     return `Промокод <code> ${code} </code> на ${discount} % успешно создан`;
   } catch (error) {
@@ -99,7 +101,7 @@ export async function getPromocodesMessage() {
   return message;
 }
 
-const botLink = "https://t.me/pocket_nutritionist_test_bot?start=";
+const botLink = "https://t.me/@Tvoi_Nutriciolog_bot?start=";
 export const createLink = async (title: string) => {
   let link = botLink + title;
 
@@ -179,3 +181,37 @@ export async function activateSubscription(userId: number) {
     return "Не удалось обновить подписку, возможно такого пользователя не существует";
   }
 }
+
+export const findPromoCodeByTitleAndProduct = async (
+  product: string,
+  promoTitle: string,
+  chatId: string
+) => {
+  try {
+    const user = await UserModel.findOne({
+      where: {
+        chatId,
+      },
+    });
+    const userCurrentPromo = user?.promoCode;
+    const promo = await PromocodeModel.findOne({
+      where: {
+        promoTitle,
+        product: {
+          [Op.or]: [product, "all"],
+        },
+      },
+    });
+    if (user && promo && !userCurrentPromo?.includes(promoTitle)) {
+      promo.timesUsed += 1;
+      await promo.save();
+      user.promoCode = userCurrentPromo
+        ? `${userCurrentPromo},${promoTitle}`
+        : promoTitle;
+      await user.save();
+      return promo;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
