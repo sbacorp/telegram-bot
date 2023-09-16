@@ -37,33 +37,33 @@ export const yesNoKeyboard = new InlineKeyboard()
   .row()
   .text("Уже ознакомлен(а)", "yes");
 
-const conditions = async (ctx: Context) => {
+const conditions = async (
+  conversation: Conversation<Context>,
+  ctx: Context
+) => {
   let message = await ctx.reply(`
 Формат консультации не предполагает переписку в режиме «мне срочно», переписки в любое время и в любом количестве. Разбор состояния ваших родных и близких, без оплаты консультации для них.
 
 Если вы не готовы оплатить в среднем анализы на 10-15 тысяч рублей, купить добавок в среднем на 25-30 тысяч рублей, а также принимать в день большое количество добавок, иногда их число достигает 15 штук в день, в зависимости от вашего состояния, то не отнимайте мое время и не тратьте ваши деньги.
   `);
-  setTimeout(async () => {
-    await ctx.reply(
-      `
+  await conversation.sleep(1000);
+  await ctx.reply(
+    `
 Если вы по каким-то причинам досдаете, пересдаете анализы и досылаете их после получения схемы, то они не будут разбираться, т.к. это предполагает полное погружение заново и будет рассматриваться как новая консультация.
 
 Если вы получили схему сейчас, а смогли приобрести все добавки через пару месяцев, это уже не актуально, т.к. процессы в организме не стоят на месте и всё быстро меняется.
       `
-    );
-  }, 2000);
-  setTimeout(async () => {
-    message = await ctx.reply(
-      `
+  );
+  await conversation.sleep(1000);
+  message = await ctx.reply(
+    `
 Консультация для взрослых - 10.000₽
-
 Консультация для детей - 5.000₽
 `,
-      {
-        reply_markup: yesNoKeyboard,
-      }
-    );
-  }, 3000);
+    {
+      reply_markup: yesNoKeyboard,
+    }
+  );
   return message;
 };
 export const CONSULTATION_CONVERSATION = "consultation";
@@ -103,7 +103,7 @@ export async function consultationConversation(
     do {
       ctx = await conversation.wait();
       if (ctx.update.callback_query?.data === "no") {
-        message = await conditions(ctx);
+        message = await conditions(conversation, ctx);
         continue;
       }
     } while (!(ctx.update.callback_query?.data === "yes"));
