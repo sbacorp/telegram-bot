@@ -13,7 +13,7 @@ function getPrivateChatCommands(): BotCommand[] {
     },
     {
       command: "help",
-      description: "Помошь",
+      description: "Помощь",
     },
   ];
 }
