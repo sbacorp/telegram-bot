@@ -69,7 +69,7 @@ export async function consultationConversation(
   const chatId = ctx.chat!.id.toString();
   const user = await UserModel.findOne({
     where: {
-      chatId: ctx.chat!.id,
+      chatId,
     },
   });
   let consultationObject: IConsultationObject = {
