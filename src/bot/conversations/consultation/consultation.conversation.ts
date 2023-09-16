@@ -34,10 +34,11 @@ import { BuyConsultationConversation } from "./buy-consult.conv.js";
 
 export const yesNoKeyboard = new InlineKeyboard()
   .text("Ознакомиться", "no")
+  .row()
   .text("Уже ознакомлен(а)", "yes");
 
 const conditions = async (ctx: Context) => {
-  await ctx.reply(`
+  let message = await ctx.reply(`
 Формат консультации не предполагает переписку в режиме «мне срочно», переписки в любое время и в любом количестве. Разбор состояния ваших родных и близких, без оплаты консультации для них.
 
 Если вы не готовы оплатить в среднем анализы на 10-15 тысяч рублей, купить добавок в среднем на 25-30 тысяч рублей, а также принимать в день большое количество добавок, иногда их число достигает 15 штук в день, в зависимости от вашего состояния, то не отнимайте мое время и не тратьте ваши деньги.
@@ -52,16 +53,18 @@ const conditions = async (ctx: Context) => {
     );
   }, 2000);
   setTimeout(async () => {
-    await ctx.reply(
+    message = await ctx.reply(
       `
 Консультация для взрослых - 10.000₽
 
 Консультация для детей - 5.000₽
-`, {
+`,
+      {
         reply_markup: yesNoKeyboard,
       }
     );
   }, 3000);
+  return message;
 };
 export const CONSULTATION_CONVERSATION = "consultation";
 export async function consultationConversation(
@@ -100,7 +103,7 @@ export async function consultationConversation(
     do {
       ctx = await conversation.wait();
       if (ctx.update.callback_query?.data === "no") {
-        await conditions(ctx);
+        message = await conditions(ctx);
         continue;
       }
     } while (!(ctx.update.callback_query?.data === "yes"));
