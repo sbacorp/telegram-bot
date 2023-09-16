@@ -99,7 +99,7 @@ export async function consultationConversation(
       ctx = await conversation.wait();
       if (ctx.update.callback_query?.data === "no") {
         await conditions(ctx);
-        ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
+        await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
           reply_markup: yesNoKeyboard,
         });
         continue;
