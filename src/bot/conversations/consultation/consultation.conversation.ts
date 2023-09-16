@@ -57,7 +57,9 @@ const conditions = async (ctx: Context) => {
 Консультация для взрослых - 10.000₽
 
 Консультация для детей - 5.000₽
-`
+`, {
+        reply_markup: yesNoKeyboard,
+      }
     );
   }, 3000);
 };
@@ -99,9 +101,6 @@ export async function consultationConversation(
       ctx = await conversation.wait();
       if (ctx.update.callback_query?.data === "no") {
         await conditions(ctx);
-        await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
-          reply_markup: yesNoKeyboard,
-        });
         continue;
       }
     } while (!(ctx.update.callback_query?.data === "yes"));
