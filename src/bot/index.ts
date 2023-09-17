@@ -132,8 +132,8 @@ export function createBot(token: string, options: Options = {}) {
   bot.command("help", async (ctx: Context) => {
     await ctx.reply("Возникли проблемы с работой бота?", {
       reply_markup: new InlineKeyboard().url(
-        "Техническая поддержкуа",
-        "https://t.me/@frontsDev"
+        "Техническая поддержка",
+        "https://t.me/frontsDev"
       ),
     });
   });
@@ -328,7 +328,7 @@ export function createBot(token: string, options: Options = {}) {
           [
             {
               text: "Перейти в бота 🤖 ",
-              url: "https://t.me/pocket_nutritionist_test_bot",
+              url: "https://t.me/Tvoi_Nutriciolog_bot",
             },
           ],
         ],
