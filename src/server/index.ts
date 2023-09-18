@@ -12,7 +12,6 @@ export const createServer = async (bot: Bot) => {
   server.setErrorHandler(async (error, request, response) => {
     if (error instanceof BotError) {
       errorHandler(error);
-
       await response.code(200).send({});
     }
     if (error instanceof GrammyError) {
