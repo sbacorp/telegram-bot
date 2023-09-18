@@ -383,7 +383,6 @@ export function createBot(token: string, options: Options = {}) {
         reply_markup: toProjectsMenu,
       }
     );
-    return ctx.deleteMessage();
   });
   //* must be the last handler
   bot.hears("asdf", async () => {
