@@ -88,7 +88,8 @@ export async function BuyConsultationConversation(
       {
         reply_markup: new Keyboard()
           .requestContact("Отправить контакт")
-          .resized(),
+          .resized()
+          .oneTime(),
       }
     );
     ctx = await conversation.waitFor(":contact");
@@ -112,9 +113,10 @@ export async function BuyConsultationConversation(
           ctx.chat!.id.toString()
         );
       });
-      await ctx.reply("Промокод не найден, попробуйте снова!", {
-        reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
-      });
+      if (!promo)
+        await ctx.reply("Промокод не найден, попробуйте снова!", {
+          reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
+        });
     }
   }
   if (promo) {
