@@ -88,9 +88,15 @@ export async function buyConversation(
     sugMessage.message_id,
     {
       reply_markup: new InlineKeyboard()
-        .url("Пользовательское соглашение", "https://telegra.ph")
+        .url(
+          "Пользовательское соглашение",
+          "https://telegra.ph/Politika-konfidencialnost-09-19"
+        )
         .row()
-        .url("Политика конфеденциальности", "https://telegra.ph")
+        .url(
+          "Политика конфеденциальности",
+          "https://telegra.ph/PUBLICHNAYA-OFERTA-09-19-3"
+        )
         .row()
         .text(" ✅ Ознакомлен"),
     }
