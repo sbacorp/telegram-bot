@@ -51,9 +51,15 @@ export const products: IProduct[] = [
 ];
 
 export const userSuggestions = new InlineKeyboard()
-  .url("Пользовательское соглашение", "https://telegra.ph")
+  .url(
+    "Пользовательское соглашение",
+    "https://telegra.ph/Politika-konfidencialnost-09-19"
+  )
   .row()
-  .url("Политика конфеденциальности", "https://telegra.ph")
+  .url(
+    "Политика конфеденциальности",
+    "https://telegra.ph/PUBLICHNAYA-OFERTA-09-19-3"
+  )
   .row()
   .text(" ☑️ Соглашаюсь с условиями", "accept");
 
