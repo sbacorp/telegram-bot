@@ -156,12 +156,15 @@ export async function buyConversation(
   }
   let promo;
   await ctx.reply("Введите промокод");
-  while (!promo || ctx.update.callback_query?.data === "skip") {
-    promoTitle = await conversation.form.text();
-    if (promoTitle) {
+  while (!promo) {
+    ctx = await conversation.wait();
+    if (ctx.update.callback_query?.data === "skip") {
+      break;
+    }
+    if (ctx.message?.text) {
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
-          product!.name,
+          "Консультация",
           promoTitle!,
           ctx.chat!.id.toString()
         );

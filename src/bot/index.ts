@@ -186,7 +186,11 @@ export function createBot(token: string, options: Options = {}) {
   projectsMenu.register(studyProjectsMenu);
   projectsMenu.register(freeProjectsMenu);
   projectsMenu.register(budsProjectsMenu);
+
   //* consultations menus
+  bot.use(
+    createConversation(consultationConversation, CONSULTATION_CONVERSATION)
+  );
   bot.use(consultationConditionsMenu);
   bot.use(consultationAboutMenu);
   bot.use(consultationAbout2Menu);

@@ -103,10 +103,12 @@ export async function BuyConsultationConversation(
   await ctx.reply("Введите промокод", {
     reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
   });
-  while (!promo || ctx.update.callback_query?.data === "skip") {
-if(ctx.update.callback_query?.data === "skip") break
-    promoTitle = await conversation.form.text();
-    if (promoTitle) {
+  while (!promo) {
+    ctx = await conversation.wait();
+    if (ctx.update.callback_query?.data === "skip") {
+      break;
+    }
+    if (ctx.message?.text) {
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
           "Консультация",
