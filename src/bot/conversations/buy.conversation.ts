@@ -9,6 +9,7 @@ import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
+  editUserAttribute,
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
@@ -133,6 +134,9 @@ export async function buyConversation(
       ctx = await conversation.waitFor("message:text");
     }
     conversation.session.fio = ctx.message?.text;
+    await conversation.external(async () => {
+      await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
+    });
   } else {
     await ctx.reply(
       `Ваше ФИО: ${conversation.session.fio}
@@ -153,6 +157,9 @@ export async function buyConversation(
         ctx = await conversation.waitFor("message:text");
       }
       conversation.session.fio = ctx.message?.text;
+      await conversation.external(async () => {
+        await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
+      });
     } else if (ctx.update.callback_query?.data === "yes") {
       await ctx.answerCallbackQuery("Переходим к оплате");
     }

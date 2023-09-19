@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 import { Op, Sequelize } from "sequelize";
@@ -29,6 +30,16 @@ export async function findOrCreateUser(chatId: number) {
       await UserModel.create({ chatId });
       return false;
     }
+  } catch (error) {
+    console.error(error);
+  }
+}
+export async function fetchUser(chatId: number) {
+  try {
+    const user = await UserModel.findOne({
+      where: { chatId: chatId.toString() },
+    });
+    return user;
   } catch (error) {
     console.error(error);
   }
@@ -210,6 +221,37 @@ export const findPromoCodeByTitleAndProduct = async (
         : promoTitle;
       await user.save();
       return promo;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+type UserAttributes =
+  | "sub"
+  | "joinedToNutr"
+  | "status"
+  | "promoCode"
+  | "phoneNumber"
+  | "fio"
+  | "boughtProducts"
+  | "consultationPaidStatus"
+  | "sex";
+
+export const editUserAttribute = async (
+  chatId: number,
+  attribute: UserAttributes,
+  payload: string | number | boolean
+) => {
+  try {
+    const user = await UserModel.findOne({
+      where: {
+        chatId,
+      },
+    });
+    if (user) {
+      // @ts-ignore
+      user[attribute] = payload;
+      await user.save();
     }
   } catch (error) {
     console.log(error);

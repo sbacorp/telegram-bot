@@ -25,7 +25,6 @@ export const UserModel = sequelize.define<IUserModel>("user", {
   },
   phoneNumber: {
     type: DataTypes.STRING,
-    defaultValue: "",
   },
   fio: {
     type: DataTypes.STRING,

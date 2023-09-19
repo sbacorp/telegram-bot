@@ -10,6 +10,8 @@ import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
 import {
+  editUserAttribute,
+  fetchUser,
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
@@ -54,13 +56,14 @@ export async function BuyConsultationConversation(
   message: any,
   consultationObject: IConsultationObject
 ) {
+  const user = await conversation.external(async () => fetchUser(ctx.chat!.id));
   const product = {
     id: 5,
     name: "Консультация",
     price: 10_000,
   };
   await ctx.deleteMessage();
-  if (conversation.session.fio === "") {
+  if (conversation.session.fio === "" || !user?.fio) {
     await ctx.reply("Введите ФИО", {
       reply_markup: new Keyboard()
         .text("⬅️ К выбору даты")
@@ -81,6 +84,9 @@ export async function BuyConsultationConversation(
       ctx = await conversation.waitFor("message:text");
     }
     conversation.session.fio = ctx.message?.text;
+    await conversation.external(async () => {
+      await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
+    });
   }
   if (conversation.session.phoneNumber === "") {
     await ctx.reply(
@@ -97,6 +103,9 @@ export async function BuyConsultationConversation(
       await updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number);
     });
     conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
+    await conversation.external(async () => {
+      await editUserAttribute(ctx.chat!.id, "phoneNumber", ctx.message!.text!);
+    });
   }
   let promo;
   let promoTitle;
@@ -166,13 +175,7 @@ export async function BuyConsultationConversation(
     );
   });
   await conversation.external(async () => {
-    const user = await UserModel.findOne({
-      where: {
-        chatId: ctx.chat!.id,
-      },
-    });
-    user!.consultationPaidStatus = true;
-    user!.save();
+    await editUserAttribute(ctx.chat!.id, "consultationPaidStatus", true);
   });
   conversation.session.consultationStep = 3;
   await ctx.reply("<b>Оплата прошла успешно</b>", {
