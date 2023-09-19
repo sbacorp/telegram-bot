@@ -104,6 +104,7 @@ export async function BuyConsultationConversation(
     reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
   });
   while (!promo || ctx.update.callback_query?.data === "skip") {
+if(ctx.update.callback_query?.data === "skip") break
     promoTitle = await conversation.form.text();
     if (promoTitle) {
       promo = await conversation.external(async () => {
