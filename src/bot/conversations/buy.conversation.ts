@@ -155,7 +155,9 @@ export async function buyConversation(
     }
   }
   let promo;
-  await ctx.reply("Введите промокод");
+  await ctx.reply("Введите промокод", {
+    reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
+  });
   while (!promo) {
     ctx = await conversation.wait();
     if (ctx.update.callback_query?.data === "skip") {
