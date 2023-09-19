@@ -160,10 +160,6 @@ export function createBot(token: string, options: Options = {}) {
   });
   //* buy conversation
   bot.use(createConversation(buyConversation, BUY_CONVERSATION));
-  //* consultations conversation
-  bot.use(
-    createConversation(consultationConversation, CONSULTATION_CONVERSATION)
-  );
   bot.hears("Начать запись заново", async (ctx: Context) => {
     await ctx.conversation.exit();
     ctx.session.consultationStep = 1;
