@@ -138,7 +138,8 @@ export async function BuyConsultationConversation(
     {
       reply_markup: new Keyboard()
         .webApp("Оплатить", "https://payform.ru/992L3rc/")
-        .add("⬅️ К выбору даты")
+        .row()
+        .text("⬅️ К выбору даты")
         .resized(),
     }
   );
