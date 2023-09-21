@@ -146,7 +146,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(deletePromoConversation());
   bot.use(deleteLinkConversation());
   bot.use(activateSubscriptionConversation());
-  bot.use(createConversation(changeSheduleConversation, "changeShedule"));
+  bot.use(changeSheduleConversation());
   //* Handlers welcome and admin
   bot.use(welcomeFeature);
   bot.use(botAdminFeature);

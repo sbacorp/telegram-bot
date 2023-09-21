@@ -22,7 +22,6 @@ export type timeAttributeType =
   | "time19"
   | "time20";
 
-export const CREATELINK_CONVERSATION = "createlinkConversation";
 export function changeSheduleConversation() {
   return createConversation(
     async (conversation: Conversation<Context>, ctx: Context) => {
@@ -89,6 +88,6 @@ export function changeSheduleConversation() {
         });
       }
     },
-    "changeSheduleConversation"
+    "changeShedule"
   );
 }
