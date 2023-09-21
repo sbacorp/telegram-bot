@@ -177,6 +177,9 @@ export const ConsultationAppointmentModel =
     time: {
       type: DataTypes.STRING,
     },
+    chatId: {
+      type: DataTypes.STRING,
+    },
   });
 
 ConsultationAppointmentModel.belongsTo(UserModel, { foreignKey: "chatId" });
