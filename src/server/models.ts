@@ -165,21 +165,31 @@ export interface IConsultationAppointment extends Model {
   time: string;
 }
 export const ConsultationAppointmentModel =
-  sequelize.define<IConsultationAppointment>("consultationAppointment", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+  sequelize.define<IConsultationAppointment>(
+    "consultationAppointment",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      date: {
+        type: DataTypes.STRING,
+      },
+      time: {
+        type: DataTypes.STRING,
+      },
+      chatId: {
+        type: DataTypes.STRING,
+      },
     },
-    date: {
-      type: DataTypes.STRING,
-    },
-    time: {
-      type: DataTypes.STRING,
-    },
-    chatId: {
-      type: DataTypes.STRING,
-    },
-  });
+    {
+      updatedAt: false,
+    }
+  );
 
-ConsultationAppointmentModel.belongsTo(UserModel, { foreignKey: "chatId" });
+ConsultationAppointmentModel.belongsTo(UserModel, {
+  foreignKey: "chatId",
+  targetKey: "chatId",
+  onDelete: "cascade",
+});
