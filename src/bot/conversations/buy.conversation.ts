@@ -49,6 +49,13 @@ export const products: IProduct[] = [
     answer:
       "<a href='https://t.me/+798aDavPym8yODgy'>Закрытый телеграм чат</a>",
   },
+  {
+    id: 5,
+    name: "Консультация",
+    price: 10_000,
+    type: "link",
+    answer: "Оплата успешно произведена",
+  },
 ];
 
 export const userSuggestions = new InlineKeyboard()
