@@ -238,7 +238,7 @@ type UserAttributes =
   | "sex";
 
 export const editUserAttribute = async (
-  chatId: number,
+  chatId: string,
   attribute: UserAttributes,
   payload: string | number | boolean
 ) => {

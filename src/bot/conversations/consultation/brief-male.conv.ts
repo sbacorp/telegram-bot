@@ -357,23 +357,6 @@ export async function briefMaleConversation(
 ) {
   const answersCount = conversation.session.consultation.answers.length;
   await ctx.deleteMessage();
-  // eslint-disable-next-line no-restricted-syntax
-  if (
-    conversation.session.consultation.dateString.split("-")[2] !==
-    new Date().getDate().toString()
-  ) {
-    conversation.session.consultationStep = 1;
-    await ctx.reply("Вы не успели выполнить тестирование", {
-      reply_markup: new Keyboard()
-        .text("Перейти к выбору даты")
-        .row()
-        .text("🏠 Главное меню"),
-    });
-    ctx = await conversation.wait();
-    if (ctx.message?.text === "Перейти к выбору даты") {
-      return ctx.conversation.enter("consultation");
-    }
-  }
   for (let i = answersCount; i < questions.length; i += 1) {
     if (!questions[i].type) {
       await ctx.reply(questions[i].text);

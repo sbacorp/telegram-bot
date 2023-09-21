@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-console */
 /* eslint-disable unicorn/prefer-optional-catch-binding */
@@ -56,14 +57,13 @@ export async function BuyConsultationConversation(
   message: any,
   consultationObject: IConsultationObject
 ) {
-  const user = await conversation.external(async () => fetchUser(ctx.chat!.id));
   const product = {
     id: 5,
     name: "Консультация",
-    price: 10_000,
+    price: conversation.session.sex === "child" ? 5000 : 10_000,
   };
   await ctx.deleteMessage();
-  if (conversation.session.fio === "" || !user?.fio) {
+  if (conversation.session.fio === "") {
     await ctx.reply("Введите ФИО", {
       reply_markup: new Keyboard()
         .text("⬅️ К выбору даты")
@@ -84,9 +84,9 @@ export async function BuyConsultationConversation(
       ctx = await conversation.waitFor("message:text");
     }
     conversation.session.fio = ctx.message?.text;
-    await conversation.external(async () => {
-      await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
-    });
+    await conversation.external(async () =>
+      editUserAttribute(ctx.chat!.id.toString(), "fio", ctx.message!.text!)
+    );
   }
   if (conversation.session.phoneNumber === "") {
     await ctx.reply(
@@ -99,12 +99,16 @@ export async function BuyConsultationConversation(
       }
     );
     ctx = await conversation.waitFor(":contact");
-    await conversation.external(async () => {
-      await updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number);
-    });
+    await conversation.external(async () =>
+      updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number)
+    );
     conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
     await conversation.external(async () => {
-      await editUserAttribute(ctx.chat!.id, "phoneNumber", ctx.message!.text!);
+      await editUserAttribute(
+        ctx.chat!.id.toString(),
+        "phoneNumber",
+        ctx.message!.text!
+      );
     });
   }
   let promo;
@@ -133,8 +137,7 @@ export async function BuyConsultationConversation(
   }
   if (promo) {
     await ctx.reply("Промокод принят");
-    await ctx.reply(`Скидка составляет ${promo.discount}%
-Итоговая цена: ${10_000 - 10_000 * promo.discount!}`);
+    await ctx.reply(`Скидка составляет ${promo.discount}%`);
     product!.price =
       product!.price! - product!.price! * (promo.discount! / 100);
   }
@@ -175,9 +178,16 @@ export async function BuyConsultationConversation(
     );
   });
   await conversation.external(async () => {
-    await editUserAttribute(ctx.chat!.id, "consultationPaidStatus", true);
+    await editUserAttribute(
+      ctx.chat!.id.toString(),
+      "consultationPaidStatus",
+      true
+    );
   });
-  conversation.session.consultationStep = 3;
+  conversation.session.consultation.answers = [];
+  conversation.session.consultation.buyDate =
+    new Date().getDate() + new Date().getMonth().toString();
+  conversation.session.consultationStep = 4;
   await ctx.reply("<b>Оплата прошла успешно</b>", {
     reply_markup: cancel,
   });

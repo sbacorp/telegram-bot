@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-null */
+/* eslint-disable default-case */
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-const */
@@ -7,20 +8,16 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-await */
-/* eslint-disable no-shadow */
 /* eslint-disable import/no-cycle */
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
   ConsultationAppointmentModel,
-  ConsultationModel,
   UserModel,
 } from "#root/server/models.js";
-import { updateUserPhone } from "#root/server/utils.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
-import { createDatePicker } from "./calendar.js";
 import {
   briefMaleConversation,
   questions as maleQuestions,
@@ -29,6 +26,10 @@ import {
   briefFemaleConversation,
   questions as femaleQuestions,
 } from "./brief-female.conv.js";
+import {
+  briefChildConversation,
+  questions as childQuestions,
+} from "./brief-child.conv.js";
 import { chooseDateConversation } from "./choose-date.conv.js";
 import { BuyConsultationConversation } from "./buy-consult.conv.js";
 
@@ -121,41 +122,18 @@ export async function consultationConversation(
     } while (!(ctx.update.callback_query?.data === "start"));
     conversation.session.consultationStep = 1;
   }
-  if (conversation.session.consultationStep < 2) {
-    consultationObject = await chooseDateConversation(
-      conversation,
-      ctx,
-      consultationObject,
-      message
-    );
-    conversation.session.consultationStep = 2;
-  }
   if (
-    conversation.session.consultationStep < 3 &&
-    !user!.consultationPaidStatus
-  ) {
-    ctx = (await BuyConsultationConversation(
-      conversation,
-      ctx,
-      message,
-      consultationObject
-    )) as Context;
-  }
-  if (
-    conversation.session.consultationStep < 4 &&
+    conversation.session.consultationStep < 2 &&
     conversation.session.sex === ""
   ) {
-    await ctx.editMessageText(`Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
-От этого этапа будет зависеть список назначенных анализов.
-Обязательно ответьте на вопросы до 00:00 текущего дня.
-В противном вам придется выбрать другую дату`);
     await ctx.reply("Пожалуйста, укажите ваш пол", {
       reply_markup: new InlineKeyboard()
         .text("Мужской", "male")
-        .text("Женский", "female"),
+        .text("Женский", "female")
+        .text("Ребенку", "child"),
     });
     ctx = await conversation.wait();
-    while (!ctx.update.callback_query?.data?.match(/^(male|female)$/)) {
+    while (!ctx.update.callback_query?.data?.match(/^(male|female|child)$/)) {
       await ctx.answerCallbackQuery("Используйте кнопки");
       ctx = await conversation.wait();
     }
@@ -165,12 +143,29 @@ export async function consultationConversation(
     if (ctx.update.callback_query?.data === "female") {
       conversation.session.sex = "female";
     }
-    await ctx.reply("Отлично, теперь перейдем к опроснику", {
-      reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
-    });
-    conversation.session.consultationStep = 4;
+    conversation.session.consultationStep = 2;
   }
 
+  if (conversation.session.consultationStep < 3) {
+    consultationObject = await chooseDateConversation(
+      conversation,
+      ctx,
+      consultationObject,
+      message
+    );
+    conversation.session.consultationStep = 3;
+  }
+  if (
+    conversation.session.consultationStep < 4 ||
+    user!.consultationPaidStatus === false
+  ) {
+    ctx = (await BuyConsultationConversation(
+      conversation,
+      ctx,
+      message,
+      consultationObject
+    )) as Context;
+  }
   if (
     conversation.session.consultationStep < 5 &&
     ((conversation.session.sex === "male" &&
@@ -178,12 +173,51 @@ export async function consultationConversation(
         maleQuestions.length) ||
       (conversation.session.sex === "female" &&
         conversation.session.consultation.questionsAnswered !==
-          femaleQuestions.length))
+          femaleQuestions.length) ||
+      (conversation.session.sex === "child" &&
+        conversation.session.consultation.questionsAnswered !==
+          childQuestions.length))
   ) {
-    if (conversation.session.sex === "male") {
-      await briefMaleConversation(conversation, ctx);
-    } else if (conversation.session.sex === "female") {
-      await briefFemaleConversation(conversation, ctx);
+    await ctx.reply(`Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
+От этого этапа будет зависеть список назначенных анализов.
+Обязательно ответьте на вопросы до 00:00 текущего дня.
+В противном вам придется выбрать другую дату`);
+    if (
+      conversation.session.consultation.buyDate !==
+      new Date().getDate() + new Date().getMonth().toString()
+    ) {
+      conversation.session.consultationStep = 1;
+      await ctx.reply("Вы не успели выполнить тестирование", {
+        reply_markup: new Keyboard()
+          .text("Перейти к выбору даты")
+          .row()
+          .text("🏠 Главное меню"),
+      });
+      ctx = await conversation.wait();
+      if (ctx.message?.text === "Перейти к выбору даты") {
+        return ctx.conversation.enter("consultation");
+      }
+    }
+    switch (conversation.session.sex) {
+      case "male": {
+        await briefMaleConversation(conversation, ctx);
+
+        break;
+      }
+      case "female": {
+        await briefFemaleConversation(conversation, ctx);
+
+        break;
+      }
+      case "child": {
+        await briefChildConversation(conversation, ctx);
+
+        break;
+      }
+      default: {
+        break;
+      }
+      // No default
     }
     conversation.session.consultationStep = 5;
   }
@@ -209,8 +243,8 @@ export async function consultationConversation(
     await ctx.reply("Напишите контакт для связи в этом мессенджере");
     ctx = await conversation.waitFor("message:text");
     while (!ctx.message?.text) ctx = await conversation.waitFor("message:text");
-    conversation.session.consultation.messanger = `${consultationObject.massanger} ${ctx.message.text}`;
 
+    conversation.session.consultation.messanger = `${consultationObject.massanger} ${ctx.message.text}`;
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
@@ -224,12 +258,22 @@ export async function consultationConversation(
       `;
         })
         .join("\n");
-    } else {
+    } else if (conversation.session.sex === "female") {
       answerQuestions = consultationObject.answers
         .map((answer) => {
           return `
         
 Вопрос :${femaleQuestions[consultationObject.answers.indexOf(answer)].text}
+Ответ: ${answer}
+      `;
+        })
+        .join("\n");
+    } else {
+      answerQuestions = consultationObject.answers
+        .map((answer) => {
+          return `
+        
+Вопрос :${childQuestions[consultationObject.answers.indexOf(answer)].text}
 Ответ: ${answer}
       `;
         })

@@ -73,7 +73,7 @@ export async function buyConversation(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
-  const selectedProduct = ctx.session?.selectedProduct;
+  const selectedProduct = conversation.session?.selectedProduct;
   let product: IProduct | undefined;
   let promoTitle: string | undefined;
   if (!selectedProduct) {
@@ -142,7 +142,11 @@ export async function buyConversation(
     }
     conversation.session.fio = ctx.message?.text;
     await conversation.external(async () => {
-      await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
+      await editUserAttribute(
+        ctx.chat!.id.toString(),
+        "fio",
+        ctx.message!.text!
+      );
     });
   } else {
     await ctx.reply(
@@ -165,7 +169,11 @@ export async function buyConversation(
       }
       conversation.session.fio = ctx.message?.text;
       await conversation.external(async () => {
-        await editUserAttribute(ctx.chat!.id, "fio", ctx.message!.text!);
+        await editUserAttribute(
+          ctx.chat!.id.toString(),
+          "fio",
+          ctx.message!.text!
+        );
       });
     } else if (ctx.update.callback_query?.data === "yes") {
       await ctx.answerCallbackQuery("Переходим к оплате");

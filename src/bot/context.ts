@@ -15,6 +15,7 @@ export const sessionDataDefaults: SessionData = {
   sex: "",
   consultationStep: 0,
   consultation: {
+    buyDate: "",
     questionsAnswered: 0,
     dateString: "",
     time: "",

@@ -6,9 +6,10 @@ export type SessionData = {
   subscribedToChannel?: boolean;
   phoneNumber: string;
   fio: string;
-  sex: "male" | "female" | "";
+  sex: "male" | "female" | "child" | "";
   consultationStep: number;
   consultation: {
+    buyDate: string;
     questionsAnswered: number;
     dateString: string;
     time: string;
