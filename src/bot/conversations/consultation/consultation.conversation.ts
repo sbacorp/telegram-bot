@@ -9,7 +9,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-await */
 /* eslint-disable import/no-cycle */
-import { type Conversation, createConversation } from "@grammyjs/conversations";
+import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
@@ -82,7 +82,10 @@ export async function consultationConversation(
         },
       })
   );
-  const { phoneNumber, fio, consultationPaidStatus, sex, buyDate } = user!;
+  console.log(user!.dataValues);
+
+  const { phoneNumber, fio, consultationPaidStatus, sex, buyDate } =
+    user!.dataValues;
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -128,33 +131,11 @@ export async function consultationConversation(
     conversation.session.consultationStep = 1;
   }
   if (conversation.session.consultationStep < 2) {
-    if (conversation.session.sex !== "") {
-      await ctx.reply(
-        `Вы выбрали косультация для ${conversation.session.sex}, верно? `,
-        {
-          reply_markup: new Keyboard().text("Да").text("Нет"),
-        }
-      );
-      ctx = await conversation.wait();
-      while (!ctx.message?.text) {
-        await ctx.reply("Используйте кнопки");
-        ctx = await conversation.wait();
-      }
-      if (ctx.message.text === "Нет") {
-        conversation.session.consultationStep = 1;
-        conversation.session.sex = "";
-        return ctx.conversation.reenter("consultation");
-      }
-      if (ctx.message.text === "Да") {
-        conversation.session.consultationStep = 2;
-        return ctx.conversation.reenter("consultation");
-      }
-    }
     await ctx.reply("Пожалуйста, укажите для кого консультация.", {
       reply_markup: new InlineKeyboard()
-        .text("Мужской", "male")
-        .text("Женский", "female")
-        .text("Ребенку", "child"),
+        .text("Мужчины", "male")
+        .text("Женщины", "female")
+        .text("Ребенка", "child"),
     });
     ctx = await conversation.wait();
     while (!ctx.update.callback_query?.data?.match(/^(male|female|child)$/)) {
@@ -198,7 +179,7 @@ export async function consultationConversation(
   }
   if (
     conversation.session.consultationStep < 4 &&
-    user!.consultationPaidStatus === false
+    user!.consultationPaidStatus !== true
   ) {
     ctx = (await BuyConsultationConversation(
       conversation,
@@ -228,8 +209,12 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
+    console.log(
+      buyDate,
+      new Date().getDate() + new Date().getMonth().toString()
+    );
+
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
-      conversation.session.consultationStep = 1;
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
           .text("Перейти к выбору даты")
@@ -239,6 +224,7 @@ export async function consultationConversation(
       });
       ctx = await conversation.wait();
       if (ctx.message?.text === "Перейти к выбору даты") {
+        conversation.session.consultationStep = 2;
         return ctx.conversation.enter("consultation");
       }
     }
