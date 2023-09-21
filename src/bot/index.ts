@@ -388,6 +388,21 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("asdf", async () => {
     await fillConsultations();
   });
+  bot.on("callback_query:data", async (ctx: Context) => {
+    const data = ctx.callbackQuery?.data;
+    if (data === "child") {
+      await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
+      ctx.session.sex = "child";
+    }
+    if (data === "male") {
+      await ctx.answerCallbackQuery("Вы выбрали консультацию для мужчины");
+      ctx.session.sex = "male";
+    }
+    if (data === "female") {
+      await ctx.answerCallbackQuery("Вы выбрали консультацию для женщины");
+      ctx.session.sex = "female";
+    }
+  });
   bot.on("my_chat_member", async (ctx: Context) => {
     if (ctx.update.my_chat_member?.new_chat_member?.status === "kicked") {
       const chatId = ctx.update.my_chat_member?.chat.id.toString();
@@ -406,18 +421,6 @@ export function createBot(token: string, options: Options = {}) {
   if (config.isDev) {
     bot.catch(errorHandler);
   }
-  // bot.catch((error) => {
-  //   const { ctx } = error;
-  //   console.error(`Error while handling update ${ctx.update.update_id}:`);
-  //   const error_ = error.error;
-  //   if (error_ instanceof GrammyError) {
-  //     console.error("Error in request:", error_.description);
-  //   } else if (error_ instanceof HttpError) {
-  //     console.error("Could not contact Telegram:", error_);
-  //   } else {
-  //     console.error("Unknown error:", error_);
-  //   }
-  // });
   return bot;
 }
 

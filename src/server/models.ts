@@ -62,6 +62,10 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  buyDate: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+  },
 });
 
 export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
@@ -181,6 +185,13 @@ export const ConsultationAppointmentModel =
       },
       chatId: {
         type: DataTypes.STRING,
+      },
+      paidAt: {
+        type: DataTypes.STRING,
+      },
+      paid: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

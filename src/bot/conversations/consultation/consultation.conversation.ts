@@ -17,6 +17,7 @@ import {
   UserModel,
 } from "#root/server/models.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
+import { editUserAttribute } from "#root/server/utils.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import {
   briefMaleConversation,
@@ -73,11 +74,15 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  const user = await UserModel.findOne({
-    where: {
-      chatId,
-    },
-  });
+  const user = await conversation.external(
+    async () =>
+      await UserModel.findOne({
+        where: {
+          chatId,
+        },
+      })
+  );
+  const { phoneNumber, fio, consultationPaidStatus, sex, buyDate } = user!;
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -122,11 +127,30 @@ export async function consultationConversation(
     } while (!(ctx.update.callback_query?.data === "start"));
     conversation.session.consultationStep = 1;
   }
-  if (
-    conversation.session.consultationStep < 2 &&
-    conversation.session.sex === ""
-  ) {
-    await ctx.reply("Пожалуйста, укажите ваш пол", {
+  if (conversation.session.consultationStep < 2) {
+    if (conversation.session.sex !== "") {
+      await ctx.reply(
+        `Вы выбрали косультация для ${conversation.session.sex}, верно? `,
+        {
+          reply_markup: new Keyboard().text("Да").text("Нет"),
+        }
+      );
+      ctx = await conversation.wait();
+      while (!ctx.message?.text) {
+        await ctx.reply("Используйте кнопки");
+        ctx = await conversation.wait();
+      }
+      if (ctx.message.text === "Нет") {
+        conversation.session.consultationStep = 1;
+        conversation.session.sex = "";
+        return ctx.conversation.reenter("consultation");
+      }
+      if (ctx.message.text === "Да") {
+        conversation.session.consultationStep = 2;
+        return ctx.conversation.reenter("consultation");
+      }
+    }
+    await ctx.reply("Пожалуйста, укажите для кого консультация.", {
       reply_markup: new InlineKeyboard()
         .text("Мужской", "male")
         .text("Женский", "female")
@@ -137,11 +161,28 @@ export async function consultationConversation(
       await ctx.answerCallbackQuery("Используйте кнопки");
       ctx = await conversation.wait();
     }
-    if (ctx.update.callback_query?.data === "male") {
-      conversation.session.sex = "male";
-    }
-    if (ctx.update.callback_query?.data === "female") {
-      conversation.session.sex = "female";
+    switch (ctx.update.callback_query?.data) {
+      case "male": {
+        conversation.session.sex = "male";
+        await conversation.external(
+          async () => await editUserAttribute(chatId, "sex", "male")
+        );
+        break;
+      }
+      case "female": {
+        conversation.session.sex = "female";
+        await conversation.external(
+          async () => await editUserAttribute(chatId, "sex", "female")
+        );
+        break;
+      }
+      case "child": {
+        conversation.session.sex = "child";
+        await conversation.external(
+          async () => await editUserAttribute(chatId, "sex", "child")
+        );
+        break;
+      }
     }
     conversation.session.consultationStep = 2;
   }
@@ -156,7 +197,7 @@ export async function consultationConversation(
     conversation.session.consultationStep = 3;
   }
   if (
-    conversation.session.consultationStep < 4 ||
+    conversation.session.consultationStep < 4 &&
     user!.consultationPaidStatus === false
   ) {
     ctx = (await BuyConsultationConversation(
@@ -165,6 +206,11 @@ export async function consultationConversation(
       message,
       consultationObject
     )) as Context;
+  }
+  if (conversation.session.sex === "") {
+    conversation.session.consultationStep = 1;
+    await ctx.reply("Вы не выбрали пол");
+    return ctx.conversation.reenter("consultation");
   }
   if (
     conversation.session.consultationStep < 5 &&
@@ -182,16 +228,14 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-    if (
-      conversation.session.consultation.buyDate !==
-      new Date().getDate() + new Date().getMonth().toString()
-    ) {
+    if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       conversation.session.consultationStep = 1;
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
           .text("Перейти к выбору даты")
           .row()
-          .text("🏠 Главное меню"),
+          .text("🏠 Главное меню")
+          .resized(),
       });
       ctx = await conversation.wait();
       if (ctx.message?.text === "Перейти к выбору даты") {
@@ -201,7 +245,6 @@ export async function consultationConversation(
     switch (conversation.session.sex) {
       case "male": {
         await briefMaleConversation(conversation, ctx);
-
         break;
       }
       case "female": {
@@ -215,6 +258,9 @@ export async function consultationConversation(
         break;
       }
       default: {
+        await ctx.reply(
+          "Произошла непредвиденная ошибка, пожалуйста заполните форму записи заново!"
+        );
         break;
       }
       // No default
@@ -241,10 +287,8 @@ export async function consultationConversation(
       consultationObject.massanger = "WhatsApp";
     }
     await ctx.reply("Напишите контакт для связи в этом мессенджере");
-    ctx = await conversation.waitFor("message:text");
-    while (!ctx.message?.text) ctx = await conversation.waitFor("message:text");
-
-    conversation.session.consultation.messanger = `${consultationObject.massanger} ${ctx.message.text}`;
+    const messanger = await conversation.form.text();
+    conversation.session.consultation.messanger = `${consultationObject.massanger} ${messanger}`;
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
@@ -313,7 +357,7 @@ ${answerQuestions}`
       day: "numeric",
     })} в ${consultationObject.time}`,
     {
-      reply_markup: new Keyboard().text("🏠 Главное меню"),
+      reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }
   );
 }

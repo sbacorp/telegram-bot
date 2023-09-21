@@ -187,6 +187,13 @@ export async function BuyConsultationConversation(
   conversation.session.consultation.answers = [];
   conversation.session.consultation.buyDate =
     new Date().getDate() + new Date().getMonth().toString();
+  await conversation.external(async () => {
+    await editUserAttribute(
+      ctx.chat!.id.toString(),
+      "buyDate",
+      conversation.session.consultation.buyDate
+    );
+  });
   conversation.session.consultationStep = 4;
   await ctx.reply("<b>Оплата прошла успешно</b>", {
     reply_markup: cancel,
