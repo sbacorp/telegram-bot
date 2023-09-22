@@ -632,11 +632,8 @@ export async function diagnosticInsulinConversationAdult(
   const guideAnswer = await conversation.waitForCallbackQuery("guide");
 
   if (guideAnswer.match === "guide") {
-    await ctx.replyWithDocument(
-      "BQACAgIAAxkBAAIKv2UDL1FR6Z5VDJPkhpZJOqf-fhlTAAK2NAACS5AZSPfLB5NlMbd8MAQ",
-      {
-        reply_markup: cancel,
-      }
-    );
+    await ctx.reply("ИНСУЛИН", {
+      reply_markup: cancel,
+    });
   }
 }
