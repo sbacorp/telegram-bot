@@ -74,15 +74,16 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  const user = await conversation.external(
-    async () =>
-      await UserModel.findOne({
-        where: {
-          chatId,
-        },
-      })
+  const user = await conversation.external(async () => {
+    return UserModel.findOne({
+      where: {
+        chatId,
+      },
+    });
+  });
+  console.log(
+    "asdfasdf asfasdfa sdfas df asdf a sdfa sdfas fsad fasdf asd fsad fsad fasd fas fasdf "
   );
-  console.log(user!.dataValues);
 
   const { phoneNumber, fio, consultationPaidStatus, sex, buyDate } =
     user!.dataValues;

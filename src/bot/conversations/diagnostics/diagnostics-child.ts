@@ -2,8 +2,8 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
-import { type Conversation, createConversation } from "@grammyjs/conversations";
-import { InlineKeyboard, Keyboard } from "grammy";
+import { type Conversation } from "@grammyjs/conversations";
+import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { yesNo, next, canceldiagnostic } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -12,7 +12,6 @@ import { diagnosticConversationChild } from "./diagnostic-child.conversation.js"
 export const DIAGNOSTIC_DEFICIT_CONVERSATION_CHILD = "diagnosticDeficitChild";
 export const DIAGNOSTIC_INSULIN_CONVERSATION_CHILD = "diagnosticInsulinChild";
 export const DIAGNOSTIC_ZHKT_CONVERSATION_CHILD = "diagnosticZhktChild";
-export const DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD = "diagnosticParazitChild";
 export const DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD = "diagnosticAmmiakChild";
 interface Question {
   question: string;
@@ -200,38 +199,6 @@ const questionsInsulin: Question[] = [
   },
 ];
 
-const questionsParazit: Question[] = [
-  {
-    question: "Бывает ли боль возле пупка?",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-  {
-    question: "Облазит кожа на пальцах возле ногтей",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-  {
-    question: "Зуд в области заднего прохода ?",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-  {
-    question: "У ребёнка плохой аппетит?",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-  {
-    question: "Есть ли резкий запах от стула?",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-  {
-    question: "Расстройства стула - запор и диарея",
-    answer: "Риски паразитоза",
-    keyboard: false,
-  },
-];
 const questionsAmmiak: Question[] = [
   {
     question: "Ребенок малоежка?",
@@ -342,9 +309,12 @@ export async function diagnosticZhktConversationChild(
   });
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUxGUNi1ASh9e-QbgBcFdMdsBY9C_aAALDNAACPlFoSB8TiZdQRZGOMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
 
@@ -425,9 +395,12 @@ export async function diagnosticDeficitConversationChild(
     },
   });
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUxmUNi8FP2DJZpUaDKghopfxH7BsYAALNNAACPlFoSDYF45rE6xESMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
 
@@ -508,93 +481,12 @@ export async function diagnosticInsulinConversationChild(
     },
   });
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
-  }
-}
-
-export async function diagnosticParazitConversationChild(
-  conversation: Conversation<Context>,
-  ctx: Context
-) {
-  let answer;
-  await ctx.reply("<b>Вы выбрали диагностику на Паразитов</b>", {
-    reply_markup: canceldiagnostic,
-  });
-  // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
-  for (let index = 0; index < questionsParazit.length; index++) {
-    await (questionsParazit[index]?.keyboard
-      ? ctx.reply(questionsParazit[index].question, {
-          reply_markup: noYes,
-        })
-      : ctx.reply(questionsParazit[index].question, {
-          reply_markup: yesNo,
-        }));
-    answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
-      otherwise: async (ctx) => {
-        if (ctx.message?.text === "🔁 Начать сначала") {
-          return diagnosticParazitConversationChild(conversation, ctx);
-        } else if (ctx.message?.text === "📒 Другая диагностика") {
-          // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
-        } else
-          await ctx.reply("Используйте кнопки", {
-            reply_markup: yesNo,
-          });
-      },
-    });
-    if (answer.match === "Да") {
-      await ctx.reply(questionsParazit[index].answer, { reply_markup: next });
-      const nextAnswer = await conversation.waitForCallbackQuery("next", {
-        otherwise: async (ctx) => {
-          if (ctx.message?.text === "🔁 Начать сначала") {
-            return diagnosticParazitConversationChild(conversation, ctx);
-          } else if (ctx.message?.text === "📒 Другая диагностика") {
-            // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
-          }
-          // eslint-disable-next-line no-return-await
-          else
-            await ctx.reply("Используйте кнопки", {
-              reply_markup: next,
-            });
-        },
-      });
-      if (nextAnswer.match === "next") {
-        // eslint-disable-next-line no-continue
-        continue;
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUyGUNjBiE-gfFH4WUHz1zmrYJKLVgAALaNAACPlFoSLVKD74WiqYFMAQ",
+      {
+        reply_markup: cancel,
       }
-    }
-    if (answer.match === "Нет") {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-  }
-  await ctx.reply(
-    `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
-    {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
-    }
-  );
-  const guideAnswer = await conversation.waitForCallbackQuery("guide", {
-    otherwise: async (ctx) => {
-      if (ctx.message?.text === "🔁 Начать сначала") {
-        return diagnosticParazitConversationChild(conversation, ctx);
-      } else if (ctx.message?.text === "📒 Другая диагностика") {
-        // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
-      }
-      // eslint-disable-next-line no-return-await
-    },
-  });
-
-  if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    );
   }
 }
 
@@ -676,6 +568,8 @@ export async function diagnosticAmmiakConversationChild(
   });
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд");
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUwmUNirBYTKdnsLQb9H2owH1eQAspAAK-NAACPlFoSO8W2FUrdueFMAQ"
+    );
   }
 }

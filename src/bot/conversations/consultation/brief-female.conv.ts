@@ -442,6 +442,9 @@ export async function briefFemaleConversation(
     if (!questions[i].type) {
       await ctx.reply(questions[i].text);
       const answer = await conversation.waitFor("message:text");
+      if (answer.message.text === "🏠 Главное меню") {
+        return ctx.conversation.exit();
+      }
       conversation.session.consultation.answers.push(answer.message.text);
       continue;
     } else if (questions[i].type === "select" && questions[i].keyboard) {
@@ -449,6 +452,9 @@ export async function briefFemaleConversation(
         reply_markup: questions[i].keyboard,
       });
       const answer = await conversation.waitFor("message:text");
+      if (answer.message.text === "🏠 Главное меню") {
+        return ctx.conversation.exit();
+      }
       conversation.session.consultation.answers.push(answer.message.text);
       continue;
     } else if (questions[i].type === "withPhoto") {
@@ -457,6 +463,9 @@ export async function briefFemaleConversation(
         "AgACAgIAAxkBAAIH5mUBo_wEF_qf8ueeUfSvBDPeybnBAAKRzTEbrDsRSBmhSt-tkbJiAQADAgADbQADMAQ"
       );
       const answer = await conversation.waitFor("message:text");
+      if (answer.message.text === "🏠 Главное меню") {
+        return ctx.conversation.exit();
+      }
       conversation.session.consultation.answers.push(answer.message.text);
       continue;
     } else if (questions[i].type === "withMultiAnswer") {

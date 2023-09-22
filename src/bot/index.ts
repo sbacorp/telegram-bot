@@ -81,8 +81,6 @@ import {
   deletePromoConversation,
   activateSubscriptionConversation,
   deleteLinkConversation,
-  diagnosticParazitConversationChild,
-  DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD,
   diagnosticAmmiakConversationChild,
   DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD,
   newsletterConversation,
@@ -241,12 +239,6 @@ export function createBot(token: string, options: Options = {}) {
     createConversation(
       diagnosticZhktConversationChild,
       DIAGNOSTIC_ZHKT_CONVERSATION_CHILD
-    )
-  );
-  bot.use(
-    createConversation(
-      diagnosticParazitConversationChild,
-      DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD
     )
   );
   bot.use(

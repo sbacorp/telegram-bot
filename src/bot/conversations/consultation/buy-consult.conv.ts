@@ -9,6 +9,7 @@
 /* eslint-disable no-await-in-loop */
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
+import CryptoJS from "crypto-js";
 import { Context } from "#root/bot/context.js";
 import {
   editUserAttribute,
@@ -144,12 +145,28 @@ export async function BuyConsultationConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
+  const paymentParams = {
+    MerchantLogin: "BOT.RU",
+    OutSum: product.price,
+    InvId: 0,
+    Description: encodeURIComponent(product.name),
+    SignatureValue: "",
+    Shp_chatId: ctx.chat!.id.toString(),
+    password1: "hHo6ozI7SHnPu9Umo5P3",
+    password2: "p5qJ5xdqBWw261DrrcMf",
+  };
+  const signitureString = `${paymentParams.MerchantLogin}:${paymentParams.OutSum}:0:${paymentParams.password1}:Shp_chatId=${paymentParams.Shp_chatId}`;
+  console.log(signitureString);
+
+  const SignatureValue = CryptoJS.MD5(signitureString);
+  const link = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${paymentParams.MerchantLogin}&OutSum=${paymentParams.OutSum}&InvId=0&Description=${paymentParams.Description}&SignatureValue=${SignatureValue}&Shp_chatId=${paymentParams.Shp_chatId}&IsTest=1`;
+
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
 В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
     {
       reply_markup: new Keyboard()
-        .webApp("Оплатить", "https://payform.ru/992L3rc/")
+        .webApp("Оплатить", link)
         .row()
         .text("⬅️ К выбору даты")
         .resized(),

@@ -413,9 +413,12 @@ export async function diagnosticZhktConversationAdult(
   const guideAnswer = await conversation.waitForCallbackQuery("guide");
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUuGUNhV3gtfQ5OtDzWXY_SDJ6w3iKAAKfNAACPlFoSPPFJtCefiq8MAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
 export async function diagnosticDeficitConversationAdult(
@@ -483,9 +486,12 @@ export async function diagnosticDeficitConversationAdult(
   const guideAnswer = await conversation.waitForCallbackQuery("guide");
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUumUNhgV7Ill3cun6MidKcQVBASwWAAKnNAACPlFoSHxhxX_CPYGmMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
 export async function diagnosticThyroidConversationAdult(
@@ -553,9 +559,12 @@ export async function diagnosticThyroidConversationAdult(
   const guideAnswer = await conversation.waitForCallbackQuery("guide");
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUvGUNhtkde0NBu5suUK1bMk2daHSKAAKuNAACPlFoSNvUtSTsKNmgMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
 export async function diagnosticInsulinConversationAdult(
