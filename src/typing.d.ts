@@ -23,7 +23,7 @@ export interface IProduct {
   price: number;
   answer?: string;
   docId?: string;
-  type: "link" | "doc";
+  type?: "link" | "doc";
 }
 export interface IUserModel extends Model {
   id: number;

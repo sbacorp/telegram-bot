@@ -204,3 +204,31 @@ ConsultationAppointmentModel.belongsTo(UserModel, {
   targetKey: "chatId",
   onDelete: "cascade",
 });
+
+export interface IPayment extends Model {
+  id: number;
+  chatId: string;
+  amount: number;
+  productName: string;
+  status: string;
+}
+export const PaymentModel = sequelize.define<IPayment>("payment", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  chatId: {
+    type: DataTypes.STRING,
+  },
+  amount: {
+    type: DataTypes.INTEGER,
+  },
+  productName: {
+    type: DataTypes.STRING,
+  },
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "pending",
+  },
+});

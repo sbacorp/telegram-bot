@@ -9,6 +9,7 @@ import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
+  createPaymentLink,
   editUserAttribute,
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
@@ -210,22 +211,15 @@ export async function buyConversation(
       product!.price! - product!.price! * (promo.discount! / 100);
   }
   //! create link to perchase
-  await ctx.reply(
-    `<b>Можете приступать к оплате.</b>
-В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
+  const { link, paymentId } = await conversation.external(() =>
+    createPaymentLink(product!, ctx.chat!.id.toString())
+  );
+  const message = await ctx.reply(
+    `<b>Можете приступать к оплате. Номер заказа: #${paymentId}</b>`,
     {
-      reply_markup: new InlineKeyboard()
-        .webApp("Оплатить", "https://payform.ru/d42Lwlz/")
-        .text("Оплатил", "paid"),
+      reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
     }
   );
-  do {
-    ctx = await conversation.wait();
-    if (ctx.update.callback_query?.data === "paid") {
-      break;
-    }
-  } while (!(ctx.update.callback_query?.data === "paid"));
-
   //! check payment loop
   await ctx.editMessageText("<b>Оплата прошла успешно</b>");
   return product?.type === "doc"

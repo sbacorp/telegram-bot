@@ -12,6 +12,7 @@ import { type Conversation } from "@grammyjs/conversations";
 import CryptoJS from "crypto-js";
 import { Context } from "#root/bot/context.js";
 import {
+  createPaymentLink,
   editUserAttribute,
   fetchUser,
   findPromoCodeByTitleAndProduct,
@@ -145,60 +146,34 @@ export async function BuyConsultationConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
-  const paymentParams = {
-    MerchantLogin: "BOT.RU",
-    OutSum: product.price,
-    InvId: 0,
-    Description: encodeURIComponent(product.name),
-    SignatureValue: "",
-    Shp_chatId: ctx.chat!.id.toString(),
-    password1: "hHo6ozI7SHnPu9Umo5P3",
-    password2: "p5qJ5xdqBWw261DrrcMf",
-  };
-  const signitureString = `${paymentParams.MerchantLogin}:${paymentParams.OutSum}:0:${paymentParams.password1}:Shp_chatId=${paymentParams.Shp_chatId}`;
-  console.log(signitureString);
-
-  const SignatureValue = CryptoJS.MD5(signitureString);
-  const link = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${paymentParams.MerchantLogin}&OutSum=${paymentParams.OutSum}&InvId=0&Description=${paymentParams.Description}&SignatureValue=${SignatureValue}&Shp_chatId=${paymentParams.Shp_chatId}&IsTest=1`;
+  const { link, paymentId } = await createPaymentLink(
+    product!,
+    ctx.chat!.id.toString()
+  );
 
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
-В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.`,
+В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.
+Не`,
     {
-      reply_markup: new Keyboard()
-        .webApp("Оплатить", link)
+      reply_markup: new InlineKeyboard()
+        .webApp("💰 Оплатить", link)
         .row()
-        .text("⬅️ К выбору даты")
-        .resized(),
+        .text("⬅️ К выбору даты"),
     }
   );
-  await ctx.reply("Подтвердите оплату", {
-    reply_markup: new InlineKeyboard().text("Оплатил", "paid"),
-  });
-  do {
-    ctx = await conversation.wait();
-    if (ctx.update.callback_query?.data === "paid") {
-      break;
-    }
-    if (ctx.message?.text === "⬅️ К выбору даты") {
-      conversation.session.consultationStep -= 1;
+  await conversation.waitFor(":web_app_data", {
+    otherwise: async () => {
+      await ctx.reply("Оплата не прошла, попробуйте снова!");
       return ctx.conversation.reenter("consultation");
-    }
-  } while (!(ctx.update.callback_query?.data === "paid"));
-
+    },
+  });
   //! check payment loop
   //! if paid
   await conversation.external(async () => {
     await disableConsultationByDateTime(
       consultationObject.dateString,
       consultationObject.time
-    );
-  });
-  await conversation.external(async () => {
-    await editUserAttribute(
-      ctx.chat!.id.toString(),
-      "consultationPaidStatus",
-      true
     );
   });
   conversation.session.consultation.answers = [];

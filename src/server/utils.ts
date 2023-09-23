@@ -1,8 +1,17 @@
+/* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
+import crypto from "node:crypto";
 import { Op, Sequelize } from "sequelize";
-import { LinkModel, PromocodeModel, UserModel } from "./models.js";
+import { FastifyRequest } from "fastify";
+import { IProduct } from "#root/typing.js";
+import {
+  LinkModel,
+  PaymentModel,
+  PromocodeModel,
+  UserModel,
+} from "./models.js";
 
 export async function initDB(sequelize: Sequelize) {
   try {
@@ -258,3 +267,57 @@ export const editUserAttribute = async (
     console.log(error);
   }
 };
+
+export const createPaymentLink = async (product: IProduct, chatId: string) => {
+  const paymentParameters = {
+    MerchantLogin: "BOT.RU",
+    OutSum: product!.price,
+    InvId: 0,
+    Description: encodeURIComponent(product!.name),
+    SignatureValue: "",
+    Shp_chatId: chatId,
+    password1: "hHo6ozI7SHnPu9Umo5P3",
+    password2: "p5qJ5xdqBWw261DrrcMf",
+  };
+  const signitureString = `${paymentParameters.MerchantLogin}:${paymentParameters.OutSum}:0:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
+  const SignatureValue = CryptoJS.MD5(signitureString);
+  const link = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${paymentParameters.MerchantLogin}&OutSum=${paymentParameters.OutSum}&InvId=0&Description=${paymentParameters.Description}&SignatureValue=${SignatureValue}&Shp_chatId=${paymentParameters.Shp_chatId}&IsTest=1`;
+  const payment = await PaymentModel.create({
+    chatId,
+    productName: product.name,
+    amount: product.price,
+  });
+  return { link, paymentId: payment.id };
+};
+// export async function handlePaymentNotification(request: FastifyRequest) {
+//   // Данные из запроса
+//   const outSum = request.query.OutSum as string;
+//   const invId = request.query.InvId as string;
+//   const signature = request.query.SignatureValue as string;
+
+//   // Ваши регистрационные данные
+//   const mrhPass2 = "securepass2";
+
+//   // Построение подписи
+//   const mySignature = crypto
+//     .createHash("md5")
+//     .update(`${outSum}:${invId}:${mrhPass2}`)
+//     .digest("hex")
+//     .toUpperCase();
+
+//   // Проверка подписей
+//   if (mySignature !== signature) {
+//     return {
+//       status: "error",
+//       message: "Invalid signature",
+//     };
+//   }
+
+//   // Обработка успешного уведомления
+//   // Изменение статуса заказа и т.д.
+
+//   return {
+//     status: "ok",
+//     message: `OK${invId}`,
+//   };
+// }
