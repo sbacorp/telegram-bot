@@ -2,6 +2,7 @@
 /* eslint-disable func-names */
 import fastify from "fastify";
 import { BotError, GrammyError, webhookCallback } from "grammy";
+import CryptoJS from "crypto-js";
 import type { Bot } from "#root/bot/index.js";
 import { errorHandler } from "#root/bot/handlers/index.js";
 import { logger } from "#root/logger.js";

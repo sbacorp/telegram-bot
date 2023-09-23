@@ -2,9 +2,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
-import crypto from "node:crypto";
 import { Op, Sequelize } from "sequelize";
-import { FastifyRequest } from "fastify";
+import CryptoJS from "crypto-js";
 import { IProduct } from "#root/typing.js";
 import {
   LinkModel,
