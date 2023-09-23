@@ -128,8 +128,8 @@ export const createServer = async (bot: Bot) => {
     </style>
   </head>
 
-  <body class="" style="visibility: hidden">
-    <div id="title">Обработка платежа</div>
+  <body class="">
+    <div id="title">Платеж успешно выполнен, перейдите в бота</div>
     <script type="application/javascript">
       const DemoApp = {
         initData: Telegram.WebApp.initData || "",
@@ -196,6 +196,9 @@ export const createServer = async (bot: Bot) => {
       };
 
       DemoApp.sendText();
+      Telegram.WebApp.ready(() => {
+  DemoApp.sendText(); 
+});
     </script>
   </body>
 </html>
