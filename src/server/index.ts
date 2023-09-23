@@ -86,7 +86,7 @@ export const createServer = async (bot: Bot) => {
       await payment.save();
     }
     return reply.type("text/html").send(`
-   <html lang="ru">
+<html lang="ru">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -109,10 +109,10 @@ export const createServer = async (bot: Bot) => {
     </script>
     <style>
       body {
-        --bg-color: var(--tg-theme-bg-color, #fff);
+        --bg-color: var(--tg-theme-bg-color, #222);
         font-family: sans-serif;
         background-color: var(--bg-color);
-        color: var(--tg-theme-text-color, #222);
+        color: var(--tg-theme-text-color, #fff);
         font-size: 22px;
         display: flex;
         align-items: center;
@@ -129,7 +129,7 @@ export const createServer = async (bot: Bot) => {
   </head>
 
   <body class="">
-    <div id="title">Платеж успешно выполнен, перейдите в бота</div>
+    <div id="title">Платеж успешно выполнен! перейдите в бота</div>
     <script type="application/javascript">
       const DemoApp = {
         initData: Telegram.WebApp.initData || "",
@@ -166,7 +166,7 @@ export const createServer = async (bot: Bot) => {
             });
           }
         },
-        sendText(spam) {
+        paid() {
           Telegram.WebApp.sendData("paid");
         },
       };
@@ -194,11 +194,9 @@ export const createServer = async (bot: Bot) => {
           DemoApp.checkInitData();
         },
       };
-
-      DemoApp.sendText();
-      Telegram.WebApp.ready(() => {
-  DemoApp.sendText(); 
-});
+      DemoApp.init();
+      DemoApp.paid();
+      DemoApp.close();
     </script>
   </body>
 </html>

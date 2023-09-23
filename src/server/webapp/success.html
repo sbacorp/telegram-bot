@@ -22,10 +22,10 @@
     </script>
     <style>
       body {
-        --bg-color: var(--tg-theme-bg-color, #fff);
+        --bg-color: var(--tg-theme-bg-color, #222);
         font-family: sans-serif;
         background-color: var(--bg-color);
-        color: var(--tg-theme-text-color, #222);
+        color: var(--tg-theme-text-color, #fff);
         font-size: 22px;
         display: flex;
         align-items: center;
@@ -41,8 +41,8 @@
     </style>
   </head>
 
-  <body class="" style="visibility: hidden">
-    <div id="title">Обработка платежа</div>
+  <body class="">
+    <div id="title">Платеж успешно выполнен! перейдите в бота</div>
     <script type="application/javascript">
       const DemoApp = {
         initData: Telegram.WebApp.initData || "",
@@ -79,7 +79,7 @@
             });
           }
         },
-        sendText(spam) {
+        paid() {
           Telegram.WebApp.sendData("paid");
         },
       };
@@ -107,8 +107,9 @@
           DemoApp.checkInitData();
         },
       };
-
-      DemoApp.sendText();
+      DemoApp.init();
+      DemoApp.paid();
+      DemoApp.close();
     </script>
   </body>
 </html>
