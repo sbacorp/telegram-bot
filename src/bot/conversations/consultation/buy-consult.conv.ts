@@ -162,14 +162,15 @@ export async function BuyConsultationConversation(
         .text("⬅️ К выбору даты"),
     }
   );
+
+  //! check payment loop
+  //! if paid
+
   await conversation.waitFor(":web_app_data", {
     otherwise: async () => {
       await ctx.reply("Оплата не прошла, попробуйте снова!");
-      return ctx.conversation.reenter("consultation");
     },
   });
-  //! check payment loop
-  //! if paid
   await conversation.external(async () => {
     await disableConsultationByDateTime(
       consultationObject.dateString,

@@ -70,7 +70,6 @@ export const createServer = async (bot: Bot) => {
     const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
 
     const SignatureValue = CryptoJS.MD5(signitureString);
-    console.log(SignatureValue.toString());
 
     if (SignatureValue.toString() !== data.SignatureValue) {
       return reply.code(400).send("Invalid signature");
@@ -84,6 +83,18 @@ export const createServer = async (bot: Bot) => {
     if (payment) {
       payment.status = "paid";
       await payment.save();
+      await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Оплатил",
+                callback_data: "paid",
+              },
+            ],
+          ],
+        },
+      });
     }
     return reply.type("text/html").send(`
 <html lang="ru">
@@ -196,7 +207,6 @@ export const createServer = async (bot: Bot) => {
       };
       DemoApp.init();
       DemoApp.paid();
-      DemoApp.close();
     </script>
   </body>
 </html>
