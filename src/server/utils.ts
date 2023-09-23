@@ -288,35 +288,3 @@ export const createPaymentLink = async (product: IProduct, chatId: string) => {
   });
   return { link, paymentId: payment.id };
 };
-// export async function handlePaymentNotification(request: FastifyRequest) {
-//   // Данные из запроса
-//   const outSum = request.query.OutSum as string;
-//   const invId = request.query.InvId as string;
-//   const signature = request.query.SignatureValue as string;
-
-//   // Ваши регистрационные данные
-//   const mrhPass2 = "securepass2";
-
-//   // Построение подписи
-//   const mySignature = crypto
-//     .createHash("md5")
-//     .update(`${outSum}:${invId}:${mrhPass2}`)
-//     .digest("hex")
-//     .toUpperCase();
-
-//   // Проверка подписей
-//   if (mySignature !== signature) {
-//     return {
-//       status: "error",
-//       message: "Invalid signature",
-//     };
-//   }
-
-//   // Обработка успешного уведомления
-//   // Изменение статуса заказа и т.д.
-
-//   return {
-//     status: "ok",
-//     message: `OK${invId}`,
-//   };
-// }

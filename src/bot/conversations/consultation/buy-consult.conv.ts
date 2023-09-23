@@ -18,7 +18,11 @@ import {
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
-import { ConsultationModel, UserModel } from "#root/server/models.js";
+import {
+  ConsultationModel,
+  PaymentModel,
+  UserModel,
+} from "#root/server/models.js";
 import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 
@@ -160,17 +164,24 @@ export async function BuyConsultationConversation(
         .text("⬅️ К выбору даты"),
     }
   );
-
   //! check payment loop
   //! if paid
   ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "paid") {
-    await conversation.external(async () => {
-      await disableConsultationByDateTime(
-        consultationObject.dateString,
-        consultationObject.time
-      );
-    });
+    const paymentStatus = await conversation
+      .external(() =>
+        PaymentModel.findOne({
+          where: { paymentId },
+        })
+      )
+      .then((res) => res?.dataValues.status);
+    if (paymentStatus === "failed") {
+      await ctx.deleteMessage();
+      await ctx.reply("Оплата не прошла, попробуйте еще раз");
+      conversation.session.consultationStep -= 1;
+      return ctx.conversation.enter("consultation");
+    }
+    conversation.session.consultationStep = 4;
     conversation.session.consultation.answers = [];
     conversation.session.consultation.buyDate =
       new Date().getDate() + new Date().getMonth().toString();
@@ -181,11 +192,15 @@ export async function BuyConsultationConversation(
         conversation.session.consultation.buyDate
       );
     });
-    conversation.session.consultationStep = 4;
+    await conversation.external(async () => {
+      await disableConsultationByDateTime(
+        consultationObject.dateString,
+        consultationObject.time
+      );
+    });
     await ctx.reply("<b>Оплата прошла успешно</b>", {
       reply_markup: cancel,
     });
   }
-
   return ctx;
 }

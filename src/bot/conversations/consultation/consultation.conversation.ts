@@ -68,25 +68,23 @@ const conditions = async (
   );
   return message;
 };
+
 export const CONSULTATION_CONVERSATION = "consultation";
 export async function consultationConversation(
   conversation: Conversation<Context>,
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  const user = await conversation.external(async () => {
-    return UserModel.findOne({
-      where: {
-        chatId,
-      },
-    });
-  });
-  console.log(
-    "asdfasdf asfasdfa sdfas df asdf a sdfa sdfas fsad fasdf asd fsad fsad fasd fas fasdf "
-  );
+  const user = await conversation
+    .external(() =>
+      UserModel.findOne({
+        where: {
+          chatId,
+        },
+      })
+    )
+    .then((u) => u?.dataValues);
 
-  const { phoneNumber, fio, consultationPaidStatus, sex, buyDate } =
-    user!.dataValues;
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -210,11 +208,15 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-    console.log(
-      buyDate,
-      new Date().getDate() + new Date().getMonth().toString()
-    );
-
+    const buyDate = await conversation
+      .external(async () =>
+        UserModel.findOne({
+          where: {
+            chatId,
+          },
+        })
+      )
+      .then((u) => u?.dataValues?.buyDate);
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
@@ -280,31 +282,41 @@ export async function consultationConversation(
     ctx.chatAction = "typing";
     let answerQuestions: string;
     if (conversation.session.sex === "male") {
-      answerQuestions = consultationObject.answers
+      answerQuestions = conversation.session.consultation.answers
         .map((answer) => {
           return `Вопрос :${
-            maleQuestions[consultationObject.answers.indexOf(answer)].text
+            maleQuestions[
+              conversation.session.consultation.answers.indexOf(answer)
+            ].text
           }
       Ответ: ${answer}
       `;
         })
         .join("\n");
     } else if (conversation.session.sex === "female") {
-      answerQuestions = consultationObject.answers
+      answerQuestions = conversation.session.consultation.answers
         .map((answer) => {
           return `
         
-Вопрос :${femaleQuestions[consultationObject.answers.indexOf(answer)].text}
+Вопрос :${
+            femaleQuestions[
+              conversation.session.consultation.answers.indexOf(answer)
+            ].text
+          }
 Ответ: ${answer}
       `;
         })
         .join("\n");
     } else {
-      answerQuestions = consultationObject.answers
+      answerQuestions = conversation.session.consultation.answers
         .map((answer) => {
           return `
         
-Вопрос :${childQuestions[consultationObject.answers.indexOf(answer)].text}
+Вопрос :${
+            childQuestions[
+              conversation.session.consultation.answers.indexOf(answer)
+            ].text
+          }
 Ответ: ${answer}
       `;
         })

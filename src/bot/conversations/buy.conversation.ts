@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable no-loop-func */
 /* eslint-disable prefer-const */
 /* eslint-disable no-useless-return */
@@ -15,6 +16,7 @@ import {
   updateUserPhone,
 } from "#root/server/utils.js";
 import { IProduct } from "#root/typing.js";
+import { PaymentModel } from "#root/server/models.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
 
 export const products: IProduct[] = [
@@ -221,10 +223,25 @@ export async function buyConversation(
     }
   );
   //! check payment loop
-  await ctx.editMessageText("<b>Оплата прошла успешно</b>");
-  return product?.type === "doc"
-    ? ctx.replyWithDocument(product.docId!, {
-        reply_markup: cancel,
-      })
-    : ctx.reply(product!.answer!);
+  ctx = await conversation.wait();
+  if (ctx.update.callback_query?.data === "paid") {
+    const paymentStatus = await conversation
+      .external(() =>
+        PaymentModel.findOne({
+          where: { paymentId },
+        })
+      )
+      .then((res) => res?.dataValues.status);
+    await ctx.deleteMessage();
+    if (paymentStatus === "failed") {
+      return ctx.editMessageText("Оплата не прошла, попробуйте позже");
+    }
+    await ctx.editMessageText("<b>Оплата прошла успешно</b>");
+    return product?.type === "doc"
+      ? ctx.replyWithDocument(product.docId!, {
+          reply_markup: cancel,
+        })
+      : ctx.reply(product!.answer!);
+  }
+  return ctx.editMessageText("Оплата не прошла");
 }
