@@ -140,8 +140,7 @@ export async function BuyConsultationConversation(
   if (promo) {
     await ctx.reply("Промокод принят");
     await ctx.reply(`Скидка составляет ${promo.discount}%`);
-    product!.price =
-      product!.price! - product!.price! * (promo.discount! / 100);
+    product.price -= product.price * (promo.discount / 100);
   }
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
@@ -150,7 +149,6 @@ export async function BuyConsultationConversation(
     product!,
     ctx.chat!.id.toString()
   );
-
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
 В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.
@@ -165,31 +163,29 @@ export async function BuyConsultationConversation(
 
   //! check payment loop
   //! if paid
+  ctx = await conversation.wait();
+  if (ctx.update.callback_query?.data === "paid") {
+    await conversation.external(async () => {
+      await disableConsultationByDateTime(
+        consultationObject.dateString,
+        consultationObject.time
+      );
+    });
+    conversation.session.consultation.answers = [];
+    conversation.session.consultation.buyDate =
+      new Date().getDate() + new Date().getMonth().toString();
+    await conversation.external(async () => {
+      await editUserAttribute(
+        ctx.chat!.id.toString(),
+        "buyDate",
+        conversation.session.consultation.buyDate
+      );
+    });
+    conversation.session.consultationStep = 4;
+    await ctx.reply("<b>Оплата прошла успешно</b>", {
+      reply_markup: cancel,
+    });
+  }
 
-  await conversation.waitFor(":web_app_data", {
-    otherwise: async () => {
-      await ctx.reply("Оплата не прошла, попробуйте снова!");
-    },
-  });
-  await conversation.external(async () => {
-    await disableConsultationByDateTime(
-      consultationObject.dateString,
-      consultationObject.time
-    );
-  });
-  conversation.session.consultation.answers = [];
-  conversation.session.consultation.buyDate =
-    new Date().getDate() + new Date().getMonth().toString();
-  await conversation.external(async () => {
-    await editUserAttribute(
-      ctx.chat!.id.toString(),
-      "buyDate",
-      conversation.session.consultation.buyDate
-    );
-  });
-  conversation.session.consultationStep = 4;
-  await ctx.reply("<b>Оплата прошла успешно</b>", {
-    reply_markup: cancel,
-  });
   return ctx;
 }
