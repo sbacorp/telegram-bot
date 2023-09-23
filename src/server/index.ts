@@ -70,6 +70,7 @@ export const createServer = async (bot: Bot) => {
     const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
 
     const SignatureValue = CryptoJS.MD5(signitureString);
+    console.log(SignatureValue.toString());
 
     if (SignatureValue.toString() !== data.SignatureValue) {
       return reply.code(400).send("Invalid signature");
