@@ -228,7 +228,7 @@ export async function buyConversation(
     const paymentStatus = await conversation
       .external(() =>
         PaymentModel.findOne({
-          where: { paymentId },
+          where: { id: paymentId },
         })
       )
       .then((res) => res?.dataValues.status);
