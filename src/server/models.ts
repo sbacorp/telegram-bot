@@ -30,6 +30,10 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     type: DataTypes.STRING,
     defaultValue: "",
   },
+  name: {
+    type: DataTypes.STRING,
+    defaultValue: "",
+  },
   sex: {
     type: DataTypes.STRING,
     defaultValue: "",
