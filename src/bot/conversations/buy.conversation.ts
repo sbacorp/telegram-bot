@@ -232,7 +232,6 @@ export async function buyConversation(
         })
       )
       .then((res) => res?.dataValues.status);
-    await ctx.deleteMessage();
     if (paymentStatus === "failed") {
       return ctx.editMessageText("Оплата не прошла, попробуйте позже");
     }

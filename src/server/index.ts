@@ -219,13 +219,12 @@ export const createServer = async (bot: Bot) => {
     if (payment) {
       payment.status = "failed";
       await payment.save();
-      await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
+      await bot.api.sendMessage(payment.chatId, "Операция не прошла!", {
         reply_markup: {
-          inline_keyboard: [
+          keyboard: [
             [
               {
-                text: "Оплатил",
-                callback_data: "paid",
+                text: "🏠 Главное меню",
               },
             ],
           ],

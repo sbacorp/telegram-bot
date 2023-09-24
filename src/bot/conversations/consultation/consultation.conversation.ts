@@ -209,12 +209,13 @@ export async function consultationConversation(
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
     const buyDate = await conversation
-      .external(async () =>
-        UserModel.findOne({
-          where: {
-            chatId,
-          },
-        })
+      .external(
+        async () =>
+          await UserModel.findOne({
+            where: {
+              chatId,
+            },
+          })
       )
       .then((u) => u?.dataValues?.buyDate);
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {

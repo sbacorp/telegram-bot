@@ -150,7 +150,7 @@ export async function BuyConsultationConversation(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
   const { link, paymentId } = await createPaymentLink(
-    product!,
+    product,
     ctx.chat!.id.toString()
   );
   message = await ctx.reply(
@@ -164,8 +164,7 @@ export async function BuyConsultationConversation(
         .text("⬅️ К выбору даты"),
     }
   );
-  //! check payment loop
-  //! if paid
+  ctx = await conversation.wait();
   ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "paid") {
     const paymentStatus = await conversation
