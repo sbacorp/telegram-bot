@@ -6,7 +6,7 @@ import CryptoJS from "crypto-js";
 import type { Bot } from "#root/bot/index.js";
 import { errorHandler } from "#root/bot/handlers/index.js";
 import { logger } from "#root/logger.js";
-import { PaymentModel } from "./models.js";
+import { PaymentModel, UserModel } from "./models.js";
 
 interface PaymentData {
   OutSum: string;
@@ -67,7 +67,7 @@ export const createServer = async (bot: Bot) => {
     const SignatureValue = CryptoJS.MD5(signitureString);
 
     if (SignatureValue.toString() !== data.SignatureValue) {
-      return reply.code(400).send("Invalid signature");
+      return reply.code(400).send("Ошибка на сервере, попробуйте позже");
     }
     const payment = await PaymentModel.findOne({
       where: {
@@ -91,7 +91,20 @@ export const createServer = async (bot: Bot) => {
           ],
         },
       });
+
+      if (payment.productName === "Консультация") {
+        const user = await UserModel.findOne({
+          where: {
+            chatId: payment.chatId,
+          },
+        });
+        if (user) {
+          user.consultationPaidStatus = true;
+          await user.save();
+        }
+      }
     }
+
     return reply.type("text/html").send(`
   <html lang="ru">
     <head>

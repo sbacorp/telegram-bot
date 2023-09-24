@@ -78,7 +78,6 @@ export async function buyConversation(
 ) {
   const selectedProduct = conversation.session?.selectedProduct;
   let product: IProduct | undefined;
-  let promoTitle: string | undefined;
   if (!selectedProduct) {
     return ctx.reply("Выберите продукт");
   }
@@ -195,7 +194,7 @@ export async function buyConversation(
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
           "Консультация",
-          promoTitle!,
+          ctx.message!.text!,
           ctx.chat!.id.toString()
         );
       });

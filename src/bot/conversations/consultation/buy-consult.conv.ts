@@ -1,15 +1,10 @@
-/* eslint-disable no-return-await */
-/* eslint-disable no-loop-func */
-/* eslint-disable no-console */
-/* eslint-disable unicorn/prefer-optional-catch-binding */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-continue */
 /* eslint-disable unicorn/prevent-abbreviations */
+/* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable no-param-reassign */
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
-import CryptoJS from "crypto-js";
 import { Context } from "#root/bot/context.js";
 import {
   createPaymentLink,
@@ -26,8 +21,8 @@ import {
 import { IConsultationObject } from "#root/typing.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 
-export type timeAttributeType =
-  | `time10`
+type TimeAttributeType =
+  | "time10"
   | "time11"
   | "time12"
   | "time13"
@@ -38,22 +33,15 @@ export type timeAttributeType =
   | "time18"
   | "time19"
   | "time20";
+
 const disableConsultationByDateTime = async (date: string, time: string) => {
-  try {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const timeAttribute: timeAttributeType = `time${time.split(":")[0]}`;
-    const consultation = await ConsultationModel.findOne({
-      where: {
-        date,
-      },
-    });
-    if (consultation) {
-      consultation[timeAttribute] = false;
-      await consultation.save();
-    }
-  } catch (error) {
-    console.log(error);
+  const timeAttribute: TimeAttributeType = `time${
+    time.split(":")[0]
+  }` as TimeAttributeType;
+  const consultation = await ConsultationModel.findOne({ where: { date } });
+  if (consultation) {
+    consultation[timeAttribute] = false;
+    await consultation.save();
   }
 };
 
@@ -68,8 +56,10 @@ export async function BuyConsultationConversation(
     name: "Консультация",
     price: conversation.session.sex === "child" ? 5000 : 10_000,
   };
+
   await ctx.deleteMessage();
-  if (conversation.session.fio === "") {
+
+  if (!conversation.session.fio) {
     await ctx.reply("Введите ФИО", {
       reply_markup: new Keyboard()
         .text("⬅️ К выбору даты")
@@ -94,7 +84,8 @@ export async function BuyConsultationConversation(
       editUserAttribute(ctx.chat!.id.toString(), "fio", ctx.message!.text!)
     );
   }
-  if (conversation.session.phoneNumber === "") {
+
+  if (!conversation.session.phoneNumber) {
     await ctx.reply(
       "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
       {
@@ -109,50 +100,55 @@ export async function BuyConsultationConversation(
       updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number)
     );
     conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
-    await conversation.external(async () => {
-      await editUserAttribute(
+    await conversation.external(async () =>
+      editUserAttribute(
         ctx.chat!.id.toString(),
         "phoneNumber",
         ctx.message!.text!
-      );
-    });
+      )
+    );
   }
+
   let promo;
-  let promoTitle;
   await ctx.reply("Введите промокод", {
     reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
   });
+
   while (!promo) {
     ctx = await conversation.wait();
     if (ctx.update.callback_query?.data === "skip") {
       break;
     }
     if (ctx.message?.text) {
-      promo = await conversation.external(async () => {
-        return findPromoCodeByTitleAndProduct(
+      promo = await conversation.external(async () =>
+        findPromoCodeByTitleAndProduct(
           "Консультация",
-          promoTitle!,
+          ctx.message!.text!,
           ctx.chat!.id.toString()
-        );
-      });
+        )
+      );
       if (!promo)
         await ctx.reply("Промокод не найден, попробуйте снова!", {
           reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
         });
     }
   }
+
   if (promo) {
     await ctx.reply("Промокод принят");
     await ctx.reply(`Скидка составляет ${promo.discount}%`);
     product.price -= product.price * (promo.discount / 100);
   }
+
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
+
   const { link, invoiceId } = await createPaymentLink(
     product,
     ctx.chat!.id.toString()
   );
+
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
 В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.
@@ -164,6 +160,7 @@ export async function BuyConsultationConversation(
         .text("⬅️ К выбору даты"),
     }
   );
+
   ctx = await conversation.wait();
   ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "paid") {
@@ -174,32 +171,38 @@ export async function BuyConsultationConversation(
         })
       )
       .then((res) => res?.dataValues.status);
+
     if (paymentStatus === "failed") {
       await ctx.deleteMessage();
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
       conversation.session.consultationStep -= 1;
       return ctx.conversation.enter("consultation");
     }
+
     conversation.session.consultationStep = 4;
     conversation.session.consultation.answers = [];
     conversation.session.consultation.buyDate =
       new Date().getDate() + new Date().getMonth().toString();
-    await conversation.external(async () => {
-      await editUserAttribute(
+
+    await conversation.external(async () =>
+      editUserAttribute(
         ctx.chat!.id.toString(),
         "buyDate",
         conversation.session.consultation.buyDate
-      );
-    });
-    await conversation.external(async () => {
-      await disableConsultationByDateTime(
+      )
+    );
+
+    await conversation.external(async () =>
+      disableConsultationByDateTime(
         consultationObject.dateString,
         consultationObject.time
-      );
-    });
+      )
+    );
+
     await ctx.reply("<b>Оплата прошла успешно</b>", {
       reply_markup: cancel,
     });
   }
+
   return ctx;
 }
