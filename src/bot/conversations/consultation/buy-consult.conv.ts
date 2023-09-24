@@ -135,9 +135,11 @@ export async function BuyConsultationConversation(
   }
 
   if (promo) {
-    await ctx.reply("Промокод принят");
-    await ctx.reply(`Скидка составляет ${promo.discount}%`);
     product.price -= product.price * (promo.discount / 100);
+    await ctx.reply(`
+        Промокод на скидку ${promo.discount}% применен!
+        Новая цена: ${product.price}₽
+        `);
   }
 
   await ctx.reply(
@@ -151,8 +153,9 @@ export async function BuyConsultationConversation(
 
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
-В течение 10 минут с момента оплаты вы получите ссылку на бриф - опросник по состоянию здоровья прямо в этот чат.
-Не`,
+    После оплаты вы получите ссылку на бриф, который необходимо заполнить не позднее<b> полночи</b> текущего дня.
+    Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
+  `,
     {
       reply_markup: new InlineKeyboard()
         .webApp("💰 Оплатить", link)
@@ -162,17 +165,13 @@ export async function BuyConsultationConversation(
   );
 
   ctx = await conversation.wait();
-  ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "paid") {
-    const paymentStatus = await conversation
-      .external(() =>
-        PaymentModel.findOne({
-          where: { invoiceId },
-        })
-      )
-      .then((res) => res?.dataValues.status);
-
-    if (paymentStatus === "failed") {
+    const payment = await conversation.external(() =>
+      PaymentModel.findOne({
+        where: { invoiceId },
+      })
+    );
+    if (payment?.status === "failed") {
       await ctx.deleteMessage();
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
       conversation.session.consultationStep -= 1;
@@ -191,14 +190,12 @@ export async function BuyConsultationConversation(
         conversation.session.consultation.buyDate
       )
     );
-
     await conversation.external(async () =>
       disableConsultationByDateTime(
         consultationObject.dateString,
         consultationObject.time
       )
     );
-
     await ctx.reply("<b>Оплата прошла успешно</b>", {
       reply_markup: cancel,
     });

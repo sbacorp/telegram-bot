@@ -21,7 +21,6 @@ export const diagnosticListChildKeyboard = new InlineKeyboard()
   .text("ЖКТ", "zhkt")
   .text("Дефициты", "deficit")
   .row()
-  .text("Паразиты", "parazit")
   .text("Инсулин", "insulin")
-  .row()
-  .text("Аммиак", "ammiak");
+  .text("Аммиак", "ammiak")
+  .row();

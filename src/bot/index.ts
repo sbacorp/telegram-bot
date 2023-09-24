@@ -326,8 +326,8 @@ export function createBot(token: string, options: Options = {}) {
     //     ],
     //   },
     // });
-    await ctx.reply("Скоро будет доступен");
-    return ctx.deleteMessage();
+    await ctx.deleteMessage();
+    return ctx.reply("⏳ Скоро будет доступен");
   });
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {
     await ctx.deleteMessage();

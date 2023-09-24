@@ -102,6 +102,16 @@ export const createServer = async (bot: Bot) => {
           user.consultationPaidStatus = true;
           await user.save();
         }
+      } else {
+        const user = await UserModel.findOne({
+          where: {
+            chatId: payment.chatId,
+          },
+        });
+        if (user) {
+          user.boughtProducts += `${payment.productName},`;
+          await user.save();
+        }
       }
     }
 
