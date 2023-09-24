@@ -218,6 +218,8 @@ export async function consultationConversation(
           })
       )
       .then((u) => u?.dataValues?.buyDate);
+    console.log(buyDate);
+
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
