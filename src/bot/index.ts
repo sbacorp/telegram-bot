@@ -314,18 +314,19 @@ export function createBot(token: string, options: Options = {}) {
     );
   });
   bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
-    await ctx.reply("Карманный нутрициолог", {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "Перейти в бота 🤖 ",
-              url: "https://t.me/Tvoi_Nutriciolog_bot",
-            },
-          ],
-        ],
-      },
-    });
+    // await ctx.reply("Карманный нутрициолог", {
+    //   reply_markup: {
+    //     inline_keyboard: [
+    //       [
+    //         {
+    //           text: "Перейти в бота 🤖 ",
+    //           url: "https://t.me/Tvoi_Nutriciolog_bot",
+    //         },
+    //       ],
+    //     ],
+    //   },
+    // });
+    await ctx.reply("Скоро будет доступен");
     return ctx.deleteMessage();
   });
   bot.hears("🗣 Тг-канал", async (ctx: Context) => {

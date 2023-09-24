@@ -75,15 +75,13 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  const user = await conversation
-    .external(() =>
-      UserModel.findOne({
-        where: {
-          chatId,
-        },
-      })
-    )
-    .then((u) => u?.dataValues);
+  let user = await conversation.external(() =>
+    UserModel.findOne({
+      where: {
+        chatId,
+      },
+    })
+  );
 
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
@@ -208,17 +206,15 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-    const buyDate = await conversation
-      .external(
-        async () =>
-          await UserModel.findOne({
-            where: {
-              chatId,
-            },
-          })
-      )
-      .then((u) => u?.dataValues?.buyDate);
-    console.log(buyDate);
+    user = await conversation.external(() =>
+      UserModel.findOne({
+        where: {
+          chatId,
+        },
+      })
+    );
+    const { buyDate } = user!;
+    console.log(buyDate, "afsdafsafdasdfasdfsadfsdf");
 
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       await ctx.reply("Вы не успели выполнить тестирование", {
@@ -231,6 +227,11 @@ export async function consultationConversation(
       ctx = await conversation.wait();
       if (ctx.message?.text === "Перейти к выбору даты") {
         conversation.session.consultationStep = 2;
+        await conversation.external(async () => {
+          user!.buyDate =
+            new Date().getDate() + new Date().getMonth().toString();
+          await user?.save();
+        });
         return ctx.conversation.enter("consultation");
       }
     }
