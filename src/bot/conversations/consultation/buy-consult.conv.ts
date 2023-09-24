@@ -149,7 +149,7 @@ export async function BuyConsultationConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
-  const { link, paymentId } = await createPaymentLink(
+  const { link, invoiceId } = await createPaymentLink(
     product,
     ctx.chat!.id.toString()
   );
@@ -170,7 +170,7 @@ export async function BuyConsultationConversation(
     const paymentStatus = await conversation
       .external(() =>
         PaymentModel.findOne({
-          where: { id: paymentId },
+          where: { invoiceId },
         })
       )
       .then((res) => res?.dataValues.status);

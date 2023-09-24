@@ -208,6 +208,7 @@ ConsultationAppointmentModel.belongsTo(UserModel, {
 export interface IPayment extends Model {
   id: number;
   chatId: string;
+  invoiceId: number;
   amount: number;
   productName: string;
   status: string;
@@ -220,6 +221,10 @@ export const PaymentModel = sequelize.define<IPayment>("payment", {
   },
   chatId: {
     type: DataTypes.STRING,
+  },
+  invoiceId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
   amount: {
     type: DataTypes.INTEGER,

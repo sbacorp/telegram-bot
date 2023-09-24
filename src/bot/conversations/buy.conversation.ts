@@ -213,11 +213,11 @@ export async function buyConversation(
       product!.price! - product!.price! * (promo.discount! / 100);
   }
   //! create link to perchase
-  const { link, paymentId } = await conversation.external(() =>
+  const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product!, ctx.chat!.id.toString())
   );
   const message = await ctx.reply(
-    `<b>Можете приступать к оплате. Номер заказа: #${paymentId}</b>`,
+    `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
     {
       reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
     }
@@ -228,12 +228,10 @@ export async function buyConversation(
     const paymentStatus = await conversation
       .external(() =>
         PaymentModel.findOne({
-          where: { id: paymentId },
+          where: { invoiceId },
         })
       )
       .then((res) => res?.dataValues.status);
-
-    console.log(paymentStatus);
 
     if (paymentStatus === "failed") {
       return ctx.reply("Оплата не прошла, попробуйте позже");

@@ -71,6 +71,7 @@ export const createServer = async (bot: Bot) => {
     }
     const payment = await PaymentModel.findOne({
       where: {
+        invoiceId: data.InvId,
         chatId: data.Shp_chatId,
         amount: Number(data.OutSum),
       },
@@ -214,6 +215,7 @@ export const createServer = async (bot: Bot) => {
       where: {
         chatId: data.Shp_chatId,
         amount: Number(data.OutSum),
+        invoiceId: data.InvId,
       },
     });
     if (payment) {
