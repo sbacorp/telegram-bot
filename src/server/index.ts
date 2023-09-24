@@ -46,7 +46,7 @@ export const createServer = async (bot: Bot) => {
     };
     const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password2}:Shp_chatId=${paymentParameters.Shp_chatId}`;
     const SignatureValue = CryptoJS.MD5(signitureString);
-    if (SignatureValue.toString() !== data.SignatureValue) {
+    if (SignatureValue.toString().toUpperCase() !== data.SignatureValue) {
       return reply.code(400).send("Invalid signature");
     }
     return reply.code(200).send(`OK${paymentParameters.InvId}`);
