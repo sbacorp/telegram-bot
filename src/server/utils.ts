@@ -290,7 +290,7 @@ export const createPaymentLink = async (product: IProduct, chatId: string) => {
     password1: "M6WBUjhP5e3LX5cdU3SC",
     password2: "BJV9PqbP4l07w9GDxPdG",
   };
-  const signitureString = `${paymentParameters.MerchantLogin}:${paymentParameters.OutSum}:0:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
+  const signitureString = `${paymentParameters.MerchantLogin}:${paymentParameters.OutSum}:${invoiceId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
   const SignatureValue = CryptoJS.MD5(signitureString);
   const link = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${paymentParameters.MerchantLogin}&OutSum=${paymentParameters.OutSum}&InvId=0&Description=${paymentParameters.Description}&SignatureValue=${SignatureValue}&Shp_chatId=${paymentParameters.Shp_chatId}&IsTest=1`;
   const payment = await PaymentModel.create({
