@@ -232,15 +232,17 @@ export async function buyConversation(
         })
       )
       .then((res) => res?.dataValues.status);
+
+    console.log(paymentStatus);
+
     if (paymentStatus === "failed") {
-      return ctx.editMessageText("Оплата не прошла, попробуйте позже");
+      return ctx.reply("Оплата не прошла, попробуйте позже");
     }
-    await ctx.editMessageText("<b>Оплата прошла успешно</b>");
+    await ctx.reply("<b>Оплата прошла успешно</b>");
     return product?.type === "doc"
       ? ctx.replyWithDocument(product.docId!, {
           reply_markup: cancel,
         })
       : ctx.reply(product!.answer!);
   }
-  return ctx.editMessageText("Оплата не прошла");
 }
