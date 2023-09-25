@@ -10,7 +10,8 @@ const feature = composer.chatType("private");
 
 feature.command("start", logHandle("command-start"), async (ctx) => {
   const chatId = ctx.chat.id;
-  const isUser = await findOrCreateUser(chatId);
+  const name = ctx.chat.username!;
+  const isUser = await findOrCreateUser(chatId, name);
   if (!isUser)
     await ctx.reply(`
 Здравствуйте
@@ -22,7 +23,8 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
 🌿 Создала 2 программы профессиональной подготовки
 🌿 Подготовила более 3000 специалистов
 🌿 Разработала собственную линейку витаминов
-🌿 Произвожу лечебную магниевую воду с идеальным составом и ценой`);
+🌿 Произвожу лечебную магниевую воду с идеальным составом и ценой
+`);
   await ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
     reply_markup: mainMenu,
   });

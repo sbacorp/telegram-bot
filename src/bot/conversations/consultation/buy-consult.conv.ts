@@ -177,7 +177,10 @@ export async function BuyConsultationConversation(
       conversation.session.consultationStep -= 1;
       return ctx.conversation.enter("consultation");
     }
-
+    if (payment?.status === "pending") {
+      await ctx.deleteMessage();
+      await ctx.answerCallbackQuery("Операция еще не прошла");
+    }
     conversation.session.consultationStep = 4;
     conversation.session.consultation.answers = [];
     conversation.session.consultation.buyDate =
@@ -199,6 +202,10 @@ export async function BuyConsultationConversation(
     await ctx.reply("<b>Оплата прошла успешно</b>", {
       reply_markup: cancel,
     });
+  }
+  if (ctx.message?.text === "⬅️ К выбору даты") {
+    conversation.session.consultationStep -= 1;
+    return ctx.conversation.reenter("consultation");
   }
 
   return ctx;

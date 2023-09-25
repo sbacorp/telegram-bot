@@ -22,7 +22,7 @@ export async function initDB(sequelize: Sequelize) {
   }
 }
 
-export async function findOrCreateUser(chatId: number) {
+export async function findOrCreateUser(chatId: number, name: string) {
   try {
     const user = await UserModel.findOne({
       where: { chatId: chatId.toString() },
@@ -35,17 +35,17 @@ export async function findOrCreateUser(chatId: number) {
       return true;
     }
     if (!user) {
-      await UserModel.create({ chatId });
+      await UserModel.create({ chatId, name });
       return false;
     }
   } catch (error) {
     console.error(error);
   }
 }
-export async function fetchUser(chatId: number) {
+export async function fetchUser(chatId: string) {
   try {
     const user = await UserModel.findOne({
-      where: { chatId: chatId.toString() },
+      where: { chatId },
     });
     return user;
   } catch (error) {

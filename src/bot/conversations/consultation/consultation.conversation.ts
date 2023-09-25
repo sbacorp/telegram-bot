@@ -17,7 +17,7 @@ import {
   UserModel,
 } from "#root/server/models.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
-import { editUserAttribute } from "#root/server/utils.js";
+import { editUserAttribute, fetchUser } from "#root/server/utils.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import {
   briefMaleConversation,
@@ -75,14 +75,7 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  let user = await conversation.external(() =>
-    UserModel.findOne({
-      where: {
-        chatId,
-      },
-    })
-  );
-
+  let user = await conversation.external(() => fetchUser(chatId));
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -165,7 +158,10 @@ export async function consultationConversation(
     conversation.session.consultationStep = 2;
   }
 
-  if (conversation.session.consultationStep < 3) {
+  if (
+    conversation.session.consultationStep < 3 &&
+    conversation.session.consultation.dateString === ""
+  ) {
     consultationObject = await chooseDateConversation(
       conversation,
       ctx,
@@ -206,16 +202,8 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-    user = await conversation.external(() =>
-      UserModel.findOne({
-        where: {
-          chatId,
-        },
-      })
-    );
+    user = await conversation.external(() => fetchUser(chatId));
     const { buyDate } = user!;
-    console.log(buyDate, "afsdafsafdasdfasdfsadfsdf");
-
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
@@ -228,9 +216,11 @@ export async function consultationConversation(
       if (ctx.message?.text === "Перейти к выбору даты") {
         conversation.session.consultationStep = 2;
         await conversation.external(async () => {
-          user!.buyDate =
-            new Date().getDate() + new Date().getMonth().toString();
-          await user?.save();
+          await editUserAttribute(
+            chatId,
+            "buyDate",
+            new Date().getDate() + new Date().getMonth().toString()
+          );
         });
         return ctx.conversation.enter("consultation");
       }
