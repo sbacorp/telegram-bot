@@ -158,11 +158,9 @@ export async function BuyConsultationConversation(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
 
-  const { link, invoiceId } = await createPaymentLink(
-    product,
-    ctx.chat!.id.toString()
+  const { link, invoiceId } = await conversation.external(() =>
+    createPaymentLink(product, ctx.chat!.id.toString())
   );
-
   message = await ctx.reply(
     `<b>Можете приступать к оплате.</b>
     После оплаты вы получите ссылку на бриф, который необходимо заполнить не позднее<b> полночи</b> текущего дня.
