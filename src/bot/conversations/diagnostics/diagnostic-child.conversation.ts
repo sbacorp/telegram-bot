@@ -12,6 +12,7 @@ import {
   diagnosticAmmiakConversationChild,
   diagnosticDeficitConversationChild,
   diagnosticInsulinConversationChild,
+  diagnosticParazitConversationChild,
   diagnosticZhktConversationChild,
 } from "./diagnostics-child.js";
 
@@ -33,7 +34,7 @@ export async function diagnosticConversationChild(
     }
   );
   const response = await conversation.waitForCallbackQuery(
-    ["zhkt", "deficit", "insulin", "ammiak"],
+    ["zhkt", "deficit", "insulin", "ammiak", "parazit"],
     {
       otherwise: async (ctx) =>
         await ctx.reply("Используйте кнопки", {
@@ -52,6 +53,9 @@ export async function diagnosticConversationChild(
   }
   if (response.match === "ammiak") {
     await diagnosticAmmiakConversationChild(conversation, ctx);
+  }
+  if (response.match === "parazit") {
+    await diagnosticParazitConversationChild(conversation, ctx);
   }
   return ctx.reply("Вам так же будет полезно :", {
     reply_markup: new Keyboard()
