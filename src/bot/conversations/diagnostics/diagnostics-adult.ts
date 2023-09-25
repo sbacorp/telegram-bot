@@ -487,7 +487,7 @@ export async function diagnosticDeficitConversationAdult(
 
   if (guideAnswer.match === "guide") {
     return ctx.replyWithDocument(
-      "BQACAgIAAxkBAAIUumUNhgV7Ill3cun6MidKcQVBASwWAAKnNAACPlFoSHxhxX_CPYGmMAQ",
+      "BQACAgIAAxkBAAIYCmURP-_IJt7yjRxi3wd2ID7jlFbTAAICOQACenmISGL2KzWSB45ZMAQ",
       {
         reply_markup: cancel,
       }
@@ -632,8 +632,11 @@ export async function diagnosticInsulinConversationAdult(
   const guideAnswer = await conversation.waitForCallbackQuery("guide");
 
   if (guideAnswer.match === "guide") {
-    await ctx.reply("ИНСУЛИН", {
-      reply_markup: cancel,
-    });
+    await ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIUumUNhgV7Ill3cun6MidKcQVBASwWAAKnNAACPlFoSHxhxX_CPYGmMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
