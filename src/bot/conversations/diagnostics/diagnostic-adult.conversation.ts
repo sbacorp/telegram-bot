@@ -66,6 +66,7 @@ export async function diagnosticConversationAdult(
       .text("🏠 Главное меню")
       .row()
       .text("Хочу комплексно решить проблему")
+      .resized()
       .oneTime(),
   });
 }

@@ -683,8 +683,11 @@ export async function diagnosticParazitConversationChild(
   });
 
   if (guideAnswer.match === "guide") {
-    return ctx.reply("Гайд", {
-      reply_markup: cancel,
-    });
+    return ctx.replyWithDocument(
+      "BQACAgIAAxkBAAIY8WURXszxS_ANhPJehztCYZUymUM6AAJoNwACenmQSCR5MmClPICMMAQ",
+      {
+        reply_markup: cancel,
+      }
+    );
   }
 }
