@@ -158,10 +158,7 @@ export async function consultationConversation(
     conversation.session.consultationStep = 2;
   }
 
-  if (
-    conversation.session.consultationStep < 3 &&
-    conversation.session.consultation.dateString === ""
-  ) {
+  if (conversation.session.consultationStep < 3 && !user!.buyDate) {
     consultationObject = await chooseDateConversation(
       conversation,
       ctx,
