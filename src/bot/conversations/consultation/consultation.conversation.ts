@@ -32,7 +32,10 @@ import {
   questions as childQuestions,
 } from "./brief-child.conv.js";
 import { chooseDateConversation } from "./choose-date.conv.js";
-import { BuyConsultationConversation } from "./buy-consult.conv.js";
+import {
+  BuyConsultationConversation,
+  enableConsultationByDateTime,
+} from "./buy-consult.conv.js";
 
 export const yesNoKeyboard = new InlineKeyboard()
   .text("Ознакомиться", "no")
@@ -202,6 +205,10 @@ export async function consultationConversation(
     user = await conversation.external(() => fetchUser(chatId));
     const { buyDate } = user!;
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
+      await enableConsultationByDateTime(
+        conversation.session.consultation.dateString,
+        conversation.session.consultation.time
+      );
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
           .text("Перейти к выбору даты")
@@ -209,6 +216,7 @@ export async function consultationConversation(
           .text("🏠 Главное меню")
           .resized(),
       });
+
       ctx = await conversation.wait();
       if (ctx.message?.text === "Перейти к выбору даты") {
         conversation.session.consultationStep = 2;

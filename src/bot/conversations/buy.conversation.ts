@@ -231,7 +231,7 @@ export async function buyConversation(
       )
       .then((res) => res?.dataValues.status);
 
-    if (paymentStatus === "failed") {
+    if (paymentStatus !== "paid") {
       return ctx.reply("Оплата не прошла, попробуйте позже");
     }
     await ctx.reply("<b>Оплата прошла успешно</b>");

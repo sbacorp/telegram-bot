@@ -44,6 +44,19 @@ const disableConsultationByDateTime = async (date: string, time: string) => {
     await consultation.save();
   }
 };
+export const enableConsultationByDateTime = async (
+  date: string,
+  time: string
+) => {
+  const timeAttribute: TimeAttributeType = `time${
+    time.split(":")[0]
+  }` as TimeAttributeType;
+  const consultation = await ConsultationModel.findOne({ where: { date } });
+  if (consultation) {
+    consultation[timeAttribute] = true;
+    await consultation.save();
+  }
+};
 
 export async function BuyConsultationConversation(
   conversation: Conversation<Context>,
@@ -141,7 +154,6 @@ export async function BuyConsultationConversation(
         Новая цена: ${product.price}₽
         `);
   }
-
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
@@ -171,15 +183,10 @@ export async function BuyConsultationConversation(
         where: { invoiceId },
       })
     );
-    if (payment?.status === "failed") {
+    if (payment?.status !== "paid") {
       await ctx.deleteMessage();
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
-      conversation.session.consultationStep -= 1;
       return ctx.conversation.enter("consultation");
-    }
-    if (payment?.status === "pending") {
-      await ctx.deleteMessage();
-      await ctx.answerCallbackQuery("Операция еще не прошла");
     }
     conversation.session.consultationStep = 4;
     conversation.session.consultation.answers = [];
@@ -195,8 +202,8 @@ export async function BuyConsultationConversation(
     );
     await conversation.external(async () =>
       disableConsultationByDateTime(
-        consultationObject.dateString,
-        consultationObject.time
+        conversation.session.consultation.dateString,
+        conversation.session.consultation.time
       )
     );
     await ctx.reply("<b>Оплата прошла успешно</b>", {

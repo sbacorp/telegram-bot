@@ -9,6 +9,8 @@ export function setPromoConversation() {
     async (conversation: Conversation<Context>, ctx: Context) => {
       await ctx.reply("<b>Выберите товар :</b>", {
         reply_markup: new Keyboard()
+          .text("all")
+          .row()
           .text("Подписка на нутрициолога")
           .row()
           .text("Консультация")
