@@ -50,7 +50,7 @@ export const createPaymentLink = async (product: IProduct, chatId: string) => {
     paymentParameters.OutSum
   }&InvId=${invoiceId}&Receipt=${encodeURIComponent(
     paymentParameters.Reciept
-  )}Description=${
+  )}&Description=${
     paymentParameters.Description
   }&SignatureValue=${SignatureValue}&Shp_chatId=${
     paymentParameters.Shp_chatId
