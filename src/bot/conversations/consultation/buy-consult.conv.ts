@@ -80,13 +80,13 @@ export async function BuyConsultationConversation(
         .resized(),
     });
     ctx = await conversation.waitFor("message:text");
-    while (!ctx.message?.text?.match(/^(?:[ЁА-Я][а-яё]+ ){2}[ЁА-Я][а-яё]+$/)) {
+    while (ctx.message?.text!=="⬅️ К выбору даты" || !ctx.message?.text?.match(/^(?:[ЁА-Я][а-яё]+ ){2}[ЁА-Я][а-яё]+$/)) {
       if (ctx.message?.text === "⬅️ К выбору даты") {
-        conversation.session.consultationStep -= 1;
+        conversation.session.consultationStep = 2;
         return "change date";
       }
       if (ctx.message?.text === "🏠 Главное меню") {
-        return ctx.conversation.exit();
+        return "home"
       }
 
       await ctx.reply("Введите ФИО");
