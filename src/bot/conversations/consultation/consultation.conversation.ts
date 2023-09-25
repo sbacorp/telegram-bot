@@ -160,8 +160,11 @@ export async function consultationConversation(
     }
     conversation.session.consultationStep = 2;
   }
-
-  if (conversation.session.consultationStep < 3 && !user!.buyDate) {
+  if (
+    conversation.session.consultationStep < 3 &&
+    user?.dataValues.buyDate !==
+      new Date().getDate() + new Date().getMonth().toString()
+  ) {
     consultationObject = await chooseDateConversation(
       conversation,
       ctx,
@@ -172,7 +175,7 @@ export async function consultationConversation(
   }
   if (
     conversation.session.consultationStep < 4 &&
-    user!.consultationPaidStatus !== true
+    user!.dataValues.consultationPaidStatus !== true
   ) {
     ctx = (await BuyConsultationConversation(
       conversation,
@@ -204,22 +207,24 @@ export async function consultationConversation(
 В противном вам придется выбрать другую дату`);
     user = await conversation.external(() => fetchUser(chatId));
     const { buyDate } = user!;
+
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
-      await enableConsultationByDateTime(
-        conversation.session.consultation.dateString,
-        conversation.session.consultation.time
+      await conversation.external(() =>
+        enableConsultationByDateTime(
+          conversation.session.consultation.dateString,
+          conversation.session.consultation.time
+        )
       );
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
-          .text("Перейти к выбору даты")
+          .text("выбрать дату")
           .row()
           .text("🏠 Главное меню")
           .resized(),
       });
-
       ctx = await conversation.wait();
-      if (ctx.message?.text === "Перейти к выбору даты") {
-        conversation.session.consultationStep = 2;
+
+      if (ctx.update.message?.text === "выбрать дату") {
         await conversation.external(async () => {
           await editUserAttribute(
             chatId,
@@ -227,7 +232,8 @@ export async function consultationConversation(
             new Date().getDate() + new Date().getMonth().toString()
           );
         });
-        return ctx.conversation.enter("consultation");
+        conversation.session.consultationStep = 2;
+        return consultationConversation(conversation, ctx);
       }
     }
     switch (conversation.session.sex) {
@@ -251,7 +257,6 @@ export async function consultationConversation(
         );
         break;
       }
-      // No default
     }
     conversation.session.consultationStep = 5;
   }
