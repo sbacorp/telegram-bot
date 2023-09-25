@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable no-loop-func */
@@ -20,6 +21,7 @@ import {
 import { IConsultationObject } from "#root/typing.js";
 import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
+import { consultationConversation } from "./consultation.conversation.js";
 
 type TimeAttributeType =
   | "time10"
@@ -217,7 +219,7 @@ export async function BuyConsultationConversation(
   }
   if (ctx.message?.text === "⬅️ К выбору даты") {
     conversation.session.consultationStep -= 1;
-    return ctx.conversation.reenter("consultation");
+    return consultationConversation(conversation, ctx);
   }
 
   return ctx;
