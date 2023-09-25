@@ -7,6 +7,8 @@ import type { Bot } from "#root/bot/index.js";
 import { errorHandler } from "#root/bot/handlers/index.js";
 import { logger } from "#root/logger.js";
 import { PaymentModel, UserModel } from "./models.js";
+import { initDB } from "./utils.js";
+import { sequelize } from "./database.js";
 
 interface PaymentData {
   OutSum: string;
@@ -69,6 +71,7 @@ export const createServer = async (bot: Bot) => {
     if (SignatureValue.toString() !== data.SignatureValue) {
       return reply.code(400).send("Ошибка на сервере, попробуйте позже");
     }
+    await initDB(sequelize);
     const payment = await PaymentModel.findOne({
       where: {
         invoiceId: data.InvId,
