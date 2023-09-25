@@ -78,7 +78,7 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
-  let user = await conversation.external(() => fetchUser(chatId));
+  let user = await conversation.external(async () => await fetchUser(chatId));
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.split("-")[2] || "",
     dateString: conversation.session.consultation.dateString,
@@ -205,15 +205,17 @@ export async function consultationConversation(
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-    user = await conversation.external(() => fetchUser(chatId));
-    const { buyDate } = user!;
 
+    user = await conversation.external(async () => await fetchUser(chatId));
+    const buyDate = user?.dataValues.buyDate;
+    const consultationDate = user?.dataValues.consultationDate;
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
-      await conversation.external(() =>
-        enableConsultationByDateTime(
-          conversation.session.consultation.dateString,
-          conversation.session.consultation.time
-        )
+      await conversation.external(
+        async () =>
+          await enableConsultationByDateTime(
+            consultationDate,
+            conversation.session.consultation.time
+          )
       );
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
@@ -223,7 +225,6 @@ export async function consultationConversation(
           .resized(),
       });
       ctx = await conversation.wait();
-
       if (ctx.update.message?.text === "выбрать дату") {
         await conversation.external(async () => {
           await editUserAttribute(
@@ -236,6 +237,7 @@ export async function consultationConversation(
         return consultationConversation(conversation, ctx);
       }
     }
+    await ctx.reply("Начинаем тестирование");
     switch (conversation.session.sex) {
       case "male": {
         await briefMaleConversation(conversation, ctx);
@@ -243,7 +245,6 @@ export async function consultationConversation(
       }
       case "female": {
         await briefFemaleConversation(conversation, ctx);
-
         break;
       }
       case "child": {
@@ -347,7 +348,7 @@ ${answerQuestions}`
     conversation.session.consultationStep = 6;
     ctx.chatAction = null;
   }
-  return ctx.reply(
+  await ctx.reply(
     `Запись на консультацию прошла успешно!
     Ожидайте моего сообщения ${new Date(
       consultationObject.year,
@@ -363,4 +364,5 @@ ${answerQuestions}`
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }
   );
+  return ctx.conversation.exit("consultation");
 }

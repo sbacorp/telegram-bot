@@ -70,6 +70,10 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     type: DataTypes.STRING,
     defaultValue: null,
   },
+  consultationDate: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+  },
 });
 
 export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {

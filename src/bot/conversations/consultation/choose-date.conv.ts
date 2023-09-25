@@ -252,13 +252,7 @@ export async function chooseDateConversation(
   }
   consultationObject.time = ctx.update.callback_query?.data;
   conversation.session.consultation.time = consultationObject.time;
-  conversation.session.consultation.dateString = `${consultationObject.dateString.slice(
-    0,
-    4
-  )}-${consultationObject.dateString.slice(
-    4,
-    6
-  )}-${consultationObject.dateString.slice(6)}`;
+  conversation.session.consultation.dateString = consultationObject.dateString;
   await ctx.reply(`Выбранная дата: ${consultationObject.date.toLocaleDateString(
     "ru-RU",
     {

@@ -244,7 +244,8 @@ type UserAttributes =
   | "boughtProducts"
   | "consultationPaidStatus"
   | "sex"
-  | "buyDate";
+  | "buyDate"
+  | "consultationDate";
 
 export const editUserAttribute = async (
   chatId: string,

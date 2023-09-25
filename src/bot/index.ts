@@ -84,6 +84,8 @@ import {
   diagnosticAmmiakConversationChild,
   DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD,
   newsletterConversation,
+  diagnosticParazitConversationChild,
+  DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD,
 } from "./conversations/index.js";
 import { cancel } from "./keyboards/cancel.keyboard.js";
 import {
@@ -120,8 +122,8 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(hydrate());
   bot.use(
     session({
-      initial: () => ({ ...sessionDataDefaults }),
       storage: sessionStorage,
+      initial: () => ({ ...sessionDataDefaults }),
     })
   );
   const constraint = (ctx: Context) => String(ctx.chat?.id);
@@ -215,6 +217,12 @@ export function createBot(token: string, options: Options = {}) {
     createConversation(
       diagnosticZhktConversationAdult,
       DIAGNOSTIC_ZHKT_CONVERSATION_ADULT
+    )
+  );
+  bot.use(
+    createConversation(
+      diagnosticParazitConversationChild,
+      DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD
     )
   );
   bot.use(

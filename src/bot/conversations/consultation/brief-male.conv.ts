@@ -356,7 +356,12 @@ export async function briefMaleConversation(
   ctx: Context
 ) {
   const answersCount = conversation.session.consultation.answers.length;
-  await ctx.deleteMessage();
+  console.log(
+    answersCount,
+    questions.length,
+    "sadfasfasdfasdfasd asdf asdfasd fasd f"
+  );
+
   for (let i = answersCount; i < questions.length; i += 1) {
     if (!questions[i].type) {
       await ctx.reply(questions[i].text);
@@ -365,7 +370,6 @@ export async function briefMaleConversation(
         return ctx.conversation.exit();
       }
       conversation.session.consultation.answers.push(answer.message.text);
-      continue;
     } else if (questions[i].type === "select" && questions[i].keyboard) {
       await ctx.reply(questions[i].text, {
         reply_markup: questions[i].keyboard,
@@ -375,7 +379,6 @@ export async function briefMaleConversation(
         return ctx.conversation.exit();
       }
       conversation.session.consultation.answers.push(answer.message.text);
-      continue;
     } else if (questions[i].type === "withPhoto") {
       await ctx.reply(questions[i].text);
       await ctx.replyWithPhoto(
@@ -386,7 +389,6 @@ export async function briefMaleConversation(
         return ctx.conversation.exit();
       }
       conversation.session.consultation.answers.push(answer.message.text);
-      continue;
     } else if (questions[i].type === "withMultiAnswer") {
       let answer: string;
       await ctx.reply(questions[i].text);

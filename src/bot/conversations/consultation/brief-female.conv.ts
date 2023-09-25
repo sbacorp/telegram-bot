@@ -436,7 +436,6 @@ export async function briefFemaleConversation(
   ctx: Context
 ) {
   const answersCount = conversation.session.consultation.answers.length;
-  await ctx.deleteMessage();
   // eslint-disable-next-line no-restricted-syntax
   for (let i = answersCount; i < questions.length; i++) {
     if (!questions[i].type) {

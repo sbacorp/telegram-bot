@@ -40,6 +40,7 @@ export interface IUserModel extends Model {
   boughtProducts?: string;
   consultationPaidStatus: boolean;
   buyDate?: string;
+  consultationDate?: string;
 }
 export interface IPromocodeModel extends Model {
   id: number;

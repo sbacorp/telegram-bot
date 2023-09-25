@@ -199,6 +199,13 @@ export async function BuyConsultationConversation(
       )
     );
     await conversation.external(async () =>
+      editUserAttribute(
+        ctx.chat!.id.toString(),
+        "consultationDate",
+        conversation.session.consultation.dateString
+      )
+    );
+    await conversation.external(async () =>
       disableConsultationByDateTime(
         conversation.session.consultation.dateString,
         conversation.session.consultation.time
