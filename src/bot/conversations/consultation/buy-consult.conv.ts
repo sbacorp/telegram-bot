@@ -72,8 +72,6 @@ export async function BuyConsultationConversation(
     price: conversation.session.sex === "child" ? 5000 : 10_000,
   };
 
-  await ctx.deleteMessage();
-
   if (!conversation.session.fio) {
     await ctx.reply("Введите ФИО", {
       reply_markup: new Keyboard()
@@ -85,7 +83,7 @@ export async function BuyConsultationConversation(
     while (!ctx.message?.text?.match(/^(?:[ЁА-Я][а-яё]+ ){2}[ЁА-Я][а-яё]+$/)) {
       if (ctx.message?.text === "⬅️ К выбору даты") {
         conversation.session.consultationStep -= 1;
-        return ctx.conversation.reenter("consultation");
+        return "change date";
       }
       if (ctx.message?.text === "🏠 Главное меню") {
         return ctx.conversation.exit();
@@ -175,11 +173,10 @@ export async function BuyConsultationConversation(
         .text("⬅️ К выбору даты"),
     }
   );
-
   ctx = await conversation.wait();
   if (ctx.message?.text === "⬅️ К выбору даты") {
-    conversation.session.consultationStep -= 1;
-    return consultationConversation(conversation, ctx);
+    conversation.session.consultationStep = 2;
+    return "change date";
   }
   if (ctx.update.callback_query?.data === "paid") {
     const payment = await conversation.external(() =>
@@ -187,10 +184,13 @@ export async function BuyConsultationConversation(
         where: { invoiceId },
       })
     );
+
     if (payment?.status !== "paid") {
       await ctx.deleteMessage();
+      conversation.session.consultation.dateString = "";
+      conversation.session.consultationStep = 2;
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
-      return ctx.conversation.enter("consultation");
+      return "fail";
     }
     conversation.session.consultationStep = 4;
     conversation.session.consultation.answers = [];
@@ -220,11 +220,8 @@ export async function BuyConsultationConversation(
     await ctx.reply("<b>Оплата прошла успешно</b>", {
       reply_markup: cancel,
     });
+    return "success";
   }
-  if (ctx.message?.text === "⬅️ К выбору даты") {
-    conversation.session.consultationStep -= 1;
-    return consultationConversation(conversation, ctx);
-  }
-
-  return ctx;
+  conversation.session.consultationStep = 2;
+  return "fail";
 }

@@ -160,11 +160,7 @@ export async function consultationConversation(
     }
     conversation.session.consultationStep = 2;
   }
-  if (
-    conversation.session.consultationStep < 3 &&
-    user?.dataValues.buyDate !==
-      new Date().getDate() + new Date().getMonth().toString()
-  ) {
+  if (conversation.session.consultationStep < 3) {
     consultationObject = await chooseDateConversation(
       conversation,
       ctx,
@@ -177,17 +173,23 @@ export async function consultationConversation(
     conversation.session.consultationStep < 4 &&
     user!.dataValues.consultationPaidStatus !== true
   ) {
-    ctx = (await BuyConsultationConversation(
+    const paymentResult = await BuyConsultationConversation(
       conversation,
       ctx,
       message,
       consultationObject
-    )) as Context;
+    );
+    if (paymentResult === "change date") {
+      return consultationConversation(conversation, ctx);
+    }
+    if (paymentResult === "fail") {
+      return consultationConversation(conversation, ctx);
+    }
   }
   if (conversation.session.sex === "") {
     conversation.session.consultationStep = 1;
     await ctx.reply("Вы не выбрали пол");
-    return ctx.conversation.reenter("consultation");
+    return consultationConversation(conversation, ctx);
   }
   if (
     conversation.session.consultationStep < 5 &&
