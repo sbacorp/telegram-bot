@@ -185,7 +185,6 @@ export async function BuyConsultationConversation(
     );
 
     if (payment?.status !== "paid") {
-      await ctx.deleteMessage();
       conversation.session.consultation.dateString = "";
       conversation.session.consultationStep = 2;
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
