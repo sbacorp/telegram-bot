@@ -185,6 +185,9 @@ export async function consultationConversation(
     if (paymentResult === "fail") {
       return consultationConversation(conversation, ctx);
     }
+    if (paymentResult === "home") {
+      return;
+    }
   }
   if (conversation.session.sex === "") {
     conversation.session.consultationStep = 1;
