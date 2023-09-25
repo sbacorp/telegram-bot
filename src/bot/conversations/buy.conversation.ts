@@ -206,10 +206,9 @@ export async function buyConversation(
   }
   if (promo) {
     await ctx.reply("Промокод принят");
+    product!.price -= product!.price * (promo.discount / 100);
     await ctx.reply(`Скидка составляет ${promo.discount}%
-Итоговая цена: ${product!.price! - product!.price! * (promo.discount! / 100)}`);
-    product!.price =
-      product!.price! - product!.price! * (promo.discount! / 100);
+Итоговая цена: ${product!.price} рублей`);
   }
   //! create link to perchase
   const { link, invoiceId } = await conversation.external(() =>
