@@ -177,6 +177,10 @@ export async function BuyConsultationConversation(
   );
 
   ctx = await conversation.wait();
+  if (ctx.message?.text === "⬅️ К выбору даты") {
+    conversation.session.consultationStep -= 1;
+    return consultationConversation(conversation, ctx);
+  }
   if (ctx.update.callback_query?.data === "paid") {
     const payment = await conversation.external(() =>
       PaymentModel.findOne({

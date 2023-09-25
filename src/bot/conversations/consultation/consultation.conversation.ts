@@ -219,13 +219,13 @@ export async function consultationConversation(
       );
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
-          .text("выбрать дату")
+          .text("📅 выбрать дату")
           .row()
           .text("🏠 Главное меню")
           .resized(),
       });
       ctx = await conversation.wait();
-      if (ctx.update.message?.text === "выбрать дату") {
+      if (ctx.update.message?.text === "📅 выбрать дату") {
         await conversation.external(async () => {
           await editUserAttribute(
             chatId,
