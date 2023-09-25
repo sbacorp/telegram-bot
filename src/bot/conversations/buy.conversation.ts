@@ -10,13 +10,13 @@ import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
-  createPaymentLink,
   editUserAttribute,
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
 import { IProduct } from "#root/typing.js";
 import { PaymentModel } from "#root/server/models.js";
+import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
 
 export const products: IProduct[] = [

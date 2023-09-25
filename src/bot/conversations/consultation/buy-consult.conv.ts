@@ -7,7 +7,6 @@ import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
 import {
-  createPaymentLink,
   editUserAttribute,
   fetchUser,
   findPromoCodeByTitleAndProduct,
@@ -19,6 +18,7 @@ import {
   UserModel,
 } from "#root/server/models.js";
 import { IConsultationObject } from "#root/typing.js";
+import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 
 type TimeAttributeType =
