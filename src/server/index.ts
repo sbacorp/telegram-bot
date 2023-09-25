@@ -234,30 +234,6 @@ export const createServer = async (bot: Bot) => {
   });
   server.get("/bot/fail", async (request, reply) => {
     const data = request.query as PaymentData;
-    const payment = await PaymentModel.findOne({
-      where: {
-        chatId: data.Shp_chatId,
-        amount: Number(data.OutSum),
-        invoiceId: data.InvId,
-      },
-    });
-    if (payment) {
-      payment.status = "failed";
-      await payment.save();
-      await bot.api.sendMessage(payment.chatId, "Операция не прошла!", {
-        reply_markup: {
-          keyboard: [
-            [
-              {
-                text: "🏠 Главное меню",
-              },
-            ],
-          ],
-        },
-      });
-    } else {
-      await bot.api.sendMessage(data.Shp_chatId, "Платеж завершился неудачей!");
-    }
     return reply.type("text/html").send(`
   <html lang="ru">
     <head>
