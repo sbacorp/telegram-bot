@@ -10,6 +10,7 @@ import { sequelize } from "#root/server/database.js";
 
 try {
   const bot = createBot(config.BOT_TOKEN);
+  await initDB(sequelize);
   const server = await createServer(bot);
   let runner: undefined | RunnerHandle;
   // Graceful shutdown
@@ -23,7 +24,6 @@ try {
   if (config.isProd) {
     // to prevent receiving updates before the bot is ready
     await bot.init();
-    await initDB(sequelize);
     await server.listen({
       host: config.BOT_SERVER_HOST,
       port: config.BOT_SERVER_PORT,
