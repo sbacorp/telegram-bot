@@ -98,7 +98,6 @@ export const createServer = async (bot: Bot) => {
     }
     reply.code(200).send(`OK${paymentParameters.InvId}`);
   });
-
   server.get("/bot/successfully", async function handler(request, reply) {
     return reply.type("text/html").send(`
   <html lang="ru">

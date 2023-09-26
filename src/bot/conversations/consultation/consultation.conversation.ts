@@ -80,7 +80,7 @@ export async function consultationConversation(
   const chatId = ctx.chat!.id.toString();
   let user = await conversation.external(async () => await fetchUser(chatId));
   let consultationObject: IConsultationObject = {
-    day: conversation.session.consultation.dateString.split("-")[2] || "",
+    day: conversation.session.consultation.dateString.slice(6, 8) || "",
     dateString: conversation.session.consultation.dateString,
     time: conversation.session.consultation.time,
     year: new Date().getFullYear(),
@@ -206,11 +206,16 @@ export async function consultationConversation(
         conversation.session.consultation.questionsAnswered !==
           childQuestions.length))
   ) {
-    await ctx.reply(`Первый этап консультации - вам необходимо ответить на перечень вопросов. Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
+    if (conversation.session.consultation.questionsAnswered === 0) {
+      await ctx.reply(`
+1️⃣ Первый этап консультации - вам необходимо ответить на перечень вопросов.
+Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
 От этого этапа будет зависеть список назначенных анализов.
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
-
+    } else {
+      await ctx.reply("Продолжаем тестирование");
+    }
     const user1 = await conversation.external(
       async () => await fetchUser(chatId)
     );
@@ -244,7 +249,6 @@ export async function consultationConversation(
         return consultationConversation(conversation, ctx);
       }
     }
-    await ctx.reply("Начинаем тестирование");
     switch (conversation.session.sex) {
       case "male": {
         await briefMaleConversation(conversation, ctx);
@@ -287,7 +291,7 @@ export async function consultationConversation(
     if (ctx.update.callback_query?.data === "WhatsApp") {
       consultationObject.massanger = "WhatsApp";
     }
-    await ctx.reply("Напишите контакт для связи в этом мессенджере");
+    await ctx.reply("📞 Напишите контакт для связи в этом мессенджере");
     const messanger = await conversation.form.text();
     conversation.session.consultation.messanger = `${consultationObject.massanger} ${messanger}`;
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
@@ -357,16 +361,16 @@ ${answerQuestions}`
   }
   await ctx.reply(
     `Запись на консультацию прошла успешно!
-    Ожидайте моего сообщения ${new Date(
-      consultationObject.year,
-      consultationObject.month,
-      Number(consultationObject.dateString.split("-")[2])
-    ).toLocaleDateString("ru-RU", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })} в ${consultationObject.time}`,
+      Ожидайте моего сообщения ${new Date(
+        Number(conversation.session.consultation.dateString.slice(0, 4)),
+        Number(conversation.session.consultation.dateString.slice(4, 6)),
+        Number(conversation.session.consultation.dateString.slice(6, 8))
+      ).toLocaleDateString("ru-RU", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })} в ${conversation.session.consultation.time}:00`,
     {
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }

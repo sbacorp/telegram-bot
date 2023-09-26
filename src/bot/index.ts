@@ -277,7 +277,7 @@ export function createBot(token: string, options: Options = {}) {
       reply_markup: projectsMenu,
     });
   });
-  bot.hears("Хочу комплексно решить проблему", async (ctx: Context) => {
+  bot.hears("🎯 Хочу комплексно решить проблему", async (ctx: Context) => {
     await ctx.deleteMessage();
     await ctx.reply("🗃 Мои проекты", {
       reply_markup: projectsMenu,

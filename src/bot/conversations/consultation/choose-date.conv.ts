@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable no-continue */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-return-await */
@@ -19,58 +20,42 @@ const createConsultationTimeKeyboard = async (date: string) => {
     },
   });
   const keyboard = new InlineKeyboard();
-  if (consultation) {
-    if (consultation.time10) {
-      keyboard.text("10:00", "10:00");
-      keyboard.row();
+
+  const times = [
+    { time: "10:00", value: "time10" },
+    { time: "11:00", value: "time11" },
+    { time: "12:00", value: "time12" },
+    { time: "13:00", value: "time13" },
+    { time: "14:00", value: "time14" },
+    { time: "15:00", value: "time15" },
+    { time: "16:00", value: "time16" },
+    { time: "17:00", value: "time17" },
+    { time: "18:00", value: "time18" },
+    { time: "19:00", value: "time19" },
+    { time: "20:00", value: "time20" },
+  ];
+
+  let hasAvailableTime = false;
+
+  times.forEach(({ time, value }) => {
+    if (consultation && consultation[value as keyof typeof consultation]) {
+      keyboard.text(time, time).row();
+      hasAvailableTime = true;
     }
-    if (consultation.time11) {
-      keyboard.text("11:00", "11:00");
-      keyboard.row();
-    }
-    if (consultation.time12) {
-      keyboard.text("12:00", "12:00");
-      keyboard.row();
-    }
-    if (consultation.time13) {
-      keyboard.text("13:00", "13:00");
-      keyboard.row();
-    }
-    if (consultation.time14) {
-      keyboard.text("14:00", "14:00");
-      keyboard.row();
-    }
-    if (consultation.time15) {
-      keyboard.text("15:00", "15:00");
-      keyboard.row();
-    }
-    if (consultation.time16) {
-      keyboard.text("16:00", "16:00");
-      keyboard.row();
-    }
-    if (consultation.time17) {
-      keyboard.text("17:00", "17:00");
-      keyboard.row();
-    }
-    if (consultation.time18) {
-      keyboard.text("18:00", "18:00");
-      keyboard.row();
-    }
-    if (consultation.time19) {
-      keyboard.text("19:00", "19:00");
-      keyboard.row();
-    }
-    if (consultation.time20) {
-      keyboard.text("20:00", "20:00");
-      keyboard.row();
-    }
-    keyboard.text("⬅️Выбрать дату", "back");
-  } else {
-    return new InlineKeyboard().text("Нет свободного времени");
-    keyboard.row().text("⬅️Выбрать дату", "back");
+  });
+
+  if (!hasAvailableTime) {
+    return new InlineKeyboard()
+      .text("Нет свободного времени")
+      .row()
+      .text("📅 выбрать дату", "back");
   }
+
+  keyboard.text("📅 выбрать дату", "back");
+
   return keyboard;
 };
+
 export async function chooseDateConversation(
   conversation: Conversation<Context>,
   ctx: Context,
@@ -81,7 +66,7 @@ export async function chooseDateConversation(
     async () =>
       await createDatePicker(consultationObject.year, consultationObject.month)
   );
-  message = await ctx.reply(`Выберите свободное время  *московское время`, {
+  message = await ctx.reply(`🕑 Выберите свободное время  *московское время`, {
     reply_markup: consultationObject.calendar,
   });
   do {
