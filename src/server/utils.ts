@@ -34,10 +34,8 @@ export async function findOrCreateUser(chatId: number, name: string) {
       }
       return true;
     }
-    if (!user) {
-      await UserModel.create({ chatId, name });
-      return false;
-    }
+    await UserModel.create({ chatId });
+    return false;
   } catch (error) {
     console.error(error);
   }
