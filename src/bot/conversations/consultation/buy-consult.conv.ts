@@ -164,17 +164,16 @@ export async function BuyConsultationConversation(
     `<b>Можете приступать к оплате.</b>
     После оплаты вы получите ссылку на бриф, который необходимо заполнить не позднее<b> полночи</b> текущего дня.
     Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
-  `,
+      `,
     {
       reply_markup: new InlineKeyboard()
         .webApp("💰 Оплатить", link)
-        .text("Оплатил", "paid")
         .row()
-        .text("⬅️ К выбору даты"),
+        .text("⬅️ К выбору даты", "toDate"),
     }
   );
-  ctx = await conversation.wait();
-  if (ctx.message?.text === "⬅️ К выбору даты") {
+  ctx = await conversation.waitFor("callback_query:data");
+  if (ctx.update.callback_query?.data === "toDate") {
     conversation.session.consultationStep = 2;
     return "change date";
   }
@@ -184,7 +183,7 @@ export async function BuyConsultationConversation(
         where: { invoiceId },
       })
     );
-    if (payment?.status !== "paid") {
+    if (payment?.dataValues?.status !== "paid") {
       conversation.session.consultation.dateString = "";
       conversation.session.consultationStep = 2;
       await ctx.reply("Оплата не прошла, попробуйте еще раз");
@@ -194,7 +193,6 @@ export async function BuyConsultationConversation(
     conversation.session.consultation.answers = [];
     conversation.session.consultation.buyDate =
       new Date().getDate() + new Date().getMonth().toString();
-
     await conversation.external(async () =>
       editUserAttribute(
         ctx.chat!.id.toString(),

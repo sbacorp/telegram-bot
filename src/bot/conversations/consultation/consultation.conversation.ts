@@ -211,9 +211,11 @@ export async function consultationConversation(
 Обязательно ответьте на вопросы до 00:00 текущего дня.
 В противном вам придется выбрать другую дату`);
 
-    user = await conversation.external(async () => await fetchUser(chatId));
-    const buyDate = user?.dataValues.buyDate;
-    const consultationDate = user?.dataValues.consultationDate;
+    const user1 = await conversation.external(
+      async () => await fetchUser(chatId)
+    );
+    const buyDate = user1?.dataValues.buyDate;
+    const consultationDate = user1?.dataValues.consultationDate;
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
       await conversation.external(
         async () =>

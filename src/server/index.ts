@@ -62,19 +62,18 @@ export const createServer = async (bot: Bot) => {
     if (payment) {
       payment.status = "paid";
       await payment.save();
-      // await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
-      //   reply_markup: {
-      //     inline_keyboard: [
-      //       [
-      //         {
-      //           text: "Оплатил",
-      //           callback_data: "paid",
-      //         },
-      //       ],
-      //     ],
-      //   },
-      // });
-
+      await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Оплатил",
+                callback_data: "paid",
+              },
+            ],
+          ],
+        },
+      });
       if (payment.productName === "Консультация") {
         const user = await UserModel.findOne({
           where: {

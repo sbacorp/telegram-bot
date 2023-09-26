@@ -356,11 +356,6 @@ export async function briefMaleConversation(
   ctx: Context
 ) {
   const answersCount = conversation.session.consultation.answers.length;
-  console.log(
-    answersCount,
-    questions.length,
-    "sadfasfasdfasdfasd asdf asdfasd fasd f"
-  );
 
   for (let i = answersCount; i < questions.length; i += 1) {
     if (!questions[i].type) {

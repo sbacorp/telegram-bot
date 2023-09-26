@@ -37,7 +37,7 @@ export function newsletterConversation() {
         });
         for (const user of users) {
           setTimeout(async () => {
-            await ctx.api.sendMessage(user.chatId, text, {
+            await ctx.api.sendMessage(user.dataValues.chatId, text, {
               parse_mode: "HTML",
             });
           }, 250);
@@ -53,7 +53,7 @@ export function newsletterConversation() {
         for (const user of users) {
           setTimeout(async () => {
             try {
-              await ctx.api.sendMessage(user.chatId, text, {
+              await ctx.api.sendMessage(user.dataValues.chatId, text, {
                 parse_mode: "HTML",
               });
             } catch (error) {
@@ -72,7 +72,7 @@ export function newsletterConversation() {
         for (const user of users) {
           setTimeout(async () => {
             try {
-              await ctx.api.sendMessage(user.chatId, text, {
+              await ctx.api.sendMessage(user.dataValues.chatId, text, {
                 parse_mode: "HTML",
               });
             } catch (error) {
@@ -91,7 +91,7 @@ export function newsletterConversation() {
         for (const user of users) {
           setTimeout(async () => {
             try {
-              await ctx.api.sendMessage(user.chatId, text, {
+              await ctx.api.sendMessage(user.dataValues.chatId, text, {
                 parse_mode: "HTML",
               });
             } catch (error) {
