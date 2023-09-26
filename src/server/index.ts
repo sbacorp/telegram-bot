@@ -36,7 +36,7 @@ export const createServer = async (bot: Bot) => {
     }
   });
 
-  server.get("/bot/payment", async function (request, reply) {
+  server.get("/bot/payment", async function handler(request, reply) {
     const data = request.query as PaymentData;
     const paymentParameters = {
       MerchantLogin: "BOT.RU",
@@ -49,12 +49,12 @@ export const createServer = async (bot: Bot) => {
     const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password2}:Shp_chatId=${paymentParameters.Shp_chatId}`;
     const SignatureValue = CryptoJS.MD5(signitureString);
     if (SignatureValue.toString().toUpperCase() !== data.SignatureValue) {
-      return reply.code(400).send("Invalid signature");
+      reply.code(400).send("Invalid signature");
     }
-    return reply.code(200).send(`OK${paymentParameters.InvId}`);
+    reply.code(200).send(`OK${paymentParameters.InvId}`);
   });
 
-  server.get("/bot/successfully", async (request, reply) => {
+  server.get("/bot/successfully", async function handler(request, reply) {
     const data = request.query as PaymentData;
     const paymentParameters = {
       MerchantLogin: "BOT.RU",
@@ -69,7 +69,7 @@ export const createServer = async (bot: Bot) => {
     const SignatureValue = CryptoJS.MD5(signitureString);
 
     if (SignatureValue.toString() !== data.SignatureValue) {
-      return reply.code(400).send("Ошибка на сервере, попробуйте позже");
+      reply.code(400).send("Ошибка на сервере, попробуйте позже");
     }
     await initDB(sequelize);
     const payment = await PaymentModel.findOne({
@@ -117,8 +117,7 @@ export const createServer = async (bot: Bot) => {
         }
       }
     }
-
-    return reply.type("text/html").send(`
+    reply.type("text/html").send(`
   <html lang="ru">
     <head>
       <meta charset="utf-8" />
@@ -133,32 +132,6 @@ export const createServer = async (bot: Bot) => {
       <meta name="robots" content="noindex,nofollow" />
       <title></title>
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
-      <script>
-        function setThemeClass() {
-          document.documentElement.className = Telegram.WebApp.colorScheme;
-        }
-        Telegram.WebApp.onEvent("themeChanged", setThemeClass);
-        setThemeClass();
-      </script>
-      <style>
-        body {
-          --bg-color: var(--tg-theme-bg-color, #222);
-          font-family: sans-serif;
-          background-color: var(--bg-color);
-          color: var(--tg-theme-text-color, #fff);
-          font-size: 22px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0;
-          padding: 0;
-          color-scheme: var(--tg-color-scheme);
-        }
-        .btn {
-          font-size: 14px;
-          padding: 10px 17px;
-        }
-      </style>
     </head>
 
     <body class="">
@@ -180,55 +153,8 @@ export const createServer = async (bot: Bot) => {
           close() {
             Telegram.WebApp.close();
           },
-          checkInitData() {
-            const webViewStatus = document.querySelector("#webview_data_status");
-            if (
-              DemoApp.initDataUnsafe.query_id &&
-              DemoApp.initData &&
-              webViewStatus.classList.contains("status_need")
-            ) {
-              webViewStatus.classList.remove("status_need");
-              DemoApp.apiRequest("checkInitData", {}, function (result) {
-                if (result.ok) {
-                  webViewStatus.textContent = "Hash is correct (async)";
-                  webViewStatus.className = "ok";
-                } else {
-                  webViewStatus.textContent = result.error + " (async)";
-                  webViewStatus.className = "err";
-                }
-              });
-            }
-          },
-          paid() {
-            Telegram.WebApp.sendData("paid");
-          },
-        };
-
-        const DemoAppInitData = {
-          init() {
-            DemoApp.init();
-            Telegram.WebApp.onEvent("themeChanged", function () {
-              document.getElementById("theme_data").innerHTML = JSON.stringify(
-                Telegram.WebApp.themeParams,
-                null,
-                2
-              );
-            });
-            document.getElementById("webview_data").innerHTML = JSON.stringify(
-              DemoApp.initDataUnsafe,
-              null,
-              2
-            );
-            document.getElementById("theme_data").innerHTML = JSON.stringify(
-              Telegram.WebApp.themeParams,
-              null,
-              2
-            );
-            DemoApp.checkInitData();
-          },
         };
         DemoApp.init();
-        DemoApp.paid();
       </script>
     </body>
   </html>
