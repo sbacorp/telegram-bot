@@ -161,12 +161,17 @@ export async function consultationConversation(
     conversation.session.consultationStep = 2;
   }
   if (conversation.session.consultationStep < 3) {
-    consultationObject = await chooseDateConversation(
+    const response = await chooseDateConversation(
       conversation,
       ctx,
       consultationObject,
       message
     );
+    if (response === "back") {
+      conversation.session.consultationStep = 2;
+      return consultationConversation(conversation, ctx);
+    }
+    consultationObject = response;
     conversation.session.consultationStep = 3;
   }
   if (
@@ -347,7 +352,7 @@ export async function consultationConversation(
 Дата : ${conversation.session.consultation.dateString}
 Время: ${conversation.session.consultation.time}
 Пол: ${conversation.session.sex}
-Предпочтительная соцсеть: ${consultationObject.massanger}
+Предпочтительная соцсеть: ${conversation.session.consultation.messanger}
 Тестирование :
 ${answerQuestions}`
     );

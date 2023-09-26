@@ -116,6 +116,6 @@ export async function createDatePicker(year: number, month: number) {
   });
   const dates = availableDays.map((day) => day.date);
   const calendar = createCalendar(year, month, dates);
-  const keyboard = InlineKeyboard.from(calendar);
+  const keyboard = InlineKeyboard.from(calendar).row().text("⬅️ Назад", "back");
   return keyboard;
 }

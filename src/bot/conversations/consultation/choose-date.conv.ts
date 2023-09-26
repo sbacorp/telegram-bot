@@ -71,6 +71,9 @@ export async function chooseDateConversation(
   });
   do {
     ctx = await conversation.wait();
+    if (ctx.update.callback_query?.data === "back") {
+      return "back";
+    }
     if (ctx.update.callback_query?.data === "nextMonth") {
       consultationObject.month += 1;
       if (consultationObject.month === 12) {

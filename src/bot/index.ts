@@ -389,7 +389,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("asdf", async () => {
     await fillConsultations();
   });
-  bot.on("callback_query:data", async (ctx: Context) => {
+  bot.on("callback_query", async (ctx: Context) => {
     const data = ctx.callbackQuery?.data;
     if (data === "child") {
       await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
