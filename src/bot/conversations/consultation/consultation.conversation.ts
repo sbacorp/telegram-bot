@@ -18,6 +18,8 @@ import {
 } from "#root/server/models.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
 import { editUserAttribute, fetchUser } from "#root/server/utils.js";
+import fs from "node:fs";
+import path from "node:path";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import {
   briefMaleConversation,
@@ -168,7 +170,7 @@ export async function consultationConversation(
       message
     );
     if (response === "back") {
-      conversation.session.consultationStep = 2;
+      conversation.session.consultationStep = 1;
       return consultationConversation(conversation, ctx);
     }
     consultationObject = response;
@@ -302,50 +304,60 @@ export async function consultationConversation(
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
-    if (conversation.session.sex === "male") {
-      answerQuestions = conversation.session.consultation.answers
-        .map((answer) => {
-          return `Вопрос :${
-            maleQuestions[
-              conversation.session.consultation.answers.indexOf(answer)
-            ].text
-          }
+    switch (conversation.session.sex) {
+      case "male": {
+        answerQuestions = conversation.session.consultation.answers
+          .map((answer) => {
+            return `Вопрос :${
+              maleQuestions[
+                conversation.session.consultation.answers.indexOf(answer)
+              ].text
+            }
       Ответ: ${answer}
       `;
-        })
-        .join("\n");
-    } else if (conversation.session.sex === "female") {
-      answerQuestions = conversation.session.consultation.answers
-        .map((answer) => {
-          return `
+          })
+          .join("\n");
+
+        break;
+      }
+      case "female": {
+        answerQuestions = conversation.session.consultation.answers
+          .map((answer) => {
+            return `
         
 Вопрос :${
-            femaleQuestions[
-              conversation.session.consultation.answers.indexOf(answer)
-            ].text
-          }
+              femaleQuestions[
+                conversation.session.consultation.answers.indexOf(answer)
+              ].text
+            }
 Ответ: ${answer}
       `;
-        })
-        .join("\n");
-    } else {
-      answerQuestions = conversation.session.consultation.answers
-        .map((answer) => {
-          return `
+          })
+          .join("\n");
+
+        break;
+      }
+      case "child": {
+        answerQuestions = conversation.session.consultation.answers
+          .map((answer) => {
+            return `
         
 Вопрос :${
-            childQuestions[
-              conversation.session.consultation.answers.indexOf(answer)
-            ].text
-          }
+              childQuestions[
+                conversation.session.consultation.answers.indexOf(answer)
+              ].text
+            }
 Ответ: ${answer}
       `;
-        })
-        .join("\n");
+          })
+          .join("\n");
+
+        break;
+      }
     }
-    await ctx.api.sendMessage(
-      "1856156198",
-      `
+    const fileName = `${conversation.session.fio}_${conversation.session.phoneNumber}_${conversation.session.consultation.dateString}.txt`;
+    const filePath = path.resolve(process.cwd(), "consultations", fileName);
+    const fileContent = `
 Новая запись на консультацию:
 Имя: ${conversation.session.fio}
 Телефон: ${conversation.session.phoneNumber}
@@ -354,13 +366,25 @@ export async function consultationConversation(
 Пол: ${conversation.session.sex}
 Предпочтительная соцсеть: ${conversation.session.consultation.messanger}
 Тестирование :
-${answerQuestions}`
-    );
-    await ConsultationAppointmentModel.create({
-      chatId,
-      date: conversation.session.consultation.dateString,
-      time: conversation.session.consultation.time,
+${answerQuestions}`;
+    fs.writeFile(filePath, fileContent, (error) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      console.log(`File ${fileName} has been created`);
     });
+
+    await ctx.api.sendDocument("1856156198", filePath);
+
+    await conversation.external(async () => {
+      await ConsultationAppointmentModel.create({
+        chatId,
+        date: conversation.session.consultation.dateString,
+        time: conversation.session.consultation.time,
+      });
+    });
+
     conversation.session.consultationStep = 6;
     ctx.chatAction = null;
   }

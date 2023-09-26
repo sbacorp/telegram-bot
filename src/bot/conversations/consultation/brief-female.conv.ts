@@ -70,6 +70,7 @@ export const questions: IBriefQuestion[] = [
       .text("Обеда")
       .row()
       .text("Ужина")
+      .resized()
       .oneTime(),
     type: "select",
   },
@@ -127,6 +128,7 @@ export const questions: IBriefQuestion[] = [
       .text("Бросил(а)")
       .row()
       .text("Никогда не курил(а)")
+      .resized()
       .oneTime(),
   },
   {
@@ -144,6 +146,7 @@ export const questions: IBriefQuestion[] = [
       .text("Раздувает нижнюю часть живота")
       .row()
       .text("Ничего не наблюдается")
+      .resized()
       .oneTime(),
   },
   {
@@ -166,6 +169,7 @@ export const questions: IBriefQuestion[] = [
       .text("2")
       .text("3")
       .text("4")
+      .resized()
       .oneTime(),
   },
   {
@@ -179,6 +183,7 @@ export const questions: IBriefQuestion[] = [
       .text("Сильная, спасают обезболивающие")
       .row()
       .text("Очень сильная, не спасают обезболивающие")
+      .resized()
       .oneTime(),
   },
   {
@@ -190,7 +195,12 @@ export const questions: IBriefQuestion[] = [
   {
     text: `Вы засыпаете`,
     type: "select",
-    keyboard: new Keyboard().text("Легко").row().text("Трудно").oneTime(),
+    keyboard: new Keyboard()
+      .text("Легко")
+      .row()
+      .text("Трудно")
+      .resized()
+      .oneTime(),
   },
   {
     text: `Ваш сон`,
@@ -199,12 +209,18 @@ export const questions: IBriefQuestion[] = [
       .text("Непрерывный")
       .row()
       .text("Прерывистый")
+      .resized()
       .oneTime(),
   },
   {
     text: `Проснувшись ночью, далее Вы засыпаете`,
     type: "select",
-    keyboard: new Keyboard().text("Легко").row().text("С трудом").oneTime(),
+    keyboard: new Keyboard()
+      .text("Легко")
+      .row()
+      .text("С трудом")
+      .resized()
+      .oneTime(),
   },
   {
     text: `Сколько раз Вы просыпаетесь ночью, чтобы сходить в туалет?`,
@@ -216,6 +232,7 @@ export const questions: IBriefQuestion[] = [
       .text("Лёгкое и бодрое")
       .row()
       .text("Тяжелое и долгое")
+      .resized()
       .oneTime(),
   },
   {
@@ -230,6 +247,7 @@ export const questions: IBriefQuestion[] = [
       .text("Кошмары")
       .row()
       .text("Отсутствуют")
+      .resized()
       .oneTime(),
   },
   {
@@ -362,6 +380,7 @@ export const questions: IBriefQuestion[] = [
       .text("Чисто белый")
       .row()
       .text("Желтоватый")
+      .resized()
       .oneTime(),
   },
   {
@@ -389,6 +408,7 @@ export const questions: IBriefQuestion[] = [
       .text("Меняется")
       .row()
       .text("Не знаю")
+      .resized()
       .oneTime(),
   },
   {

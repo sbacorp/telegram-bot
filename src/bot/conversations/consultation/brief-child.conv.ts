@@ -56,6 +56,7 @@ export const questions: IBriefQuestion[] = [
       .text("Обеда")
       .row()
       .text("Ужина")
+      .resized()
       .oneTime(),
     type: "select",
   },
