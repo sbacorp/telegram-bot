@@ -168,6 +168,7 @@ export async function BuyConsultationConversation(
     {
       reply_markup: new InlineKeyboard()
         .webApp("💰 Оплатить", link)
+        .text("Оплатил", "paid")
         .row()
         .text("⬅️ К выбору даты"),
     }
@@ -183,7 +184,6 @@ export async function BuyConsultationConversation(
         where: { invoiceId },
       })
     );
-
     if (payment?.status !== "paid") {
       conversation.session.consultation.dateString = "";
       conversation.session.consultationStep = 2;

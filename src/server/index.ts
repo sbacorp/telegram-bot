@@ -62,18 +62,18 @@ export const createServer = async (bot: Bot) => {
     if (payment) {
       payment.status = "paid";
       await payment.save();
-      await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: "Оплатил",
-                callback_data: "paid",
-              },
-            ],
-          ],
-        },
-      });
+      // await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
+      //   reply_markup: {
+      //     inline_keyboard: [
+      //       [
+      //         {
+      //           text: "Оплатил",
+      //           callback_data: "paid",
+      //         },
+      //       ],
+      //     ],
+      //   },
+      // });
 
       if (payment.productName === "Консультация") {
         const user = await UserModel.findOne({
@@ -100,67 +100,51 @@ export const createServer = async (bot: Bot) => {
     reply.code(200).send(`OK${paymentParameters.InvId}`);
   });
 
-  server.get("/bot/successfully", async function handler(request, reply) {
-    const data = request.query as PaymentData;
-    const paymentParameters = {
-      MerchantLogin: "BOT.RU",
-      OutSum: data.OutSum,
-      InvId: data.InvId,
-      Shp_chatId: data.Shp_chatId,
-      password1: "M6WBUjhP5e3LX5cdU3SC",
-      password2: "BJV9PqbP4l07w9GDxPdG",
-    };
-    const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
+  // server.get("/bot/successfully", async function handler(request, reply) {
+  //   reply.type("text/html").send(`
+  // <html lang="ru">
+  //   <head>
+  //     <meta charset="utf-8" />
+  //     <meta
+  //       name="viewport"
+  //       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  //     />
+  //     <meta name="format-detection" content="telephone=no" />
+  //     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  //     <meta name="MobileOptimized" content="176" />
+  //     <meta name="HandheldFriendly" content="True" />
+  //     <meta name="robots" content="noindex,nofollow" />
+  //     <title></title>
+  //     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  //   </head>
 
-    const SignatureValue = CryptoJS.MD5(signitureString);
+  //   <body class="">
+  //     <div id="title">Платеж успешно выполнен!</div>
+  //     <script type="application/javascript">
+  //       const DemoApp = {
+  //         initData: Telegram.WebApp.initData || "",
+  //         initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
+  //         MainButton: Telegram.WebApp.MainButton,
 
-    if (SignatureValue.toString() !== data.SignatureValue) {
-      reply.code(400).send("Ошибка на сервере, попробуйте позже");
-    }
-    reply.type("text/html").send(`
-  <html lang="ru">
-    <head>
-      <meta charset="utf-8" />
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-      />
-      <meta name="format-detection" content="telephone=no" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="MobileOptimized" content="176" />
-      <meta name="HandheldFriendly" content="True" />
-      <meta name="robots" content="noindex,nofollow" />
-      <title></title>
-      <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    </head>
+  //         init(options) {
+  //           document.body.style.visibility = "";
+  //           Telegram.WebApp.ready();
+  //           Telegram.WebApp.MainButton.setParams({
+  //             text: "Вернуться в бота",
+  //             is_visible: true,
+  //           }).onClick(DemoApp.close);
+  //         },
+  //         close() {
+  //           Telegram.WebApp.close();
+  //         },
+  //       };
+  //       DemoApp.init();
+  //     </script>
+  //   </body>
+  // </html>
 
-    <body class="">
-      <div id="title">Платеж успешно выполнен!</div>
-      <script type="application/javascript">
-        const DemoApp = {
-          initData: Telegram.WebApp.initData || "",
-          initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
-          MainButton: Telegram.WebApp.MainButton,
-
-          init(options) {
-            document.body.style.visibility = "";
-            Telegram.WebApp.ready();
-            Telegram.WebApp.MainButton.setParams({
-              text: "Вернуться в бота",
-              is_visible: true,
-            }).onClick(DemoApp.close);
-          },
-          close() {
-            Telegram.WebApp.close();
-          },
-        };
-        DemoApp.init();
-      </script>
-    </body>
-  </html>
-
-    `);
-  });
+  //   `);
+  // });
   server.get("/bot/fail", async (request, reply) => {
     const data = request.query as PaymentData;
     return reply.type("text/html").send(`
