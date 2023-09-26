@@ -377,7 +377,7 @@ export async function briefMaleConversation(
     } else if (questions[i].type === "withPhoto") {
       await ctx.reply(questions[i].text);
       await ctx.replyWithPhoto(
-        "AgACAgIAAxkBAAIH5mUBo_wEF_qf8ueeUfSvBDPeybnBAAKRzTEbrDsRSBmhSt-tkbJiAQADAgADbQADMAQ"
+        "AgACAgIAAxkBAAIcSmUS8tCNoWFDHb7IFWWmhjL_ZloaAAKdzzEbKomYSDTl5aLTbXn1AQADAgADeAADMAQ"
       );
       const answer = await conversation.waitFor("message:text");
       if (answer.message.text === "🏠 Главное меню") {
