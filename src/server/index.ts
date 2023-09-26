@@ -51,26 +51,6 @@ export const createServer = async (bot: Bot) => {
     if (SignatureValue.toString().toUpperCase() !== data.SignatureValue) {
       reply.code(400).send("Invalid signature");
     }
-    reply.code(200).send(`OK${paymentParameters.InvId}`);
-  });
-
-  server.get("/bot/successfully", async function handler(request, reply) {
-    const data = request.query as PaymentData;
-    const paymentParameters = {
-      MerchantLogin: "BOT.RU",
-      OutSum: data.OutSum,
-      InvId: data.InvId,
-      Shp_chatId: data.Shp_chatId,
-      password1: "M6WBUjhP5e3LX5cdU3SC",
-      password2: "BJV9PqbP4l07w9GDxPdG",
-    };
-    const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
-
-    const SignatureValue = CryptoJS.MD5(signitureString);
-
-    if (SignatureValue.toString() !== data.SignatureValue) {
-      reply.code(400).send("Ошибка на сервере, попробуйте позже");
-    }
     await initDB(sequelize);
     const payment = await PaymentModel.findOne({
       where: {
@@ -116,6 +96,26 @@ export const createServer = async (bot: Bot) => {
           await user.save();
         }
       }
+    }
+    reply.code(200).send(`OK${paymentParameters.InvId}`);
+  });
+
+  server.get("/bot/successfully", async function handler(request, reply) {
+    const data = request.query as PaymentData;
+    const paymentParameters = {
+      MerchantLogin: "BOT.RU",
+      OutSum: data.OutSum,
+      InvId: data.InvId,
+      Shp_chatId: data.Shp_chatId,
+      password1: "M6WBUjhP5e3LX5cdU3SC",
+      password2: "BJV9PqbP4l07w9GDxPdG",
+    };
+    const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
+
+    const SignatureValue = CryptoJS.MD5(signitureString);
+
+    if (SignatureValue.toString() !== data.SignatureValue) {
+      reply.code(400).send("Ошибка на сервере, попробуйте позже");
     }
     reply.type("text/html").send(`
   <html lang="ru">
