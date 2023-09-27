@@ -448,7 +448,7 @@ export async function diagnosticDeficitConversationAdult(
       },
     });
     if (answer.match === "Да") {
-      await ctx.reply(questionsThyroid[index].answer, { reply_markup: next });
+      await ctx.reply(questionsDeficit[index].answer, { reply_markup: next });
       const nextAnswer = await conversation.waitForCallbackQuery("next", {
         otherwise: async (ctx) => {
           if (ctx.message?.text === "🔁 Начать сначала") {
