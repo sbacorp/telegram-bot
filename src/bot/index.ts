@@ -32,6 +32,7 @@ import { config } from "#root/config.js";
 import { logger } from "#root/logger.js";
 import { fillConsultations } from "#root/server/fill-consultations.js";
 import { SessionData } from "#root/typing.js";
+import SessionService from "#root/server/session-adapter.js";
 import {
   webSiteKeyboard,
   mainMenu,
@@ -122,7 +123,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(hydrate());
   bot.use(
     session({
-      storage: sessionStorage,
+      storage: SessionService,
       initial: () => ({ ...sessionDataDefaults }),
     })
   );

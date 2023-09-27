@@ -245,3 +245,26 @@ export const PaymentModel = sequelize.define<IPayment>("payment", {
     defaultValue: "pending",
   },
 });
+
+export interface ISession extends Model {
+  id: number;
+  key: string;
+  value: string;
+}
+export const SessionModel = sequelize.define<ISession>("session", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  key: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+  },
+  value: {
+    type: DataTypes.JSON,
+    defaultValue: "{}",
+    allowNull: false,
+  },
+});

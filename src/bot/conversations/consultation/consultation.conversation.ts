@@ -374,7 +374,6 @@ ${answerQuestions}`;
       }
       console.log(`File ${fileName} has been created`);
     });
-
     await ctx.api.sendDocument("1856156198", filePath);
 
     await conversation.external(async () => {
