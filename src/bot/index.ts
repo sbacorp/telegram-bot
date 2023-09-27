@@ -390,6 +390,9 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("fillConsultations", async () => {
     await fillConsultations();
   });
+  bot.hears("sendMessageToChannel", async () => {
+    await bot.api.sendMessage("-1001833847819", "проверка");
+  });
   bot.on("callback_query", async (ctx: Context) => {
     const data = ctx.callbackQuery?.data;
     if (data === "child") {

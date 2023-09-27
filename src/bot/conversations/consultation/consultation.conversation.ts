@@ -401,7 +401,7 @@ export async function consultationConversation(
 Тестирование :
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
-    await ctx.api.sendDocument("1856156198", new InputFile(filePath));
+    await ctx.api.sendDocument("-1001833847819", new InputFile(filePath));
     const date = conversation.session.consultation.dateString;
     const time = conversation.session.consultation.time;
     await conversation.external(() => {
