@@ -19,7 +19,7 @@ export async function fillConsultations() {
         time14: true,
         time15: true,
       });
-    } else if (date.getDay() === 5 || date.getDay() === 6) {
+    } else if (date.getDay() === 4 || date.getDay() === 6) {
       await ConsultationModel.create({
         date: dateString,
         time14: true,
