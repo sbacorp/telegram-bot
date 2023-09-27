@@ -193,7 +193,7 @@ export async function buyConversation(
     if (ctx.message?.text) {
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
-          "Консультация",
+          product!.name,
           ctx.message!.text!,
           ctx.chat!.id.toString()
         );
