@@ -319,13 +319,9 @@ export async function consultationConversation(
     switch (conversation.session.sex) {
       case "male": {
         answerQuestions = conversation.session.consultation.answers
-          .map((answer) => {
-            return `Вопрос :${
-              maleQuestions[
-                conversation.session.consultation.answers.indexOf(answer)
-              ].text
-            }
-      Ответ: ${answer}
+          .map((answer, index: number) => {
+            return `Вопрос :${maleQuestions[index].text}
+Ответ: ${answer}
       `;
           })
           .join("\n");
@@ -334,14 +330,10 @@ export async function consultationConversation(
       }
       case "female": {
         answerQuestions = conversation.session.consultation.answers
-          .map((answer) => {
+          .map((answer, index: number) => {
             return `
         
-Вопрос :${
-              femaleQuestions[
-                conversation.session.consultation.answers.indexOf(answer)
-              ].text
-            }
+Вопрос :${femaleQuestions[index].text}
 Ответ: ${answer}
       `;
           })
@@ -351,14 +343,10 @@ export async function consultationConversation(
       }
       case "child": {
         answerQuestions = conversation.session.consultation.answers
-          .map((answer) => {
+          .map((answer, index: number) => {
             return `
         
-Вопрос :${
-              childQuestions[
-                conversation.session.consultation.answers.indexOf(answer)
-              ].text
-            }
+Вопрос :${childQuestions[index].text}
 Ответ: ${answer}
       `;
           })
@@ -401,7 +389,7 @@ export async function consultationConversation(
 Тестирование :
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
-    await ctx.api.sendDocument("-1001833847819", new InputFile(filePath));
+    await ctx.api.sendDocument("1856156198", new InputFile(filePath));
     const date = conversation.session.consultation.dateString;
     const time = conversation.session.consultation.time;
     await conversation.external(() => {
