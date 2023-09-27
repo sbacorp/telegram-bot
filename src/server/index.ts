@@ -43,8 +43,8 @@ export const createServer = async (bot: Bot) => {
       OutSum: data.OutSum,
       InvId: data.InvId,
       Shp_chatId: data.Shp_chatId,
-      password1: "M6WBUjhP5e3LX5cdU3SC",
-      password2: "BJV9PqbP4l07w9GDxPdG",
+      password1: "m8mPZVNLj33pybLAZ0b6",
+      password2: "szUs9cBJXM0DYAh89WK2",
     };
     const signitureString = `${paymentParameters.OutSum}:${paymentParameters.InvId}:${paymentParameters.password2}:Shp_chatId=${paymentParameters.Shp_chatId}`;
     const SignatureValue = CryptoJS.MD5(signitureString);

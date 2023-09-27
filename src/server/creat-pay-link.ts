@@ -39,8 +39,8 @@ export const createPaymentLink = async (product: IProduct, chatId: string) => {
     Reciept: encodeURIComponent(recieptString),
     SignatureValue: "",
     Shp_chatId: chatId,
-    password1: "M6WBUjhP5e3LX5cdU3SC",
-    password2: "BJV9PqbP4l07w9GDxPdG",
+    password1: "m8mPZVNLj33pybLAZ0b6",
+    password2: "szUs9cBJXM0DYAh89WK2",
   };
   const signitureString = `${paymentParameters.MerchantLogin}:${paymentParameters.OutSum}:${invoiceId}:${paymentParameters.Reciept}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
   const SignatureValue = CryptoJS.MD5(signitureString);
@@ -54,7 +54,7 @@ export const createPaymentLink = async (product: IProduct, chatId: string) => {
     paymentParameters.Description
   }&SignatureValue=${SignatureValue}&Shp_chatId=${
     paymentParameters.Shp_chatId
-  }&IsTest=1`;
+  }`;
   const payment = await PaymentModel.create({
     chatId,
     invoiceId,
