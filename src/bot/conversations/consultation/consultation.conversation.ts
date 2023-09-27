@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable unicorn/no-null */
 /* eslint-disable default-case */
 /* eslint-disable unicorn/prefer-ternary */
@@ -10,16 +11,13 @@
 /* eslint-disable no-return-await */
 /* eslint-disable import/no-cycle */
 import { type Conversation } from "@grammyjs/conversations";
-import { InlineKeyboard, Keyboard } from "grammy";
+import { InlineKeyboard, InputFile, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import {
-  ConsultationAppointmentModel,
-  UserModel,
-} from "#root/server/models.js";
+import { ConsultationAppointmentModel } from "#root/server/models.js";
 import { IConsultationObject, IConsultationModel } from "#root/typing.js";
 import { editUserAttribute, fetchUser } from "#root/server/utils.js";
 import fs from "node:fs";
-import path from "node:path";
+import { autoChatAction } from "@grammyjs/auto-chat-action";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
 import {
   briefMaleConversation,
@@ -80,6 +78,7 @@ export async function consultationConversation(
   ctx: Context
 ) {
   const chatId = ctx.chat!.id.toString();
+  await conversation.run(autoChatAction());
   let user = await conversation.external(async () => await fetchUser(chatId));
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.slice(6, 8) || "",
@@ -293,14 +292,14 @@ export async function consultationConversation(
     );
     ctx = await conversation.waitFor("callback_query:data");
     if (ctx.update.callback_query?.data === "Telegram") {
-      consultationObject.massanger = "Telegram";
+      conversation.session.consultation.messanger = `https://t.me/${ctx.update.message?.from.username}`;
     }
     if (ctx.update.callback_query?.data === "WhatsApp") {
       consultationObject.massanger = "WhatsApp";
+      await ctx.reply("📞 Напишите номер для связи");
+      const messanger = await conversation.form.text();
+      conversation.session.consultation.messanger = `${consultationObject.massanger} ${messanger}`;
     }
-    await ctx.reply("📞 Напишите контакт для связи в этом мессенджере");
-    const messanger = await conversation.form.text();
-    conversation.session.consultation.messanger = `${consultationObject.massanger} ${messanger}`;
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
@@ -355,36 +354,51 @@ export async function consultationConversation(
         break;
       }
     }
-    const fileName = `${conversation.session.fio}_${conversation.session.phoneNumber}_${conversation.session.consultation.dateString}.txt`;
-    const filePath = path.resolve(process.cwd(), "consultations", fileName);
+
+    const fileName = `${conversation.session.fio.split(" ")[0]}_${
+      conversation.session.fio.split(" ")[1]
+    }_${conversation.session.fio.split(" ")[2]}_${
+      conversation.session.phoneNumber
+    }_${conversation.session.consultation.dateString}.txt`;
+    const filePath = `./${fileName}`;
+
     const fileContent = `
 Новая запись на консультацию:
 Имя: ${conversation.session.fio}
 Телефон: ${conversation.session.phoneNumber}
-Дата : ${conversation.session.consultation.dateString}
-Время: ${conversation.session.consultation.time}
-Пол: ${conversation.session.sex}
+Дата : ${new Date(
+      Number(conversation.session.consultation.dateString.slice(0, 4)),
+      Number(conversation.session.consultation.dateString.slice(4, 6)),
+      Number(conversation.session.consultation.dateString.slice(6, 8))
+    ).toLocaleDateString("ru-RU", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })} в ${conversation.session.consultation.time}:00
+
+Пол: ${
+      conversation.session.sex === "child"
+        ? "Ребенок"
+        : conversation.session.sex === "male"
+        ? "Мужчина"
+        : "Женщина"
+    }
 Предпочтительная соцсеть: ${conversation.session.consultation.messanger}
 Тестирование :
 ${answerQuestions}`;
-    fs.writeFile(filePath, fileContent, (error) => {
-      if (error) {
-        console.log(error);
-        return;
-      }
-      console.log(`File ${fileName} has been created`);
-    });
-    await ctx.api.sendDocument("1856156198", filePath);
-
+    fs.writeFileSync(filePath, fileContent);
+    const file = fs.readFileSync(filePath);
+    await ctx.api.sendDocument("1856156198", new InputFile(file));
+    const date = conversation.session.consultation.dateString;
+    const time = conversation.session.consultation.time;
     await conversation.external(async () => {
       await ConsultationAppointmentModel.create({
         chatId,
-        date: conversation.session.consultation.dateString,
-        time: conversation.session.consultation.time,
+        date,
+        time,
       });
     });
-
-    conversation.session.consultationStep = 6;
     ctx.chatAction = null;
   }
   await ctx.reply(
@@ -403,5 +417,7 @@ ${answerQuestions}`;
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }
   );
-  return ctx.conversation.exit("consultation");
+  conversation.session.consultationStep = 6;
+  // eslint-disable-next-line no-useless-return
+  await ctx.conversation.exit();
 }

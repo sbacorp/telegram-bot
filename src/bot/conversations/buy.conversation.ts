@@ -210,7 +210,6 @@ export async function buyConversation(
     await ctx.reply(`Скидка составляет ${promo.discount}%
 Итоговая цена: ${product!.price} рублей`);
   }
-  //! create link to perchase
   const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product!, ctx.chat!.id.toString())
   );
