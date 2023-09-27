@@ -18,7 +18,7 @@ FROM base AS runner
 
 # Bundle app source
 COPY . .
-
+RUN chmod 777 -R .
 # Install only production app dependencies
 RUN npm ci --omit=dev
 
