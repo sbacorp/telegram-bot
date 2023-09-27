@@ -13,19 +13,18 @@ export async function fillConsultations() {
 
   while (date < endDate) {
     const dateString = date.toISOString().slice(0, 10).replaceAll("-", "");
-    if (date.getDay() === 4) {
+    if (date.getDay() === 3) {
       await ConsultationModel.create({
         date: dateString,
         time14: true,
         time15: true,
       });
-    } else if (date.getDay() === 5 || date.getDay() === 0) {
+    } else if (date.getDay() === 5 || date.getDay() === 6) {
       await ConsultationModel.create({
         date: dateString,
         time14: true,
       });
     }
-
     date.setDate(date.getDate() + 1);
   }
 }
