@@ -416,6 +416,5 @@ export async function briefMaleConversation(
       answer += `\nНочью : ${await conversation.form.text()}`;
       conversation.session.consultation.answers.push(answer);
     }
-    conversation.session.consultation.questionsAnswered += 1;
   }
 }

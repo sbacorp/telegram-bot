@@ -252,6 +252,5 @@ export async function briefChildConversation(
       conversation.session.consultation.answers.push(answer.message.text);
       continue;
     }
-    conversation.session.consultation.questionsAnswered += 1;
   }
 }

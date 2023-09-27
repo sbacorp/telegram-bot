@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable unicorn/no-null */
 /* eslint-disable default-case */
@@ -203,16 +204,16 @@ export async function consultationConversation(
   if (
     conversation.session.consultationStep < 5 &&
     ((conversation.session.sex === "male" &&
-      conversation.session.consultation.questionsAnswered !==
+      conversation.session.consultation.answers.length !==
         maleQuestions.length) ||
       (conversation.session.sex === "female" &&
-        conversation.session.consultation.questionsAnswered !==
+        conversation.session.consultation.answers.length !==
           femaleQuestions.length) ||
       (conversation.session.sex === "child" &&
-        conversation.session.consultation.questionsAnswered !==
+        conversation.session.consultation.answers.length !==
           childQuestions.length))
   ) {
-    if (conversation.session.consultation.questionsAnswered === 0) {
+    if (conversation.session.consultation.answers.length === 0) {
       await ctx.reply(`
 1️⃣ Первый этап консультации - вам необходимо ответить на перечень вопросов.
 Обязательно вдумчиво прочтите их и дайте корректный развернутый ответ.
@@ -290,15 +291,27 @@ export async function consultationConversation(
           .row(),
       }
     );
-    ctx = await conversation.waitFor("callback_query:data");
-    if (ctx.update.callback_query?.data === "Telegram") {
-      conversation.session.consultation.messanger = `https://t.me/${ctx.update.message?.from.username}`;
+    const response = await conversation.waitForCallbackQuery(
+      ["Telegram", "WhatsApp"],
+      {
+        otherwise: async (ctx) =>
+          await ctx.reply("Используйте кнопки", {
+            reply_markup: new InlineKeyboard()
+              .text("Telegram", "Telegram")
+              .row()
+              .text("WhatsApp", "WhatsApp")
+              .row(),
+          }),
+      }
+    );
+    if (response.match === "Telegram") {
+      conversation.session.consultation.messanger = `https://t.me/${response.update.callback_query.from.username}`;
     }
-    if (ctx.update.callback_query?.data === "WhatsApp") {
+    if (response.match === "WhatsApp") {
       consultationObject.massanger = "WhatsApp";
       await ctx.reply("📞 Напишите номер для связи");
       const messanger = await conversation.form.text();
-      conversation.session.consultation.messanger = `${consultationObject.massanger} ${messanger}`;
+      conversation.session.consultation.messanger = `WhatsApp ${messanger}`;
     }
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
@@ -354,7 +367,7 @@ export async function consultationConversation(
         break;
       }
     }
-
+    conversation.session.consultationStep = 6;
     const fileName = `${conversation.session.fio.split(" ")[0]}_${
       conversation.session.fio.split(" ")[1]
     }_${conversation.session.fio.split(" ")[2]}_${
@@ -388,12 +401,11 @@ export async function consultationConversation(
 Тестирование :
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
-    const file = fs.readFileSync(filePath);
-    await ctx.api.sendDocument("1856156198", new InputFile(file));
+    await ctx.api.sendDocument("1856156198", new InputFile(filePath));
     const date = conversation.session.consultation.dateString;
     const time = conversation.session.consultation.time;
-    await conversation.external(async () => {
-      await ConsultationAppointmentModel.create({
+    await conversation.external(() => {
+      ConsultationAppointmentModel.create({
         chatId,
         date,
         time,
@@ -403,21 +415,19 @@ ${answerQuestions}`;
   }
   await ctx.reply(
     `Запись на консультацию прошла успешно!
-      Ожидайте моего сообщения ${new Date(
-        Number(conversation.session.consultation.dateString.slice(0, 4)),
-        Number(conversation.session.consultation.dateString.slice(4, 6)),
-        Number(conversation.session.consultation.dateString.slice(6, 8))
-      ).toLocaleDateString("ru-RU", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })} в ${conversation.session.consultation.time}:00`,
+Ожидайте моего сообщения ${new Date(
+      Number(conversation.session.consultation.dateString.slice(0, 4)),
+      Number(conversation.session.consultation.dateString.slice(4, 6)),
+      Number(conversation.session.consultation.dateString.slice(6, 8))
+    ).toLocaleDateString("ru-RU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })} в ${conversation.session.consultation.time}:00`,
     {
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }
   );
-  conversation.session.consultationStep = 6;
   // eslint-disable-next-line no-useless-return
-  await ctx.conversation.exit();
+  return;
 }
