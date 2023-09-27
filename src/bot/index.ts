@@ -387,7 +387,7 @@ export function createBot(token: string, options: Options = {}) {
     );
   });
   //* must be the last handler
-  bot.hears("asdf", async () => {
+  bot.hears("fillConsultations", async () => {
     await fillConsultations();
   });
   bot.on("callback_query", async (ctx: Context) => {
