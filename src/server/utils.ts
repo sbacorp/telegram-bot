@@ -265,38 +265,3 @@ export const editUserAttribute = async (
     console.log(error);
   }
 };
-// const createUniqueInvoiceId = async (): Promise<number> => {
-//   const invoiceId = Math.floor(Math.random() * 2_147_483_647) + 1;
-//   const invoice = await PaymentModel.findOne({
-//     where: {
-//       invoiceId,
-//     },
-//   });
-//   if (invoice) {
-//     return createUniqueInvoiceId();
-//   }
-//   return invoiceId;
-// };
-// export const createPaymentLink = async (product: IProduct, chatId: string) => {
-//   const invoiceId = await createUniqueInvoiceId();
-//   const paymentParameters = {
-//     MerchantLogin: "BOT.RU",
-//     OutSum: product!.price,
-//     InvId: invoiceId,
-//     Description: encodeURIComponent(product!.name),
-//     SignatureValue: "",
-//     Shp_chatId: chatId,
-//     password1: "M6WBUjhP5e3LX5cdU3SC",
-//     password2: "BJV9PqbP4l07w9GDxPdG",
-//   };
-//   const signitureString = `${paymentParameters.MerchantLogin}:${paymentParameters.OutSum}:${invoiceId}:${paymentParameters.password1}:Shp_chatId=${paymentParameters.Shp_chatId}`;
-//   const SignatureValue = CryptoJS.MD5(signitureString);
-//   const link = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${paymentParameters.MerchantLogin}&OutSum=${paymentParameters.OutSum}&InvId=${invoiceId}&Description=${paymentParameters.Description}&SignatureValue=${SignatureValue}&Shp_chatId=${paymentParameters.Shp_chatId}&IsTest=1`;
-//   const payment = await PaymentModel.create({
-//     chatId,
-//     invoiceId,
-//     productName: product.name,
-//     amount: product.price,
-//   });
-//   return { link, invoiceId };
-// };
