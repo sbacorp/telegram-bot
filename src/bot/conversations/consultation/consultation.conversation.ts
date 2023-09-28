@@ -369,7 +369,7 @@ export async function consultationConversation(
 Телефон: ${conversation.session.phoneNumber}
 Дата : ${new Date(
       Number(conversation.session.consultation.dateString.slice(0, 4)),
-      Number(conversation.session.consultation.dateString.slice(4, 6)),
+      Number(conversation.session.consultation.dateString.slice(4, 6))-1,
       Number(conversation.session.consultation.dateString.slice(6, 8))
     ).toLocaleDateString("ru-RU", {
       weekday: "long",
