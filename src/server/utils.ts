@@ -3,8 +3,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 import { Op, Sequelize } from "sequelize";
-import CryptoJS from "crypto-js";
-import { IProduct } from "#root/typing.js";
 import {
   LinkModel,
   PaymentModel,
@@ -34,7 +32,7 @@ export async function findOrCreateUser(chatId: number, name: string) {
       }
       return true;
     }
-    await UserModel.create({ chatId });
+    await UserModel.create({ chatId, name });
     return false;
   } catch (error) {
     console.error(error);
