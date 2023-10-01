@@ -22,6 +22,13 @@ export const sessionDataDefaults: SessionData = {
     answers: [],
     messanger: "",
   },
+  individual: {
+    individualSex: "",
+    individualStep: 0,
+    questionsAnswered: 0,
+    answers: [],
+    messanger: "",
+  },
 };
 
 type ExtendedContextFlavor = {

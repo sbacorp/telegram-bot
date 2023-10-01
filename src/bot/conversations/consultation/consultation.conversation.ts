@@ -31,7 +31,7 @@ import {
 import {
   briefChildConversation,
   questions as childQuestions,
-} from "./brief-child.conv.js";
+} from "../individual/brief-child.conv.js";
 import { chooseDateConversation } from "./choose-date.conv.js";
 import {
   BuyConsultationConversation,

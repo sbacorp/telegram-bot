@@ -87,6 +87,7 @@ import {
   newsletterConversation,
   diagnosticParazitConversationChild,
   DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD,
+  individualConversation,
 } from "./conversations/index.js";
 import { cancel } from "./keyboards/cancel.keyboard.js";
 import {
@@ -96,6 +97,11 @@ import {
 // eslint-disable-next-line import/order
 import { UserModel } from "#root/server/models.js";
 import { changeSheduleConversation } from "./conversations/admin/change-shedule.conversation.js";
+import {
+  individualConditionsMenu,
+  individualMenu,
+  individualStateMenu,
+} from "./keyboards/individual-menu.keyboard.js";
 
 type Options = {
   sessionStorage?: StorageAdapter<SessionData>;
@@ -159,6 +165,16 @@ export function createBot(token: string, options: Options = {}) {
     });
     return ctx.deleteMessage();
   });
+  bot.filter(
+    (ctx) => ctx.update.callback_query?.data === "home",
+    async (ctx) => {
+      await ctx.deleteMessage();
+      await ctx.conversation.exit();
+      return ctx.reply("<b>Главное меню</b>", {
+        reply_markup: mainMenu,
+      });
+    }
+  );
   //* buy conversation
   bot.use(createConversation(buyConversation, BUY_CONVERSATION));
   bot.hears("Начать запись заново", async (ctx: Context) => {
@@ -262,8 +278,16 @@ export function createBot(token: string, options: Options = {}) {
       DIAGNOSTIC_CONVERSATION_CHILD
     )
   );
+
   //* duagnostic menu
   bot.use(diagnosticMenu);
+
+  //* individual
+  bot.use(createConversation(individualConversation, "individual"));
+  bot.use(individualStateMenu);
+  bot.use(individualConditionsMenu);
+  bot.use(individualMenu);
+  individualStateMenu.register(individualConditionsMenu);
   //* hears handlers
   bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.deleteMessage();
@@ -271,7 +295,6 @@ export function createBot(token: string, options: Options = {}) {
       reply_markup: webSiteKeyboard,
     });
   });
-
   bot.hears("🗃 Мои проекты", async (ctx: Context) => {
     await ctx.deleteMessage();
     await ctx.reply("🗃 Мои проекты", {
@@ -319,6 +342,21 @@ export function createBot(token: string, options: Options = {}) {
  - возможности корректировки всего состояния организма.`,
       {
         reply_markup: consultationMenu,
+      }
+    );
+  });
+  bot.hears("📝 Индивидуальное введение", async (ctx: Context) => {
+    await ctx.deleteMessage();
+    return ctx.reply(
+      `Хотите поработать над своим здоровьем целый месяц вместе со мной?
+Формат месячного ведения включает в себя:
+ - полную оценку вашего организма со стороны эндокринной системы,
+ - анализ комплексного состояния ЖКТ,
+ - выявление дефицитов витаминов,
+ - выявление дефицитов микронутриентов,
+ - возможности корректировки всего состояния организма.`,
+      {
+        reply_markup: individualMenu,
       }
     );
   });

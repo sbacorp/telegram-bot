@@ -16,6 +16,13 @@ export type SessionData = {
     answers: string[];
     messanger: string;
   };
+  individual: {
+    individualSex: string;
+    individualStep: number;
+    questionsAnswered: number;
+    answers: string[];
+    messanger: string;
+  };
 };
 export interface IProduct {
   id: number;
@@ -52,6 +59,7 @@ export interface ILinkModel extends Model {
   id: number;
   linkTitle: string;
   timesUsed: number;
+  usersBoughtSub: number;
 }
 export interface IConsultationModel {
   id: number;

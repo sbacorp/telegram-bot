@@ -4,3 +4,4 @@ export * from "./diagnostics/diagnostics-adult.js";
 export * from "./diagnostics/diagnostics-child.js";
 export * from "./admin/index.js";
 export * from "./consultation/index.js";
+export * from "./individual/individual.conversation.js";

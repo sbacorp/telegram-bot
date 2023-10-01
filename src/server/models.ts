@@ -112,6 +112,10 @@ export const LinkModel = sequelize.define<ILinkModel>("link", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  usersBoughtSub: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
 });
 
 export const ConsultationModel = sequelize.define<IConsultationModelModel>(
