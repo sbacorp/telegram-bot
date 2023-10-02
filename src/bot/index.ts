@@ -144,6 +144,7 @@ export function createBot(token: string, options: Options = {}) {
         .url("Сотрудничество", "https://t.me/osmanovpr"),
     });
   });
+
   //* connect plugin conversations
   bot.use(conversations());
   //* setting commands conversations
@@ -155,7 +156,6 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(activateSubscriptionConversation());
   bot.use(changeSheduleConversation());
   //* Handlers welcome and admin
-  bot.use(welcomeFeature);
   bot.use(botAdminFeature);
   //* main hears
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
@@ -431,6 +431,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("sendMessageToChannel", async () => {
     await bot.api.sendMessage("-1001833847819", "проверка");
   });
+  bot.use(welcomeFeature);
   bot.on("callback_query", async (ctx: Context) => {
     const data = ctx.callbackQuery?.data;
     if (data === "child") {

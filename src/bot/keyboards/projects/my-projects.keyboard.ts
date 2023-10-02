@@ -7,7 +7,7 @@ import { cancel } from "../cancel.keyboard.js";
 import { BUY_CONVERSATION } from "../../conversations/buy.conversation.js";
 
 export const projectChildHealth = new Menu<Context>("project-child-health")
-  .url("Узнать подробности на сайте", "https://ya.ru/")
+  .url("Узнать подробности на сайте", "https://achekanova.ru")
   .row()
   .text("Купить - 7000р", async (ctx) => {
     ctx.session.selectedProduct = "Детское здоровье";
@@ -15,7 +15,7 @@ export const projectChildHealth = new Menu<Context>("project-child-health")
   });
 
 export const projectZhkt = new Menu<Context>("project-zhkt")
-  .url("Узнать подробности на сайте", "https://ya.ru/")
+  .url("Узнать подробности на сайте", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Методичка по работе с желчью";
@@ -23,7 +23,7 @@ export const projectZhkt = new Menu<Context>("project-zhkt")
   });
 
 export const guideAptechka = new Menu<Context>("guide-aptechka")
-  .url("Узнать подробности на сайте", "https://ya.ru/")
+  .url("Узнать подробности на сайте", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Гайд Аптечка для детей и взрослых";
@@ -35,7 +35,7 @@ export const toProjectsMenu = new Menu<Context>("to-projects").submenu(
   "projects-menu"
 );
 export const groupProject = new Menu<Context>("group-project")
-  .url("Узнать подробности на сайте", "https://ya.ru/")
+  .url("Узнать подробности на сайте", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Групповое ведение";
