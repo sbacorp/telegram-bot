@@ -1,6 +1,6 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import { activateSubscription, createLink } from "#root/server/utils.js";
+import { activateSubscription } from "#root/server/utils.js";
 
 export const ACTIVATE_SUBSCRIPTION_CONVERSATION =
   "activateSubscriptionConversation";

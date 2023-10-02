@@ -6,13 +6,18 @@ export const DELETE_LINK_CONVERSATION = "deleteLinkConversation";
 export function deleteLinkConversation() {
   return createConversation(
     async (conversation: Conversation<Context>, ctx: Context) => {
+      await ctx.reply("Для какого бота ссылка?");
+      const linkType = await conversation.waitForCallbackQuery([
+        "botSite",
+        "Nutr",
+      ]);
       await ctx.reply("<b>Введи название ссылки для удаления</b>");
       const {
         msg: { text },
       } = await conversation.waitFor("message:text");
       await ctx.reply("Удаляю...");
       const response = await conversation.external(async () =>
-        deleteLinkFromDB(text)
+        deleteLinkFromDB(text, linkType.update.callback_query.data)
       );
       return ctx.reply(response);
     },

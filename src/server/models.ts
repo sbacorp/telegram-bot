@@ -75,7 +75,6 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     defaultValue: null,
   },
 });
-
 export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
   id: {
     type: DataTypes.INTEGER,
@@ -98,25 +97,86 @@ export const PromocodeModel = sequelize.define<IPromocodeModel>("promocode", {
   },
 });
 
-export const LinkModel = sequelize.define<ILinkModel>("link", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+export const BotSiteLinkModel = sequelize.define<ILinkModel>(
+  "botSiteLink",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    linkTitle: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    link: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    timesUsed: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
-  linkTitle: {
-    type: DataTypes.STRING,
-    unique: true,
+  {
+    timestamps: false,
+  }
+);
+
+export const NutrLinkModel = sequelize.define<ILinkModel>(
+  "nutrLink",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    linkTitle: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    link: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    timesUsed: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    usersBoughtSub: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
-  timesUsed: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
+  {
+    timestamps: false,
+  }
+);
+export const ReferalLinkModel = sequelize.define(
+  "referalLink",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    linkTitle: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    link: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    timesUsed: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
-  usersBoughtSub: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-});
+  {
+    timestamps: false,
+  }
+);
 
 export const ConsultationModel = sequelize.define<IConsultationModelModel>(
   "consultation",
@@ -272,3 +332,21 @@ export const SessionModel = sequelize.define<ISession>("session", {
     allowNull: false,
   },
 });
+
+const botStateModel = sequelize.define(
+  "botState",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    allowIndividual: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+  },
+  {
+    timestamps: false,
+  }
+);

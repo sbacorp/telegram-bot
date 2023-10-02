@@ -68,38 +68,6 @@ export async function BuyIndividualConversation(
     )
   );
 
-  let promo;
-  await ctx.reply("Введите промокод", {
-    reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
-  });
-
-  while (!promo) {
-    ctx = await conversation.wait();
-    if (ctx.update.callback_query?.data === "skip") {
-      break;
-    }
-    if (ctx.message?.text) {
-      promo = await conversation.external(async () =>
-        findPromoCodeByTitleAndProduct(
-          "Индивидуальное введение",
-          ctx.message!.text!,
-          ctx.chat!.id.toString()
-        )
-      );
-      if (!promo)
-        await ctx.reply("Промокод не найден, попробуйте снова!", {
-          reply_markup: new InlineKeyboard().text("Пропустить", "skip"),
-        });
-    }
-  }
-
-  if (promo) {
-    product.price -= product.price * (promo.discount / 100);
-    await ctx.reply(`
-        Промокод на скидку ${promo.discount}% применен!
-        Новая цена: ${product.price}₽
-        `);
-  }
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );

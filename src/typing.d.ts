@@ -58,8 +58,9 @@ export interface IPromocodeModel extends Model {
 export interface ILinkModel extends Model {
   id: number;
   linkTitle: string;
+  link: string;
   timesUsed: number;
-  usersBoughtSub: number;
+  usersBoughtSub?: number;
 }
 export interface IConsultationModel {
   id: number;

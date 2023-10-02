@@ -11,8 +11,10 @@ const feature = composer.chatType("private");
 feature.command("start", logHandle("command-start"), async (ctx) => {
   const chatId = ctx.chat.id;
   const name = ctx.chat.username!;
-  const isUser = await findOrCreateUser(chatId, name);
-  if (!isUser)
+  const reference = ctx.message?.text?.split(" ")[1];
+  const isUser = await findOrCreateUser(chatId, name, reference);
+
+  if (!isUser) {
     await ctx.reply(`
 Здравствуйте
 Меня зовут Алла Чеканова.
@@ -25,6 +27,7 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
 🌿 Разработала собственную линейку витаминов
 🌿 Произвожу лечебную магниевую воду с идеальным составом и ценой
 `);
+  }
   await ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
     reply_markup: mainMenu,
   });

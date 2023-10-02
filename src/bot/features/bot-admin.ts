@@ -33,6 +33,7 @@ feature.command(
   chatAction("typing"),
   setCommandsHandler
 );
+
 feature.command(
   "setpromo",
   logHandle("command-setpromo"),
@@ -96,7 +97,9 @@ feature.command(
       ctx.reply(message);
     });
     await getLinksMessage().then((message) => {
-      ctx.reply(message);
+      ctx.reply(message, {
+        disable_web_page_preview: true,
+      });
     });
   }
 );

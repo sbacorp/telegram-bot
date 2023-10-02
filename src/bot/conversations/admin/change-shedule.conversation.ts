@@ -3,10 +3,8 @@
 /* eslint-disable unicorn/no-null */
 /* eslint-disable no-restricted-syntax */
 import { type Conversation, createConversation } from "@grammyjs/conversations";
-import { Op } from "sequelize";
 import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { createLink } from "#root/server/utils.js";
 import { ConsultationModel, UserModel } from "#root/server/models.js";
 
 export type timeAttributeType =

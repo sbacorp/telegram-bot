@@ -4,8 +4,8 @@
 /* eslint-disable no-restricted-syntax */
 import { Op, Sequelize } from "sequelize";
 import {
-  LinkModel,
-  PaymentModel,
+  BotSiteLinkModel,
+  NutrLinkModel,
   PromocodeModel,
   UserModel,
 } from "./models.js";
@@ -20,7 +20,11 @@ export async function initDB(sequelize: Sequelize) {
   }
 }
 
-export async function findOrCreateUser(chatId: number, name: string) {
+export async function findOrCreateUser(
+  chatId: number,
+  name: string,
+  reference?: string
+) {
   try {
     const user = await UserModel.findOne({
       where: { chatId: chatId.toString() },
@@ -33,6 +37,18 @@ export async function findOrCreateUser(chatId: number, name: string) {
       return true;
     }
     await UserModel.create({ chatId, name });
+    if (reference) {
+      const reflink = `https://t.me/Alla_nutriciolog_bot?start=${reference}`;
+      const link = await BotSiteLinkModel.findOne({
+        where: {
+          linkTitle: reflink,
+        },
+      });
+      if (link) {
+        link.timesUsed += 1;
+        await link.save();
+      }
+    }
     return false;
   } catch (error) {
     console.error(error);
@@ -116,30 +132,52 @@ export async function getPromocodesMessage() {
   return message;
 }
 
-const botLink = "https://t.me/@Tvoi_Nutriciolog_bot?start=";
-export const createLink = async (title: string) => {
-  let link = botLink + title;
-
+const botLink = "https://t.me/Alla_nutriciolog_bot?start=";
+export const createBotSiteLink = async (title: string, link: string) => {
   try {
-    await LinkModel.create({
+    await BotSiteLinkModel.create({
       linkTitle: title,
+      link: botLink + link,
     });
-    return link;
+    return botLink + link;
   } catch {
-    link = "не удалось создать ссылку";
     console.log("не удалось создать ссылку");
+    return "не удалось создать ссылку";
+  }
+};
+const nutrBotLink = "https://t.me/Tvoi_Nutriciolog_bot?start=";
+export const createNutrLink = async (title: string, link: string) => {
+  try {
+    await NutrLinkModel.create({
+      linkTitle: title,
+      link: nutrBotLink + link,
+    });
+    return nutrBotLink + link;
+  } catch {
+    console.log("не удалось создать ссылку");
+    return "не удалось создать ссылку";
   }
 };
 
 export async function getLinksMessage() {
-  const links = await LinkModel.findAll();
+  let message: string = "";
+  const links = await BotSiteLinkModel.findAll();
   if (links.length === 0) {
-    return "<b>Список ссылок пуст</b>";
+    message += "<b>Список ссылок для первого бота пуст</b>\n";
+  } else {
+    message += "<b>Список ссылок для первого бота:</b>\n-------------------\n";
+    for (const link of links) {
+      message += `${link.link} \n Использовано: ${link.timesUsed}\n-------------------\n`;
+    }
   }
-  let message = "<b>Список ссылок:</b>\n";
-  // eslint-disable-next-line no-restricted-syntax
-  for (const link of links) {
-    message += `${link.linkTitle} - Использовано: ${link.timesUsed}\n`;
+  const nutrLinks = await NutrLinkModel.findAll();
+  if (nutrLinks.length === 0) {
+    message += "<b>Список ссылок для второго бота пуст</b>\n";
+  } else {
+    message += "<b>Список ссылок для второго бота:</b>\n";
+    for (const link of nutrLinks) {
+      message += `${link.link} \n Использовано: ${link.timesUsed}\n Купили подписку: ${link?.usersBoughtSub}\n-------------------\n`;
+    }
   }
   return message;
 }
@@ -161,21 +199,42 @@ export async function deletePromoCodeFromDB(code: string): Promise<string> {
   }
 }
 
-export async function deleteLinkFromDB(title: string): Promise<string> {
-  try {
-    const link = await LinkModel.findOne({
-      where: {
-        linkTitle: title,
-      },
-    });
-    if (link) {
-      await link.destroy();
-      return `Ссылка <code> ${title} </code> удалена`;
+export async function deleteLinkFromDB(
+  title: string,
+  linkType: string
+): Promise<string> {
+  if (linkType === "botSite") {
+    try {
+      const link = await BotSiteLinkModel.findOne({
+        where: {
+          linkTitle: title,
+        },
+      });
+      if (link) {
+        await link.destroy();
+        return `Ссылка <code> ${title} </code> удалена`;
+      }
+      return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+    } catch (error) {
+      console.log(error);
+      return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
     }
-    return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
-  } catch (error) {
-    console.log(error);
-    return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+  } else {
+    try {
+      const link = await NutrLinkModel.findOne({
+        where: {
+          linkTitle: title,
+        },
+      });
+      if (link) {
+        await link.destroy();
+        return `Ссылка <code> ${title} </code> удалена`;
+      }
+      return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+    } catch (error) {
+      console.log(error);
+      return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
+    }
   }
 }
 export async function activateSubscription(userId: number) {
