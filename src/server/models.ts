@@ -152,31 +152,6 @@ export const NutrLinkModel = sequelize.define<ILinkModel>(
     timestamps: false,
   }
 );
-export const ReferalLinkModel = sequelize.define(
-  "referalLink",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    linkTitle: {
-      type: DataTypes.STRING,
-      unique: true,
-    },
-    link: {
-      type: DataTypes.STRING,
-      unique: true,
-    },
-    timesUsed: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-  },
-  {
-    timestamps: false,
-  }
-);
 
 export const ConsultationModel = sequelize.define<IConsultationModelModel>(
   "consultation",
