@@ -163,20 +163,22 @@ export async function getLinksMessage() {
   let message: string = "";
   const links = await BotSiteLinkModel.findAll();
   if (links.length === 0) {
-    message += "<b>Список ссылок для первого бота пуст</b>\n";
+    message +=
+      "<b>Список ссылок для бота-сайта пуст</b>\n-----------------------\n";
   } else {
-    message += "<b>Список ссылок для первого бота:</b>\n-------------------\n";
+    message +=
+      "<b>Список ссылок для бота-сайта:</b>\n-----------------------\n";
     for (const link of links) {
-      message += `${link.link} \n Использовано: ${link.timesUsed}\n-------------------\n`;
+      message += `${link.link} \n Использовано: ${link.timesUsed}\n-----------------------\n`;
     }
   }
   const nutrLinks = await NutrLinkModel.findAll();
   if (nutrLinks.length === 0) {
-    message += "<b>Список ссылок для второго бота пуст</b>\n";
+    message += "<b>Список ссылок для бота-нутрициолога пуст</b>\n";
   } else {
-    message += "<b>Список ссылок для второго бота:</b>\n";
+    message += "<b>Список ссылок для бота-нутрициолога:</b>\n";
     for (const link of nutrLinks) {
-      message += `${link.link} \n Использовано: ${link.timesUsed}\n Купили подписку: ${link?.usersBoughtSub}\n-------------------\n`;
+      message += `${link.link} \n Использовано: ${link.timesUsed}\n Купили подписку: ${link?.usersBoughtSub}\n-----------------------\n`;
     }
   }
   return message;
