@@ -121,6 +121,12 @@ export async function BuyConsultationConversation(
       )
     );
   }
+  await conversation.external(async () =>
+    disableConsultationByDateTime(
+      conversation.session.consultation.dateString,
+      conversation.session.consultation.time
+    )
+  );
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
@@ -150,10 +156,7 @@ export async function BuyConsultationConversation(
     Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
       `,
       {
-        reply_markup: new InlineKeyboard()
-          .webApp("💰 Оплатить", link)
-          .row()
-          .text("⬅️ К выбору даты", "toDate"),
+        reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
       }
     );
   } else {
@@ -163,10 +166,7 @@ export async function BuyConsultationConversation(
         Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
           `,
       {
-        reply_markup: new InlineKeyboard()
-          .url("💰 Оплатить", link)
-          .row()
-          .text("⬅️ К выбору даты", "toDate"),
+        reply_markup: new InlineKeyboard().url("💰 Оплатить", link).row(),
       }
     );
   }
@@ -203,12 +203,6 @@ export async function BuyConsultationConversation(
         ctx.chat!.id.toString(),
         "consultationDate",
         conversation.session.consultation.dateString
-      )
-    );
-    await conversation.external(async () =>
-      disableConsultationByDateTime(
-        conversation.session.consultation.dateString,
-        conversation.session.consultation.time
       )
     );
     await ctx.reply("<b>Оплата прошла успешно</b>", {

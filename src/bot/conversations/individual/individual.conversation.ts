@@ -113,7 +113,9 @@ export async function individualConversation(
     await ctx.reply(`Для кого индивидуальное введение?`, {
       reply_markup: new InlineKeyboard()
         .text("Мужчина", "male")
+        .row()
         .text("Женщина", "female")
+        .row()
         .text("Ребенку", "child"),
     });
     const sex = await conversation.waitFor("callback_query:data", {
