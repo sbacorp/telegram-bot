@@ -157,6 +157,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(changeSheduleConversation());
   //* Handlers welcome and admin
   bot.use(botAdminFeature);
+  bot.use(welcomeFeature);
   //* main hears
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
     await ctx.conversation.exit();
@@ -289,7 +290,6 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(individualMenu);
   individualStateMenu.register(individualConditionsMenu);
   //* hears handlers
-  bot.use(welcomeFeature);
   bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.deleteMessage();
     return ctx.reply("Перейдите по ссылке", {
@@ -433,22 +433,27 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("sendMessageToChannel", async () => {
     await bot.api.sendMessage("-1001833847819", "проверка");
   });
-
-  bot.on("callback_query", async (ctx: Context) => {
-    const data = ctx.callbackQuery?.data;
-    if (data === "child") {
+  bot.filter(
+    (ctx) => ctx.update.callback_query?.data === "child",
+    async (ctx) => {
       await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
       ctx.session.sex = "child";
     }
-    if (data === "male") {
-      await ctx.answerCallbackQuery("Вы выбрали консультацию для мужчины");
+  );
+  bot.filter(
+    (ctx) => ctx.update.callback_query?.data === "male",
+    async (ctx) => {
+      await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
       ctx.session.sex = "male";
     }
-    if (data === "female") {
-      await ctx.answerCallbackQuery("Вы выбрали консультацию для женщины");
+  );
+  bot.filter(
+    (ctx) => ctx.update.callback_query?.data === "female",
+    async (ctx) => {
+      await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
       ctx.session.sex = "female";
     }
-  });
+  );
   bot.on("my_chat_member", async (ctx: Context) => {
     if (ctx.update.my_chat_member?.new_chat_member?.status === "kicked") {
       const chatId = ctx.update.my_chat_member?.chat.id.toString();

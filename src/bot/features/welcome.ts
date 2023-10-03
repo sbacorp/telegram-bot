@@ -15,6 +15,7 @@ const composer = new Composer<Context>();
 const feature = composer.chatType("private");
 
 feature.command("start", logHandle("command-start"), async (ctx) => {
+  await ctx.conversation.exit();
   const chatId = ctx.chat.id;
   const name = ctx.chat.username!;
   const reference =
@@ -74,7 +75,7 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
       }
     );
   }
-  if (ctx.message?.text?.split(" ")[1] === "  ") {
+  if (ctx.message?.text?.split(" ")[1] === "individualIntro") {
     return ctx.reply(
       `Хотите поработать над своим здоровьем целый месяц вместе со мной?
 Формат месячного ведения включает в себя:
@@ -88,7 +89,6 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
       }
     );
   }
-  await ctx.conversation.exit();
   return ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
     reply_markup: mainMenu,
   });

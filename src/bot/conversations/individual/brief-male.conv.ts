@@ -371,10 +371,7 @@ export async function briefMaleConversation(
     if (!questions[i].type) {
       await ctx.reply(questions[i].text);
       const answer = await conversation.waitFor("message:text");
-      if (
-        answer.message.text === "🏠 Главное меню" ||
-        answer.message.text === "/start"
-      ) {
+      if (answer.message.text === "🏠 Главное меню") {
         return ctx.conversation.exit();
       }
       conversation.session.individual.answers.push(answer.message.text);
@@ -383,10 +380,7 @@ export async function briefMaleConversation(
         reply_markup: questions[i].keyboard,
       });
       const answer = await conversation.waitFor("message:text");
-      if (
-        answer.message.text === "🏠 Главное меню" ||
-        answer.message.text === "/start"
-      ) {
+      if (answer.message.text === "🏠 Главное меню") {
         return ctx.conversation.exit();
       }
       conversation.session.individual.answers.push(answer.message.text);
@@ -396,10 +390,7 @@ export async function briefMaleConversation(
         "AgACAgIAAxkBAAIcSmUS8tCNoWFDHb7IFWWmhjL_ZloaAAKdzzEbKomYSDTl5aLTbXn1AQADAgADeAADMAQ"
       );
       const answer = await conversation.waitFor("message:text");
-      if (
-        answer.message.text === "🏠 Главное меню" ||
-        answer.message.text === "/start"
-      ) {
+      if (answer.message.text === "🏠 Главное меню") {
         return ctx.conversation.exit();
       }
       conversation.session.individual.answers.push(answer.message.text);

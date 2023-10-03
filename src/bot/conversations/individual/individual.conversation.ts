@@ -113,7 +113,8 @@ export async function individualConversation(
     await ctx.reply(`Для кого индивидуальное введение?`, {
       reply_markup: new InlineKeyboard()
         .text("Мужчина", "male")
-        .text("Женщина", "female"),
+        .text("Женщина", "female")
+        .text("Ребенку", "child"),
     });
     const sex = await conversation.waitFor("callback_query:data", {
       otherwise: () => {
@@ -124,10 +125,22 @@ export async function individualConversation(
         });
       },
     });
-    if (sex.update.callback_query.data === "male") {
-      conversation.session.individual.individualSex = "Мужчина";
-    } else if (sex.update.callback_query.data === "female") {
-      conversation.session.individual.individualSex = "Женщина";
+    switch (sex.update.callback_query.data) {
+      case "male": {
+        conversation.session.individual.individualSex = "Мужчина";
+
+        break;
+      }
+      case "female": {
+        conversation.session.individual.individualSex = "Женщина";
+
+        break;
+      }
+      case "child": {
+        conversation.session.individual.individualSex = "Ребенок";
+
+        break;
+      }
     }
     conversation.session.individual.individualStep = 3;
   }

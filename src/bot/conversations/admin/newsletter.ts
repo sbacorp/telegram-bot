@@ -4,7 +4,6 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard } from "grammy";
 import { Op } from "sequelize";
-import { autoRetry } from "@grammyjs/auto-retry";
 import { Context } from "#root/bot/context.js";
 import { UserModel } from "#root/server/models.js";
 

@@ -5,7 +5,7 @@
 import { type Conversation, createConversation } from "@grammyjs/conversations";
 import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import { ConsultationModel, UserModel } from "#root/server/models.js";
+import { ConsultationModel } from "#root/server/models.js";
 
 export type timeAttributeType =
   | `time10`
