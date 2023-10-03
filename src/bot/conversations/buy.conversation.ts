@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable no-loop-func */
 /* eslint-disable prefer-const */
@@ -14,7 +15,7 @@ import {
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
-import { IProduct } from "#root/typing.js";
+import { IProduct, IPromocodeModel } from "#root/typing.js";
 import { PaymentModel } from "#root/server/models.js";
 import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
@@ -77,13 +78,12 @@ export async function buyConversation(
   ctx: Context
 ) {
   const selectedProduct = conversation.session?.selectedProduct;
-  let product: IProduct | undefined;
-  product = products.find((p) => p.name === selectedProduct);
+  const product = products.find((p) => p.name === selectedProduct);
   if (!product) {
     return ctx.reply("Выберите продукт");
   }
   await ctx.reply(
-    `Продукт : <b>${product?.name}</b> \nЦена : <b>${product?.price}</b> рублей`
+    `Продукт : <b>${product.name}</b> \nЦена : <b>${product.price}</b> рублей`
   );
   await ctx.reply("Оплачиваете один раз, доступ сохраняется навсегда");
   let sugMessage = await ctx.reply("Подтвердите ознакомление с офертой", {
@@ -191,6 +191,7 @@ export async function buyConversation(
       break;
     }
     if (ctx.message?.text) {
+      //  @ts-ignore
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
           product!.name,
@@ -206,15 +207,18 @@ export async function buyConversation(
   }
   if (promo) {
     await ctx.reply("Промокод принят");
-    product!.price -= product!.price * (promo.discount / 100);
-    await ctx.reply(`Скидка составляет ${promo.discount}%
-Итоговая цена: ${product!.price} рублей`);
+    product.price -= product.price * (Number(promo.dataValues.discount) / 100);
+    await ctx.reply(`Скидка составляет ${promo.dataValues.discount}%
+Итоговая цена: ${product.price} рублей`);
   }
   await ctx.reply("Выберите способ оплаты", {
     reply_markup: new InlineKeyboard()
       .text("Картой", "card")
       .text("СБП/MirPay", "sbp"),
   });
+  const { link, invoiceId } = await conversation.external(() =>
+    createPaymentLink(product, ctx.chat!.id.toString())
+  );
   const paymentMethod = await conversation.waitForCallbackQuery(
     ["card", "sbp"],
     {
@@ -225,9 +229,6 @@ export async function buyConversation(
             .text("СБП/MirPay", "sbp"),
         }),
     }
-  );
-  const { link, invoiceId } = await conversation.external(() =>
-    createPaymentLink(product!, ctx.chat!.id.toString())
   );
   if (paymentMethod.update.callback_query?.data === "card") {
     const message = await ctx.reply(
@@ -244,7 +245,6 @@ export async function buyConversation(
       }
     );
   }
-  //! check payment loop
   ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "paid") {
     const paymentStatus = await conversation

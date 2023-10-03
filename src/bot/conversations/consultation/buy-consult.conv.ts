@@ -130,6 +130,9 @@ export async function BuyConsultationConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
+  const { link, invoiceId } = await conversation.external(() =>
+    createPaymentLink(product, ctx.chat!.id.toString())
+  );
   await ctx.reply("Выберите способ оплаты", {
     reply_markup: new InlineKeyboard()
       .text("Картой", "card")
@@ -145,9 +148,6 @@ export async function BuyConsultationConversation(
             .text("СБП/MirPay", "sbp"),
         }),
     }
-  );
-  const { link, invoiceId } = await conversation.external(() =>
-    createPaymentLink(product, ctx.chat!.id.toString())
   );
   if (paymentMethod.update.callback_query?.data === "card") {
     message = await ctx.reply(
