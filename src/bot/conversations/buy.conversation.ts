@@ -78,10 +78,10 @@ export async function buyConversation(
 ) {
   const selectedProduct = conversation.session?.selectedProduct;
   let product: IProduct | undefined;
-  if (!selectedProduct) {
+  product = products.find((p) => p.name === selectedProduct);
+  if (!product) {
     return ctx.reply("Выберите продукт");
   }
-  product = products.find((p) => p.name === selectedProduct);
   await ctx.reply(
     `Продукт : <b>${product?.name}</b> \nЦена : <b>${product?.price}</b> рублей`
   );
