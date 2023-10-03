@@ -3,7 +3,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
-import { type Conversation, createConversation } from "@grammyjs/conversations";
+import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import {
@@ -153,10 +153,12 @@ const questionsDeficit: Question[] = [
     answer: `Возможно, присутствует риск гипоксии.
 Также сдайте кровь, чтобы проверить гемоглобин.
 Скорее всего, он понижен.`,
+    keyboard: true,
   },
   {
     question: "На ногтях - белые точки?",
     answer: `Это признак дефицита цинка - минерала, отвечающего за правильное пищеварение, заживление ран, поддерживающего иммунитет в борьбе с бактериями и вирусами, регулирующего выработку гормонов.`,
+    keyboard: true,
   },
   {
     question: "В уголках рта часто образуются трещины (“заеды”)?",
@@ -417,6 +419,8 @@ export async function diagnosticZhktConversationAdult(
     );
   }
 }
+const noYes = new InlineKeyboard().text("Да ✅", "Нет").text("Нет ❌", "Да");
+
 export async function diagnosticDeficitConversationAdult(
   conversation: Conversation<Context>,
   ctx: Context
@@ -427,9 +431,13 @@ export async function diagnosticDeficitConversationAdult(
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
   for (let index = 0; index < questionsDeficit.length; index++) {
-    await ctx.reply(questionsDeficit[index].question, {
-      reply_markup: yesNo,
-    });
+    await (questionsDeficit[index]?.keyboard
+      ? ctx.reply(questionsDeficit[index].question, {
+          reply_markup: noYes,
+        })
+      : ctx.reply(questionsDeficit[index].question, {
+          reply_markup: yesNo,
+        }));
     answer = await conversation.waitForCallbackQuery(["Да", "Нет"], {
       otherwise: async (ctx) => {
         if (ctx.message?.text === "🔁 Начать сначала") {

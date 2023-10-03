@@ -71,10 +71,40 @@ export async function BuyIndividualConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
-
+  await ctx.reply("Выберите способ оплаты", {
+    reply_markup: new InlineKeyboard()
+      .text("Картой", "card")
+      .text("СБП/MirPay", "sbp"),
+  });
+  const paymentMethod = await conversation.waitForCallbackQuery(
+    ["card", "sbp"],
+    {
+      otherwise: () =>
+        ctx.reply("Выберите способ оплаты", {
+          reply_markup: new InlineKeyboard()
+            .text("Картой", "card")
+            .text("СБП/MirPay", "sbp"),
+        }),
+    }
+  );
   const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product, ctx.chat!.id.toString())
   );
+  if (paymentMethod.update.callback_query?.data === "card") {
+    const message = await ctx.reply(
+      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
+      {
+        reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
+      }
+    );
+  } else {
+    const message = await ctx.reply(
+      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
+      {
+        reply_markup: new InlineKeyboard().url("💰 Оплатить", link).row(),
+      }
+    );
+  }
   await ctx.reply(
     `<b>Можете приступать к оплате.</b>
     После оплаты я отправлю вопросы по состоянию здоровья прямо в этот чат. На них необходимо ответить.

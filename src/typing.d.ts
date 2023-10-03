@@ -101,6 +101,7 @@ export interface IBriefQuestion {
 export interface Question {
   question: string;
   answer: string;
+  keyboard?: boolean;
 }
 export interface IConsultationObject {
   day: string;

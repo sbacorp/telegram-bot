@@ -84,6 +84,6 @@ export const individualMenu = new Menu<Context>("individual-menu")
     await conditions(ctx);
   })
   .row()
-  .text("Записаться на консультацию", async (ctx) => {
+  .text("Записаться", async (ctx) => {
     return ctx.conversation.enter("individual");
   });

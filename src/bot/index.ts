@@ -289,6 +289,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(individualMenu);
   individualStateMenu.register(individualConditionsMenu);
   //* hears handlers
+  bot.use(welcomeFeature);
   bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.deleteMessage();
     return ctx.reply("Перейдите по ссылке", {
@@ -424,6 +425,7 @@ export function createBot(token: string, options: Options = {}) {
       }
     );
   });
+
   //* must be the last handler
   bot.hears("fillConsultations", async () => {
     await fillConsultations();
@@ -431,7 +433,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.hears("sendMessageToChannel", async () => {
     await bot.api.sendMessage("-1001833847819", "проверка");
   });
-  bot.use(welcomeFeature);
+
   bot.on("callback_query", async (ctx: Context) => {
     const data = ctx.callbackQuery?.data;
     if (data === "child") {

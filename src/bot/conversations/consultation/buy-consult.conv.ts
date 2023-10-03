@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/prevent-abbreviations */
@@ -123,22 +124,52 @@ export async function BuyConsultationConversation(
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );
-
+  await ctx.reply("Выберите способ оплаты", {
+    reply_markup: new InlineKeyboard()
+      .text("Картой", "card")
+      .text("СБП/MirPay", "sbp"),
+  });
+  const paymentMethod = await conversation.waitForCallbackQuery(
+    ["card", "sbp"],
+    {
+      otherwise: () =>
+        ctx.reply("Выберите способ оплаты", {
+          reply_markup: new InlineKeyboard()
+            .text("Картой", "card")
+            .text("СБП/MirPay", "sbp"),
+        }),
+    }
+  );
   const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product, ctx.chat!.id.toString())
   );
-  message = await ctx.reply(
-    `<b>Можете приступать к оплате.</b>
+  if (paymentMethod.update.callback_query?.data === "card") {
+    message = await ctx.reply(
+      `<b>Можете приступать к оплате.</b>
     После оплаты вы получите ссылку на бриф, который необходимо заполнить не позднее<b> полночи</b> текущего дня.
     Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
       `,
-    {
-      reply_markup: new InlineKeyboard()
-        .webApp("💰 Оплатить", link)
-        .row()
-        .text("⬅️ К выбору даты", "toDate"),
-    }
-  );
+      {
+        reply_markup: new InlineKeyboard()
+          .webApp("💰 Оплатить", link)
+          .row()
+          .text("⬅️ К выбору даты", "toDate"),
+      }
+    );
+  } else {
+    message = await ctx.reply(
+      `<b>Можете приступать к оплате.</b>
+        После оплаты вы получите ссылку на бриф, который необходимо заполнить не позднее<b> полночи</b> текущего дня.
+        Если не уверены, что успеете заполнить бриф, то лучше отложить оплату до завтра.
+          `,
+      {
+        reply_markup: new InlineKeyboard()
+          .url("💰 Оплатить", link)
+          .row()
+          .text("⬅️ К выбору даты", "toDate"),
+      }
+    );
+  }
   ctx = await conversation.waitFor("callback_query:data");
   if (ctx.update.callback_query?.data === "toDate") {
     conversation.session.consultationStep = 2;

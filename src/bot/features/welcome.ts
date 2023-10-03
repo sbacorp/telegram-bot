@@ -88,7 +88,7 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
       }
     );
   }
-
+  await ctx.conversation.exit();
   return ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
     reply_markup: mainMenu,
   });
