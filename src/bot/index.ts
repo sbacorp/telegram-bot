@@ -139,7 +139,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.command("help", async (ctx: Context) => {
     await ctx.reply("Возникли проблемы с работой бота?", {
       reply_markup: new InlineKeyboard()
-        .url("Техническая поддержка", "https://t.me/frontsDev")
+        .url("Техническая поддержка", "https://t.me/allaBotSupport")
         .row()
         .url("Сотрудничество", "https://t.me/osmanovpr"),
     });

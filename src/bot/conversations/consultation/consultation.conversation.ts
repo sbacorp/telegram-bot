@@ -15,7 +15,7 @@ import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, InputFile, Keyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { ConsultationAppointmentModel } from "#root/server/models.js";
-import { IConsultationObject, IConsultationModel } from "#root/typing.js";
+import { IConsultationObject } from "#root/typing.js";
 import { editUserAttribute, fetchUser } from "#root/server/utils.js";
 import fs from "node:fs";
 import { autoChatAction } from "@grammyjs/auto-chat-action";
@@ -31,7 +31,7 @@ import {
 import {
   briefChildConversation,
   questions as childQuestions,
-} from "../individual/brief-child.conv.js";
+} from "./brief-child.conv.js";
 import { chooseDateConversation } from "./choose-date.conv.js";
 import {
   BuyConsultationConversation,
