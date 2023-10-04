@@ -4,11 +4,10 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
-import { InlineKeyboard, Keyboard } from "grammy";
+import { Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
 import { IBriefQuestion } from "#root/typing.js";
-import { cancel } from "../../keyboards/cancel.keyboard.js";
 
 export const questions: IBriefQuestion[] = [
   {

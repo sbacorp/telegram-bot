@@ -46,7 +46,7 @@ const createConsultationTimeKeyboard = async (date: string) => {
 
   if (!hasAvailableTime) {
     return new InlineKeyboard()
-      .text("Нет свободного времени")
+      .text("Нет свободного времени", "back")
       .row()
       .text("📅 выбрать дату", "back");
   }
@@ -62,9 +62,8 @@ export async function chooseDateConversation(
   consultationObject: IConsultationObject,
   message: any
 ) {
-  consultationObject.calendar = await conversation.external(
-    async () =>
-      await createDatePicker(consultationObject.year, consultationObject.month)
+  consultationObject.calendar = await conversation.external(() =>
+    createDatePicker(consultationObject.year, consultationObject.month)
   );
   message = await ctx.reply(`🕑 Выберите свободное время  *московское время`, {
     reply_markup: consultationObject.calendar,
@@ -137,8 +136,7 @@ export async function chooseDateConversation(
     Number(consultationObject.day) < 10 ? "0" : ""
   }${consultationObject.day}`;
   consultationObject.consultationTimeKeyboard = await conversation.external(
-    async () =>
-      await createConsultationTimeKeyboard(consultationObject.dateString)
+    () => createConsultationTimeKeyboard(consultationObject.dateString)
   );
   await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
     reply_markup: consultationObject.consultationTimeKeyboard,
@@ -230,8 +228,7 @@ export async function chooseDateConversation(
       Number(consultationObject.day) < 10 ? "0" : ""
     }${consultationObject.day}`;
     consultationObject.consultationTimeKeyboard = await conversation.external(
-      async () =>
-        await createConsultationTimeKeyboard(consultationObject.dateString)
+      () => createConsultationTimeKeyboard(consultationObject.dateString)
     );
     await ctx.api.editMessageReplyMarkup(message.chat.id, message.message_id, {
       reply_markup: consultationObject.consultationTimeKeyboard,
