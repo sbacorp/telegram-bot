@@ -70,7 +70,7 @@ export async function BuyConsultationConversation(
   const product = {
     id: 5,
     name: "Консультация",
-    price: conversation.session.sex === "child" ? 5000 : 10_000,
+    price: 10_000,
   };
 
   if (!conversation.session.fio) {
