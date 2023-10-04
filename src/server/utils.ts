@@ -41,7 +41,7 @@ export async function findOrCreateUser(
       const reflink = `https://t.me/Alla_nutriciolog_bot?start=${reference}`;
       const link = await BotSiteLinkModel.findOne({
         where: {
-          linkTitle: reflink,
+          link: reflink,
         },
       });
       if (link) {
