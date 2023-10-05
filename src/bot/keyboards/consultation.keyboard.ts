@@ -74,9 +74,7 @@ export const conditions = async (ctx: Context) => {
   setTimeout(async () => {
     await ctx.reply(
       `
-Консультация для взрослых - 10.000₽
-
-Консультация для детей - 5.000₽
+Стоимость консультации - 10.000₽
 `
     );
   }, 3000);

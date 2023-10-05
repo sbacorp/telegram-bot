@@ -99,19 +99,18 @@ export async function BuyConsultationConversation(
   }
 
   if (!conversation.session.phoneNumber) {
-    await ctx.reply(
-      "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
-      {
-        reply_markup: new Keyboard()
-          .requestContact("Отправить контакт")
-          .resized()
-          .oneTime(),
-      }
-    );
-    ctx = await conversation.waitFor(":contact");
-    await conversation.external(async () =>
-      updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number)
-    );
+    do {
+      await ctx.reply(
+        "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
+        {
+          reply_markup: new Keyboard()
+            .requestContact("Отправить контакт")
+            .resized()
+            .oneTime(),
+        }
+      );
+      ctx = await conversation.wait();
+    } while (!ctx.message?.contact?.phone_number);
     conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
     await conversation.external(async () =>
       editUserAttribute(
@@ -121,12 +120,30 @@ export async function BuyConsultationConversation(
       )
     );
   }
-  await conversation.external(async () =>
-    disableConsultationByDateTime(
-      conversation.session.consultation.dateString,
-      conversation.session.consultation.time
-    )
+  await ctx.reply(
+    "Если вы уверены, что верно выбрали дату, можете приступать к оплате",
+    {
+      reply_markup: new InlineKeyboard()
+        .text("Уверен(а)!", "sure")
+        .row()
+        .text("Выбрать другую дату?", "change"),
+    }
   );
+  const preBuy = await conversation.waitForCallbackQuery(["sure", "change"], {
+    otherwise: async () => {
+      await ctx.reply("Используйте кнопки", {
+        reply_markup: new InlineKeyboard()
+          .text("Уверен(а)!", "sure")
+          .row()
+          .text("Выбрать другую дату", "change"),
+      });
+    },
+  });
+  if (preBuy.update.callback_query.data === "change") {
+    conversation.session.consultationStep = 2;
+    return "change date";
+  }
+
   await ctx.reply(
     `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
   );

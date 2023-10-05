@@ -65,7 +65,7 @@ export async function chooseDateConversation(
   consultationObject.calendar = await conversation.external(() =>
     createDatePicker(consultationObject.year, consultationObject.month)
   );
-  message = await ctx.reply(`🕑 Выберите свободное время  *московское время`, {
+  message = await ctx.reply(`🕑 Выберите свободное дату  *московское время`, {
     reply_markup: consultationObject.calendar,
   });
   do {
@@ -153,7 +153,6 @@ export async function chooseDateConversation(
             consultationObject.month
           )
       );
-      await ctx.editMessageText(`Выберите свободную дату  *московское время`);
       await ctx.api.editMessageReplyMarkup(
         message.chat.id,
         message.message_id,
@@ -163,6 +162,9 @@ export async function chooseDateConversation(
       );
       do {
         ctx = await conversation.wait();
+        if (ctx.update.callback_query?.data === "back") {
+          return "back";
+        }
         if (ctx.update.callback_query?.data === "nextMonth") {
           consultationObject.month += 1;
           if (consultationObject.month === 12) {

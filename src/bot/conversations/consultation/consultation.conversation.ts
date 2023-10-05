@@ -63,8 +63,7 @@ const conditions = async (
   await conversation.sleep(1000);
   message = await ctx.reply(
     `
-Консультация для взрослых - 10.000₽
-Консультация для детей - 5.000₽
+Стоимость консультации - 10.000₽
 `,
     {
       reply_markup: yesNoKeyboard,
@@ -140,6 +139,11 @@ export async function consultationConversation(
     switch (ctx.update.callback_query?.data) {
       case "male": {
         conversation.session.sex = "male";
+        conversation.session.consultation.messanger = `${
+          ctx.update.callback_query.from.username
+            ? `https://t.me/${ctx.update.callback_query.from.username}`
+            : ""
+        }}`;
         await conversation.external(
           async () => await editUserAttribute(chatId, "sex", "male")
         );
@@ -281,38 +285,8 @@ export async function consultationConversation(
   }
   if (conversation.session.consultationStep < 6) {
     await ctx.reply(
-      `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.
- Подскажите, в какой социальной сети вам удобно продолжить общение?`,
-      {
-        reply_markup: new InlineKeyboard()
-          .text("Telegram", "Telegram")
-          .row()
-          .text("WhatsApp", "WhatsApp")
-          .row(),
-      }
+      `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.`
     );
-    const response = await conversation.waitForCallbackQuery(
-      ["Telegram", "WhatsApp"],
-      {
-        otherwise: async (ctx) =>
-          await ctx.reply("Используйте кнопки", {
-            reply_markup: new InlineKeyboard()
-              .text("Telegram", "Telegram")
-              .row()
-              .text("WhatsApp", "WhatsApp")
-              .row(),
-          }),
-      }
-    );
-    if (response.match === "Telegram") {
-      conversation.session.consultation.messanger = `https://t.me/${response.update.callback_query.from.username}`;
-    }
-    if (response.match === "WhatsApp") {
-      consultationObject.massanger = "WhatsApp";
-      await ctx.reply("📞 Напишите номер для связи");
-      const messanger = await conversation.form.text();
-      conversation.session.consultation.messanger = `WhatsApp ${messanger}`;
-    }
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
@@ -385,11 +359,20 @@ export async function consultationConversation(
         ? "Мужчина"
         : "Женщина"
     }
-Предпочтительная соцсеть: ${conversation.session.consultation.messanger}
+Ссылка на тг: ${conversation.session.consultation.messanger}
 Тестирование :
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
     await ctx.api.sendDocument("-1001833847819", new InputFile(filePath));
+    await ctx.api.sendMessage(
+      "-1001833847819",
+      `Контакт пользователя: ${
+        conversation.session.consultation.messanger === ""
+          ? conversation.session.phoneNumber
+          : conversation.session.consultation.messanger
+      }
+    `
+    );
     const date = conversation.session.consultation.dateString;
     const time = conversation.session.consultation.time;
     await conversation.external(() => {
