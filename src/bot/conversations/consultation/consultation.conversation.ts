@@ -359,7 +359,6 @@ export async function consultationConversation(
         ? "Мужчина"
         : "Женщина"
     }
-Ссылка на тг: ${conversation.session.consultation.messanger}
 Тестирование :
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
