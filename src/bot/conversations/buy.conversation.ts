@@ -65,10 +65,10 @@ export const products: IProduct[] = [
 export const userSuggestions = new InlineKeyboard()
   .url(
     "Политика конфеденциальности",
-    "https://telegra.ph/Politika-konfidencialnost-09-19"
+    "https://telegra.ph/Politika-konfidencialnost-10-06"
   )
   .row()
-  .url("Публичная оферта", "https://telegra.ph/PUBLICHNAYA-OFERTA-09-19-3")
+  .url("Публичная оферта", "https://telegra.ph/PUBLICHNAYA-OFERTA-10-06-2")
   .row()
   .text(" ☑️ Соглашаюсь с условиями", "accept");
 
@@ -102,13 +102,13 @@ export async function buyConversation(
     {
       reply_markup: new InlineKeyboard()
         .url(
-          "Пользовательское соглашение",
-          "https://telegra.ph/Politika-konfidencialnost-09-19"
+          "Публичная оферта",
+          "https://telegra.ph/PUBLICHNAYA-OFERTA-10-06-2"
         )
         .row()
         .url(
           "Политика конфеденциальности",
-          "https://telegra.ph/PUBLICHNAYA-OFERTA-09-19-3"
+          "https://telegra.ph/Politika-konfidencialnost-10-06"
         )
         .row()
         .text(" ✅ Ознакомлен"),
