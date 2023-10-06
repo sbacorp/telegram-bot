@@ -309,10 +309,17 @@ export function createBot(token: string, options: Options = {}) {
     });
   });
   bot.hears("📋 Диагностика", async (ctx: Context) => {
-    await ctx.reply("📋 Диагностика", {
+    await ctx.deleteMessage();
+    return ctx.reply("📋 Диагностика", {
       reply_markup: diagnosticMenu,
     });
-    return ctx.deleteMessage();
+  });
+  bot.hears("📒 Другая диагностика", async (ctx: Context) => {
+    await ctx.conversation.exit();
+    await ctx.deleteMessage();
+    return ctx.reply("📋 Диагностика", {
+      reply_markup: diagnosticMenu,
+    });
   });
   bot.hears("👩‍⚕️ Консультация", async (ctx: Context) => {
     await ctx.deleteMessage();

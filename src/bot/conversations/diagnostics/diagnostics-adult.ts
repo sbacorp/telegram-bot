@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-return */
 /* eslint-disable import/order */
 /* eslint-disable no-else-return */
 /* eslint-disable import/no-cycle */
@@ -6,14 +7,8 @@
 import { type Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
-import {
-  mainMenu,
-  yesNo,
-  next,
-  canceldiagnostic,
-} from "../../keyboards/index.js";
+import { yesNo, next, canceldiagnostic } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
-import { diagnosticConversationAdult } from "./diagnostic-adult.conversation.js";
 import { Question } from "#root/typing.js";
 
 export const DIAGNOSTIC_DEFICIT_CONVERSATION_ADULT = "diagnosticDeficitAdult";
@@ -364,7 +359,7 @@ export async function diagnosticZhktConversationAdult(
           return diagnosticZhktConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationAdult(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -379,7 +374,7 @@ export async function diagnosticZhktConversationAdult(
             return diagnosticZhktConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationAdult(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -403,12 +398,20 @@ export async function diagnosticZhktConversationAdult(
     `Бот проанализировал ваши ответы.
 Есть риски образования, развития и усугубления заболеваний, связанных с ЖКТ. Чтобы помочь себе и своему организму решить проблемы с ЖКТ, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
-  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+  const guideAnswer = await conversation.waitForCallbackQuery("guide", {
+    otherwise: async (ctx) => {
+      if (ctx.message?.text === "🔁 Начать сначала") {
+        return diagnosticZhktConversationAdult(conversation, ctx);
+      } else if (ctx.message?.text === "📒 Другая диагностика") {
+        // eslint-disable-next-line no-use-before-define
+        return;
+      }
+      // eslint-disable-next-line no-return-await
+    },
+  });
 
   if (guideAnswer.match === "guide") {
     return ctx.replyWithDocument(
@@ -444,7 +447,7 @@ export async function diagnosticDeficitConversationAdult(
           return diagnosticDeficitConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationAdult(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -459,7 +462,7 @@ export async function diagnosticDeficitConversationAdult(
             return diagnosticDeficitConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationAdult(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -482,12 +485,20 @@ export async function diagnosticDeficitConversationAdult(
     `Бот проанализировал ваши ответы.
   Есть риски появления и усугубления болезней на фоне дефицитов разных групп витамин. Чтобы помочь себе и своему организму решить проблемы с дефицитами, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
-  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+  const guideAnswer = await conversation.waitForCallbackQuery("guide", {
+    otherwise: async (ctx) => {
+      if (ctx.message?.text === "🔁 Начать сначала") {
+        return diagnosticDeficitConversationAdult(conversation, ctx);
+      } else if (ctx.message?.text === "📒 Другая диагностика") {
+        // eslint-disable-next-line no-use-before-define
+        return;
+      }
+      // eslint-disable-next-line no-return-await
+    },
+  });
 
   if (guideAnswer.match === "guide") {
     return ctx.replyWithDocument(
@@ -517,7 +528,7 @@ export async function diagnosticThyroidConversationAdult(
           return diagnosticThyroidConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationAdult(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -532,7 +543,7 @@ export async function diagnosticThyroidConversationAdult(
             return diagnosticThyroidConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationAdult(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -555,12 +566,20 @@ export async function diagnosticThyroidConversationAdult(
     `Бот проанализировал ваши ответы.
 Есть риски образования, развития и усугубления заболеваний, связанных с гормонами и щитовидной железой. Чтобы помочь себе и своему организму решить эти проблемы, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
-  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+  const guideAnswer = await conversation.waitForCallbackQuery("guide", {
+    otherwise: async (ctx) => {
+      if (ctx.message?.text === "🔁 Начать сначала") {
+        return diagnosticThyroidConversationAdult(conversation, ctx);
+      } else if (ctx.message?.text === "📒 Другая диагностика") {
+        // eslint-disable-next-line no-use-before-define
+        return;
+      }
+      // eslint-disable-next-line no-return-await
+    },
+  });
 
   if (guideAnswer.match === "guide") {
     return ctx.replyWithDocument(
@@ -590,7 +609,7 @@ export async function diagnosticInsulinConversationAdult(
           return diagnosticInsulinConversationAdult(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationAdult(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -605,7 +624,7 @@ export async function diagnosticInsulinConversationAdult(
             return diagnosticInsulinConversationAdult(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationAdult(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -628,12 +647,20 @@ export async function diagnosticInsulinConversationAdult(
     `Бот проанализировал ваши ответы.
 Есть риски образования, развития и усугубления заболеваний на фоне инсулинорезистентности. Чтобы помочь себе и своему организму решить эту проблему, забирайте мой гайд по кнопке ниже и внедряйте рекомендации в свою жизнь.`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
-  const guideAnswer = await conversation.waitForCallbackQuery("guide");
+  const guideAnswer = await conversation.waitForCallbackQuery("guide", {
+    otherwise: async (ctx) => {
+      if (ctx.message?.text === "🔁 Начать сначала") {
+        return diagnosticInsulinConversationAdult(conversation, ctx);
+      } else if (ctx.message?.text === "📒 Другая диагностика") {
+        // eslint-disable-next-line no-use-before-define
+        return;
+      }
+      // eslint-disable-next-line no-return-await
+    },
+  });
 
   if (guideAnswer.match === "guide") {
     await ctx.replyWithDocument(

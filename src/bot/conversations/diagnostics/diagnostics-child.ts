@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-return */
 /* eslint-disable no-else-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-shadow */
@@ -286,7 +287,7 @@ export async function diagnosticZhktConversationChild(
           return diagnosticZhktConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -301,7 +302,7 @@ export async function diagnosticZhktConversationChild(
             return diagnosticZhktConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -323,9 +324,7 @@ export async function diagnosticZhktConversationChild(
   await ctx.reply(
     `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
   const guideAnswer = await conversation.waitForCallbackQuery("guide", {
@@ -334,7 +333,7 @@ export async function diagnosticZhktConversationChild(
         return diagnosticZhktConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
+        return;
       }
       // eslint-disable-next-line no-return-await
     },
@@ -349,7 +348,6 @@ export async function diagnosticZhktConversationChild(
     );
   }
 }
-
 export async function diagnosticDeficitConversationChild(
   conversation: Conversation<Context>,
   ctx: Context
@@ -373,7 +371,7 @@ export async function diagnosticDeficitConversationChild(
           return diagnosticDeficitConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -388,7 +386,7 @@ export async function diagnosticDeficitConversationChild(
             return diagnosticDeficitConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -410,9 +408,7 @@ export async function diagnosticDeficitConversationChild(
   await ctx.reply(
     `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
   const guideAnswer = await conversation.waitForCallbackQuery("guide", {
@@ -421,7 +417,7 @@ export async function diagnosticDeficitConversationChild(
         return diagnosticDeficitConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
+        return;
       }
       // eslint-disable-next-line no-return-await
     },
@@ -459,7 +455,7 @@ export async function diagnosticInsulinConversationChild(
           return diagnosticInsulinConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -474,7 +470,7 @@ export async function diagnosticInsulinConversationChild(
             return diagnosticInsulinConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -496,9 +492,7 @@ export async function diagnosticInsulinConversationChild(
   await ctx.reply(
     `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
   const guideAnswer = await conversation.waitForCallbackQuery("guide", {
@@ -507,7 +501,7 @@ export async function diagnosticInsulinConversationChild(
         return diagnosticInsulinConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
+        return;
       }
       // eslint-disable-next-line no-return-await
     },
@@ -545,7 +539,7 @@ export async function diagnosticAmmiakConversationChild(
           return diagnosticAmmiakConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -560,7 +554,7 @@ export async function diagnosticAmmiakConversationChild(
             return diagnosticAmmiakConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -582,9 +576,7 @@ export async function diagnosticAmmiakConversationChild(
   await ctx.reply(
     `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
   const guideAnswer = await conversation.waitForCallbackQuery("guide", {
@@ -593,7 +585,7 @@ export async function diagnosticAmmiakConversationChild(
         return diagnosticAmmiakConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
+        return;
       }
       // eslint-disable-next-line no-return-await
     },
@@ -628,7 +620,7 @@ export async function diagnosticParazitConversationChild(
           return diagnosticParazitConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return diagnosticConversationChild(conversation, ctx);
+          return;
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -643,7 +635,7 @@ export async function diagnosticParazitConversationChild(
             return diagnosticParazitConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return diagnosticConversationChild(conversation, ctx);
+            return;
           }
           // eslint-disable-next-line no-return-await
           else
@@ -665,9 +657,7 @@ export async function diagnosticParazitConversationChild(
   await ctx.reply(
     `Если у вас больше одного ответа "Да", нужно обследовать ребёнка и принимать меры. Забирайте гайд и действуйте!`,
     {
-      reply_markup: InlineKeyboard.from([
-        [{ text: "Забрать гайд", callback_data: "guide" }],
-      ]),
+      reply_markup: new InlineKeyboard().text("Забрать гайд", "guide"),
     }
   );
   const guideAnswer = await conversation.waitForCallbackQuery("guide", {
@@ -676,7 +666,7 @@ export async function diagnosticParazitConversationChild(
         return diagnosticParazitConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return diagnosticConversationChild(conversation, ctx);
+        return;
       }
       // eslint-disable-next-line no-return-await
     },

@@ -8,6 +8,7 @@ export const next = new InlineKeyboard().text("Следующий вопрос �
 
 export const canceldiagnostic = new Keyboard()
   .text("📒 Другая диагностика")
+  .row()
   .text("🔁 Начать сначала")
   .row()
   .text("🏠 Главное меню")
