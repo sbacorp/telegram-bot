@@ -287,7 +287,10 @@ export async function diagnosticZhktConversationChild(
           return diagnosticZhktConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return;
+
+          return ctx.reply("Выберите другую диагностику", {
+            reply_markup: cancel,
+          });
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -302,7 +305,10 @@ export async function diagnosticZhktConversationChild(
             return diagnosticZhktConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return;
+
+            return ctx.reply("Выберите другую диагностику", {
+              reply_markup: cancel,
+            });
           }
           // eslint-disable-next-line no-return-await
           else
@@ -333,7 +339,10 @@ export async function diagnosticZhktConversationChild(
         return diagnosticZhktConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return;
+
+        return ctx.reply("Выберите другую диагностику", {
+          reply_markup: cancel,
+        });
       }
       // eslint-disable-next-line no-return-await
     },
@@ -371,7 +380,10 @@ export async function diagnosticDeficitConversationChild(
           return diagnosticDeficitConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return;
+
+          return ctx.reply("Выберите другую диагностику", {
+            reply_markup: cancel,
+          });
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -386,7 +398,10 @@ export async function diagnosticDeficitConversationChild(
             return diagnosticDeficitConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return;
+
+            return ctx.reply("Выберите другую диагностику", {
+              reply_markup: cancel,
+            });
           }
           // eslint-disable-next-line no-return-await
           else
@@ -417,7 +432,10 @@ export async function diagnosticDeficitConversationChild(
         return diagnosticDeficitConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return;
+
+        return ctx.reply("Выберите другую диагностику", {
+          reply_markup: cancel,
+        });
       }
       // eslint-disable-next-line no-return-await
     },
@@ -455,7 +473,10 @@ export async function diagnosticInsulinConversationChild(
           return diagnosticInsulinConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return;
+
+          return ctx.reply("Выберите другую диагностику", {
+            reply_markup: cancel,
+          });
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -470,7 +491,10 @@ export async function diagnosticInsulinConversationChild(
             return diagnosticInsulinConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return;
+
+            return ctx.reply("Выберите другую диагностику", {
+              reply_markup: cancel,
+            });
           }
           // eslint-disable-next-line no-return-await
           else
@@ -501,7 +525,10 @@ export async function diagnosticInsulinConversationChild(
         return diagnosticInsulinConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return;
+
+        return ctx.reply("Выберите другую диагностику", {
+          reply_markup: cancel,
+        });
       }
       // eslint-disable-next-line no-return-await
     },
@@ -539,7 +566,10 @@ export async function diagnosticAmmiakConversationChild(
           return diagnosticAmmiakConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return;
+
+          return ctx.reply("Выберите другую диагностику", {
+            reply_markup: cancel,
+          });
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -554,7 +584,10 @@ export async function diagnosticAmmiakConversationChild(
             return diagnosticAmmiakConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return;
+
+            return ctx.reply("Выберите другую диагностику", {
+              reply_markup: cancel,
+            });
           }
           // eslint-disable-next-line no-return-await
           else
@@ -585,7 +618,10 @@ export async function diagnosticAmmiakConversationChild(
         return diagnosticAmmiakConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return;
+
+        return ctx.reply("Выберите другую диагностику", {
+          reply_markup: cancel,
+        });
       }
       // eslint-disable-next-line no-return-await
     },
@@ -620,7 +656,10 @@ export async function diagnosticParazitConversationChild(
           return diagnosticParazitConversationChild(conversation, ctx);
         } else if (ctx.message?.text === "📒 Другая диагностика") {
           // eslint-disable-next-line no-use-before-define
-          return;
+
+          return ctx.reply("Выберите другую диагностику", {
+            reply_markup: cancel,
+          });
         } else
           await ctx.reply("Используйте кнопки", {
             reply_markup: yesNo,
@@ -635,7 +674,10 @@ export async function diagnosticParazitConversationChild(
             return diagnosticParazitConversationChild(conversation, ctx);
           } else if (ctx.message?.text === "📒 Другая диагностика") {
             // eslint-disable-next-line no-use-before-define
-            return;
+
+            return ctx.reply("Выберите другую диагностику", {
+              reply_markup: cancel,
+            });
           }
           // eslint-disable-next-line no-return-await
           else
@@ -666,7 +708,10 @@ export async function diagnosticParazitConversationChild(
         return diagnosticParazitConversationChild(conversation, ctx);
       } else if (ctx.message?.text === "📒 Другая диагностика") {
         // eslint-disable-next-line no-use-before-define
-        return;
+
+        return ctx.reply("Выберите другую диагностику", {
+          reply_markup: cancel,
+        });
       }
       // eslint-disable-next-line no-return-await
     },
