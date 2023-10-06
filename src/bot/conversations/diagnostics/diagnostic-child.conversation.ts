@@ -61,9 +61,9 @@ export async function diagnosticConversationChild(
     reply_markup: new Keyboard()
       .text("👩‍⚕️ Записаться на консультацию")
       .row()
-      .text("🏠 Главное меню")
-      .row()
       .text("🎯 Хочу комплексно решить проблему")
+      .row()
+      .text("🏠 Главное меню")
       .resized()
       .oneTime(),
   });

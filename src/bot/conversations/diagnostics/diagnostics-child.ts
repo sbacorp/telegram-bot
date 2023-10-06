@@ -527,7 +527,7 @@ export async function diagnosticAmmiakConversationChild(
   ctx: Context
 ) {
   let answer;
-  await ctx.reply("<b>Вы выбрали диагностику на Паразитов</b>", {
+  await ctx.reply("<b>Вы выбрали диагностику Аммиака</b>", {
     reply_markup: canceldiagnostic,
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus
