@@ -4,10 +4,12 @@ import { Context } from "../context.js";
 
 export const diagnosticMenu = new Menu<Context>("diagMenu")
   .text("Для взрослого", async (ctx) => {
+    await ctx.conversation.exit();
     await ctx.answerCallbackQuery();
     await ctx.conversation.enter("diagnosticAdult");
   })
   .text("Для ребенка", async (ctx) => {
+    await ctx.conversation.exit();
     await ctx.answerCallbackQuery();
     await ctx.conversation.enter("diagnosticChild");
   });

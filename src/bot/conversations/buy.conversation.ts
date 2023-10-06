@@ -115,21 +115,21 @@ export async function buyConversation(
     }
   );
   if (conversation.session.phoneNumber === "") {
-    await ctx.reply(
-      "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
-      {
-        reply_markup: new Keyboard()
-          .requestContact("Отправить контакт")
-          .resized(),
-      }
-    );
-    const contact = await conversation.waitFor(":contact");
-    conversation.session.phoneNumber = contact.message!.contact.phone_number;
-    await conversation.external(async () => {
-      await updateUserPhone(
-        ctx.chat!.id,
-        contact.message!.contact.phone_number
+    do {
+      await ctx.reply(
+        "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
+        {
+          reply_markup: new Keyboard()
+            .requestContact("Отправить контакт")
+            .resized()
+            .oneTime(),
+        }
       );
+      ctx = await conversation.wait();
+    } while (!ctx.message?.contact?.phone_number);
+    conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
+    await conversation.external(() => {
+      updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number);
     });
   }
   await ctx.reply("Соглашение принято", {

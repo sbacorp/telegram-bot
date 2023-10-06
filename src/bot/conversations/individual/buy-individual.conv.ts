@@ -7,12 +7,7 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import {
-  editUserAttribute,
-  fetchUser,
-  findPromoCodeByTitleAndProduct,
-  updateUserPhone,
-} from "#root/server/utils.js";
+import { editUserAttribute, fetchUser } from "#root/server/utils.js";
 import { PaymentModel } from "#root/server/models.js";
 import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
@@ -49,18 +44,20 @@ export async function BuyIndividualConversation(
     );
   }
 
-  await ctx.reply("Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️", {
-    reply_markup: new Keyboard()
-      .requestContact("Отправить контакт")
-      .resized()
-      .oneTime(),
-  });
-  ctx = await conversation.waitFor(":contact");
-  await conversation.external(async () =>
-    updateUserPhone(ctx.chat!.id, ctx.message!.contact!.phone_number)
-  );
+  do {
+    await ctx.reply(
+      "Поделитесь контактом по кнопке ниже, чтобы продолжить ⬇️",
+      {
+        reply_markup: new Keyboard()
+          .requestContact("Отправить контакт")
+          .resized()
+          .oneTime(),
+      }
+    );
+    ctx = await conversation.wait();
+  } while (!ctx.message?.contact?.phone_number);
   conversation.session.phoneNumber = ctx.message!.contact!.phone_number;
-  await conversation.external(async () =>
+  await conversation.external(() =>
     editUserAttribute(
       ctx.chat!.id.toString(),
       "phoneNumber",
@@ -69,7 +66,10 @@ export async function BuyIndividualConversation(
   );
 
   await ctx.reply(
-    `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
+    `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`,
+    {
+      reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
+    }
   );
   const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product, ctx.chat!.id.toString())
@@ -90,29 +90,21 @@ export async function BuyIndividualConversation(
         }),
     }
   );
-  if (paymentMethod.update.callback_query?.data === "card") {
-    const message = await ctx.reply(
-      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
-      {
-        reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
-      }
-    );
-  } else {
-    const message = await ctx.reply(
-      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
-      {
-        reply_markup: new InlineKeyboard().url("💰 Оплатить", link).row(),
-      }
-    );
-  }
-  await ctx.reply(
-    `<b>Можете приступать к оплате.</b>
-    После оплаты я отправлю вопросы по состоянию здоровья прямо в этот чат. На них необходимо ответить.
-      `,
-    {
-      reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link),
-    }
-  );
+  await (paymentMethod.update.callback_query?.data === "card"
+    ? ctx.reply(
+        `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
+        {
+          reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
+        }
+      )
+    : ctx.reply(
+        `Можете приступать к оплате. Номер заказа: <b>#${invoiceId}</b>
+      После оплаты я отправлю вопросы по состоянию здоровья прямо в этот чат. На них необходимо ответить.`,
+        {
+          reply_markup: new InlineKeyboard().url("💰 Оплатить", link).row(),
+        }
+      ));
+
   ctx = await conversation.waitFor("callback_query:data");
   if (ctx.update.callback_query?.data === "paid") {
     const payment = await conversation.external(() =>

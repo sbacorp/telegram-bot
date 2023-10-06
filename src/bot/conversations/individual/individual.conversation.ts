@@ -26,6 +26,13 @@ import {
 } from "./brief-female.conv.js";
 
 const acceptMenu = new InlineKeyboard()
+  .url(
+    "Политика конфеденциальности",
+    "https://telegra.ph/Politika-konfidencialnost-10-06"
+  )
+  .row()
+  .url("Публичная оферта", "https://telegra.ph/PUBLICHNAYA-OFERTA-10-06-2")
+  .row()
   .text("Ознакомиться", "conditions")
   .row()
   .text("Уже ознакомлен(а)", "accepted");
@@ -89,9 +96,6 @@ export async function individualConversation(
     });
     do {
       ctx = await conversation.wait();
-      if (!(ctx.update.callback_query?.data === "start")) {
-        await ctx.answerCallbackQuery("Используйте кнопку 'Начать запись'");
-      }
     } while (!(ctx.update.callback_query?.data === "start"));
     conversation.session.individual.individualStep = 1;
   }

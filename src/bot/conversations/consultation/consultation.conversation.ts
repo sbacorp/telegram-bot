@@ -39,6 +39,13 @@ import {
 } from "./buy-consult.conv.js";
 
 export const yesNoKeyboard = new InlineKeyboard()
+  .url(
+    "Политика конфеденциальности",
+    "https://telegra.ph/Politika-konfidencialnost-10-06"
+  )
+  .row()
+  .url("Публичная оферта", "https://telegra.ph/PUBLICHNAYA-OFERTA-10-06-2")
+  .row()
   .text("Ознакомиться", "no")
   .row()
   .text("Уже ознакомлен(а)", "yes");
@@ -117,10 +124,6 @@ export async function consultationConversation(
     });
     do {
       ctx = await conversation.wait();
-      if (!(ctx.update.callback_query?.data === "start")) {
-        await ctx.answerCallbackQuery("Используйте кнопку 'Начать запись'");
-        continue;
-      }
     } while (!(ctx.update.callback_query?.data === "start"));
     conversation.session.consultationStep = 1;
   }

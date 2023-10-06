@@ -126,7 +126,7 @@ export async function BuyConsultationConversation(
       reply_markup: new InlineKeyboard()
         .text("Уверен(а)!", "sure")
         .row()
-        .text("Выбрать другую дату?", "change"),
+        .text("Выбрать другую дату", "change"),
     }
   );
   const preBuy = await conversation.waitForCallbackQuery(["sure", "change"], {
@@ -145,7 +145,10 @@ export async function BuyConsultationConversation(
   }
 
   await ctx.reply(
-    `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`
+    `Место забронировано на 15 минут. В течение этого времени необходимо оплатить выставленный счет, иначе бронь будет снята.`,
+    {
+      reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
+    }
   );
   const { link, invoiceId } = await conversation.external(() =>
     createPaymentLink(product, ctx.chat!.id.toString())

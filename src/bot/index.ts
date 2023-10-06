@@ -332,6 +332,7 @@ export function createBot(token: string, options: Options = {}) {
   });
   bot.hears("👩‍⚕️ Записаться на консультацию", async (ctx: Context) => {
     await ctx.deleteMessage();
+    await ctx.conversation.exit();
     return ctx.reply(
       `Вам нужен проводник в мир здоровья и энергии? - приходите ко мне на консультацию!
 
