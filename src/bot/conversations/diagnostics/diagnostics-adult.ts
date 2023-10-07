@@ -438,7 +438,7 @@ export async function diagnosticDeficitConversationAdult(
   ctx: Context
 ) {
   let answer;
-  await ctx.reply("<b>Вы выбрали диагностику Дифицитов</b>", {
+  await ctx.reply("<b>Вы выбрали диагностику Дефицитов</b>", {
     reply_markup: canceldiagnostic,
   });
   // eslint-disable-next-line unicorn/no-for-loop, no-plusplus

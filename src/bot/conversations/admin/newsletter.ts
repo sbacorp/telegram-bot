@@ -77,7 +77,7 @@ export function newsletterConversation() {
             } catch (error) {
               console.log(error);
             }
-          }, 250);
+          }, 40);
         }
       }
       if (callbackQuery?.data === "subscribed") {

@@ -8,7 +8,6 @@ import { InlineKeyboard } from "grammy";
 import { Context } from "#root/bot/context.js";
 import { yesNo, next, canceldiagnostic } from "../../keyboards/index.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
-import { diagnosticConversationChild } from "./diagnostic-child.conversation.js";
 
 export const DIAGNOSTIC_PARAZIT_CONVERSATION_CHILD = "diagnosticParazitChild";
 export const DIAGNOSTIC_DEFICIT_CONVERSATION_CHILD = "diagnosticDeficitChild";
@@ -59,9 +58,9 @@ const questionsZhkt: Question[] = [
     keyboard: false,
   },
   {
-    question: "Стул не каждый день",
+    question: "Стул каждый день?",
     answer: "Есть застой желчи",
-    keyboard: false,
+    keyboard: true,
   },
   {
     question: "Стул жирный, плохо смывается и пачкает стенки унитаза",
@@ -71,7 +70,7 @@ const questionsZhkt: Question[] = [
   {
     question: "Стул, оформленный колбаской?",
     answer: "Проблема с застоем желчи и работой поджелудочной железы",
-    keyboard: false,
+    keyboard: true,
   },
   {
     question: "Отрыжка воздухом после еды",
@@ -90,12 +89,12 @@ const questionsZhkt: Question[] = [
   },
   {
     question: "Бывает повышенное газообразование",
-    answer: "Есть риски инсулинорезистентности",
+    answer: "Есть разрастание патогенной флоры",
     keyboard: false,
   },
   {
     question: "Бывает ли сильная тяга к сладкому?",
-    answer: "Кандида",
+    answer: "Кандида , патогенная Флора , риски анемии",
     keyboard: false,
   },
   {
@@ -104,6 +103,7 @@ const questionsZhkt: Question[] = [
     keyboard: false,
   },
 ];
+
 const questionsDeficit: Question[] = [
   {
     question: "При рождении ребёнка было обвитие и асфиксия",
@@ -111,7 +111,7 @@ const questionsDeficit: Question[] = [
     keyboard: false,
   },
   {
-    question: "Есть ли отпечатки зубов на щеках с внутренней стороны?",
+    question: "Есть ли отпечатки зубов на языке?",
     answer: "Это риски гипотиреоза",
     keyboard: false,
   },
@@ -137,7 +137,7 @@ const questionsDeficit: Question[] = [
   },
   {
     question: "Сильная тяга к сладкому?",
-    answer: "Риски анемии и гипоксии",
+    answer: "Кандида , патогенная Флора , риски анемии",
     keyboard: false,
   },
   {
@@ -176,6 +176,7 @@ const questionsDeficit: Question[] = [
     keyboard: false,
   },
 ];
+
 const questionsInsulin: Question[] = [
   {
     question: "Мама набрала за период беременности больше 20 кг",
@@ -228,6 +229,7 @@ const questionsAmmiak: Question[] = [
     keyboard: false,
   },
 ];
+
 const questionsParazit: Question[] = [
   {
     question: "Бывает ли боль возле пупка?",
@@ -260,6 +262,7 @@ const questionsParazit: Question[] = [
     keyboard: false,
   },
 ];
+
 export const noYes = new InlineKeyboard()
   .text("Да ✅", "Нет")
   .text("Нет ❌", "Да");
@@ -357,6 +360,7 @@ export async function diagnosticZhktConversationChild(
     );
   }
 }
+
 export async function diagnosticDeficitConversationChild(
   conversation: Conversation<Context>,
   ctx: Context
@@ -633,6 +637,7 @@ export async function diagnosticAmmiakConversationChild(
     );
   }
 }
+
 export async function diagnosticParazitConversationChild(
   conversation: Conversation<Context>,
   ctx: Context
