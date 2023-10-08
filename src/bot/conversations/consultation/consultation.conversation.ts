@@ -290,6 +290,26 @@ export async function consultationConversation(
     await ctx.reply(
       `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.`
     );
+    let address: string = "";
+    await ctx.reply("Хотели бы сдать анализы с 20% скидкой?", {
+      reply_markup: new InlineKeyboard().text("Да", "yes").text("Нет", "no"),
+    });
+    ctx = await conversation.waitForCallbackQuery(["yes", "no"], {
+      otherwise: async () => {
+        await ctx.reply("Используйте кнопки", {
+          reply_markup: new InlineKeyboard()
+            .text("Да", "yes")
+            .text("Нет", "no"),
+        });
+      },
+    });
+    if (ctx.update.callback_query?.data === "yes") {
+      await ctx.reply("Введите адрес ближайшей к вам лаборатории Invitro");
+      address = await conversation.form.text();
+      if (address) {
+        await ctx.reply("Спасибо, в день консультации алла вышлет вам скидку!");
+      }
+    }
     await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
     ctx.chatAction = "typing";
     let answerQuestions: string;
@@ -344,6 +364,7 @@ export async function consultationConversation(
 Новая запись на консультацию:
 Имя: ${conversation.session.fio}
 Телефон: ${conversation.session.phoneNumber}
+Хочет скидку : ${address ? `Да, адресс ${address}` : "Нет"}
 Дата : ${new Date(
       Number(conversation.session.consultation.dateString.slice(0, 4)),
       Number(conversation.session.consultation.dateString.slice(4, 6)) - 1,
