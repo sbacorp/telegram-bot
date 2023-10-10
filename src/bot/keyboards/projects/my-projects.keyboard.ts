@@ -7,7 +7,7 @@ import { cancel } from "../cancel.keyboard.js";
 import { BUY_CONVERSATION } from "../../conversations/buy.conversation.js";
 
 export const projectChildHealth = new Menu<Context>("project-child-health")
-  .url("Узнать подробности на сайте", "https://achekanova.ru")
+  .url("Перейти на сайт", "https://achekanova.ru")
   .row()
   .text("Купить - 7000р", async (ctx) => {
     ctx.session.selectedProduct = "Детское здоровье";
@@ -15,7 +15,7 @@ export const projectChildHealth = new Menu<Context>("project-child-health")
   });
 
 export const projectZhkt = new Menu<Context>("project-zhkt")
-  .url("Узнать подробности на сайте", "https://achekanova.ru")
+  .url("Перейти на сайт", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Методичка по работе с желчью";
@@ -23,7 +23,7 @@ export const projectZhkt = new Menu<Context>("project-zhkt")
   });
 
 export const guideAptechka = new Menu<Context>("guide-aptechka")
-  .url("Узнать подробности на сайте", "https://achekanova.ru")
+  .url("Перейти на сайт", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Гайд Аптечка для детей и взрослых";
@@ -35,7 +35,7 @@ export const toProjectsMenu = new Menu<Context>("to-projects").submenu(
   "projects-menu"
 );
 export const groupProject = new Menu<Context>("group-project")
-  .url("Узнать подробности на сайте", "https://achekanova.ru")
+  .url("Перейти на сайт", "https://achekanova.ru")
   .row()
   .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Групповое ведение";
@@ -139,7 +139,7 @@ export const studyProjectsMenu = new Menu<Context>("study-projects-menu")
       }
     );
     const keyboard = new InlineKeyboard().url(
-      "Узнать подробности на сайте",
+      "Перейти на сайт",
       "https://lp-edpro.ru/lk/22/nutriciologia/child_nutrition/?utm_source=advcake&utm_medium=cpa&utm_campaign=affiliate&utm_content=academymarket&utm_term=6250eb57edd1584af7711424c13d4a53&erid=LdtCKV66K&_gl=1*1htskc1*_ga*MTEyMzgyODY4LjE2OTM4NDA0ODQ.*_ga_PBZBSS23X9*MTY5NDI5MTQwMS4yLjAuMTY5NDI5MTQwMS42MC4wLjA"
     );
     setTimeout(async () => {
@@ -165,7 +165,7 @@ export const studyProjectsMenu = new Menu<Context>("study-projects-menu")
       }
     );
     const keyboard = new InlineKeyboard().url(
-      "Узнать подробности на сайте",
+      "Перейти на сайт",
       "https://lp-edpro.ru/lk/23/nutriciologia/family_nutrition/?utm_source=advcake&utm_medium=cpa&utm_campaign=affiliate&utm_content=academymarket&utm_term=6250eb57edd1584af7711424c13d4a53&erid=LdtCKV66K&_gl=1*kr70ev*_ga*MTEyMzgyODY4LjE2OTM4NDA0ODQ.*_ga_PBZBSS23X9*MTY5NDI5MTQwMS4yLjEuMTY5NDI5MTQ0OC4xMy4wLjA"
     );
     setTimeout(async () => {
