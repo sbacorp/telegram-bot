@@ -210,6 +210,13 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(consultationMenu);
   consultationConditionsMenu.register(consultationAboutMenu);
   consultationAboutMenu.register(consultationAbout2Menu);
+
+  //* individual
+  bot.use(createConversation(individualConversation, "individual"));
+  bot.use(individualStateMenu);
+  bot.use(individualConditionsMenu);
+  bot.use(individualMenu);
+  individualStateMenu.register(individualConditionsMenu);
   bot.use(welcomeFeature);
   //* conversations diagnostics
   bot.use(
@@ -282,12 +289,6 @@ export function createBot(token: string, options: Options = {}) {
   //* duagnostic menu
   bot.use(diagnosticMenu);
 
-  //* individual
-  bot.use(createConversation(individualConversation, "individual"));
-  bot.use(individualStateMenu);
-  bot.use(individualConditionsMenu);
-  bot.use(individualMenu);
-  individualStateMenu.register(individualConditionsMenu);
   //* hears handlers
   bot.hears("🌐 Сайт", async (ctx: Context) => {
     await ctx.deleteMessage();
