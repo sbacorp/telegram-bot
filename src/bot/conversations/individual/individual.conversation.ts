@@ -194,39 +194,7 @@ export async function individualConversation(
     conversation.session.individual.individualStep = 4;
   }
   if (conversation.session.individual.individualStep < 5) {
-    await ctx.reply(
-      `Благодарю вас за проделанную работу. В выбранную вами дату я свяжусь с вами.
- Подскажите, в какой социальной сети вам удобно продолжить общение?`,
-      {
-        reply_markup: new InlineKeyboard()
-          .text("Telegram", "Telegram")
-          .row()
-          .text("WhatsApp", "WhatsApp")
-          .row(),
-      }
-    );
-    const response = await conversation.waitForCallbackQuery(
-      ["Telegram", "WhatsApp"],
-      {
-        otherwise: async () =>
-          await ctx.reply("Используйте кнопки", {
-            reply_markup: new InlineKeyboard()
-              .text("Telegram", "Telegram")
-              .row()
-              .text("WhatsApp", "WhatsApp")
-              .row(),
-          }),
-      }
-    );
-    if (response.match === "Telegram") {
-      conversation.session.individual.messanger = `https://t.me/${response.update.callback_query.from.username}`;
-    }
-    if (response.match === "WhatsApp") {
-      await ctx.reply("📞 Напишите номер для связи");
-      const messanger = await conversation.form.text();
-      conversation.session.individual.messanger = `WhatsApp ${messanger}`;
-    }
-    await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
+    await ctx.reply("Пожалуйста подождите, идет запись на ведение...");
     ctx.chatAction = "typing";
     let answerQuestions;
     switch (conversation.session.individual.individualSex) {
@@ -279,6 +247,7 @@ export async function individualConversation(
 Индивидуальное введение:
 Имя: ${conversation.session.fio}
 Телефон: ${conversation.session.phoneNumber}
+Ссылка на тг : ${ctx.chat?.id}
 Для: ${
       conversation.session.individual.individualSex === "Ребенок"
         ? "Ребенка"
