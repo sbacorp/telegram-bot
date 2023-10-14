@@ -157,7 +157,6 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(changeSheduleConversation());
   //* Handlers welcome and admin
   bot.use(botAdminFeature);
-  bot.use(welcomeFeature);
   //* main hears
   bot.hears("🏠 Главное меню", async (ctx: Context) => {
     await ctx.conversation.exit();
@@ -211,7 +210,7 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(consultationMenu);
   consultationConditionsMenu.register(consultationAboutMenu);
   consultationAboutMenu.register(consultationAbout2Menu);
-
+  bot.use(welcomeFeature);
   //* conversations diagnostics
   bot.use(
     createConversation(
