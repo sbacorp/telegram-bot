@@ -38,25 +38,9 @@ export const UserModel = sequelize.define<IUserModel>("user", {
     type: DataTypes.STRING,
     defaultValue: "",
   },
-  sub: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  referenceFrom: {
-    type: DataTypes.STRING,
-    defaultValue: "",
-  },
-  joinedToNutr: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
   promoCode: {
     type: DataTypes.STRING,
     defaultValue: "",
-  },
-  subEndDateTime: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
   },
   boughtProducts: {
     type: DataTypes.STRING,
