@@ -41,12 +41,8 @@ function getPrivateChatAdminCommands(): BotCommand[] {
       description: "удалить ссылку",
     },
     {
-      command: "activatesubscription",
-      description: "активировать подписку по id",
-    },
-    {
       command: "setcommands",
-      description: "setcommands_command.description",
+      description: "обновить команды",
     },
     {
       command: "newsletter",

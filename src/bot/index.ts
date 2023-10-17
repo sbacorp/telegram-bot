@@ -7,10 +7,7 @@ import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { autoRetry } from "@grammyjs/auto-retry";
 import {
   BotConfig,
-  GrammyError,
-  HttpError,
   InlineKeyboard,
-  Keyboard,
   StorageAdapter,
   Bot as TelegramBot,
   session,
@@ -80,7 +77,6 @@ import {
   setPromoConversation,
   createlinkConversation,
   deletePromoConversation,
-  activateSubscriptionConversation,
   deleteLinkConversation,
   diagnosticAmmiakConversationChild,
   DIAGNOSTIC_AMMIAK_CONVERSATION_CHILD,
@@ -153,7 +149,6 @@ export function createBot(token: string, options: Options = {}) {
   bot.use(createlinkConversation());
   bot.use(deletePromoConversation());
   bot.use(deleteLinkConversation());
-  bot.use(activateSubscriptionConversation());
   bot.use(changeSheduleConversation());
   //* Handlers welcome and admin
   bot.use(botAdminFeature);

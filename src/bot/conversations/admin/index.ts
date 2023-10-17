@@ -1,4 +1,3 @@
-export * from "./activatesub.conversation.js";
 export * from "./createlink.conversation.js";
 export * from "./deletepromo.conversation.js";
 export * from "./deletelink.conversation.js";

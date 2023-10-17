@@ -11,15 +11,12 @@ import { logHandle } from "#root/bot/helpers/logging.js";
 import {
   getLinksMessage,
   getPromocodesMessage,
-  getSubscribedUsersCount,
   getTotalUsersCount,
-  getUsersJoinedNutrCount,
 } from "#root/server/utils.js";
 import {
   SETPROMO_CONVERSATION,
   CREATELINK_CONVERSATION,
   DELETE_PROMO_CONVERSATION,
-  ACTIVATE_SUBSCRIPTION_CONVERSATION,
   DELETE_LINK_CONVERSATION,
 } from "../conversations/index.js";
 
@@ -66,14 +63,6 @@ feature.command(
     return ctx.conversation.enter(DELETE_LINK_CONVERSATION);
   }
 );
-feature.command(
-  "activatesubscription",
-  logHandle("command-activeSubscription"),
-  chatAction("typing"),
-  async (ctx) => {
-    return ctx.conversation.enter(ACTIVATE_SUBSCRIPTION_CONVERSATION);
-  }
-);
 feature.command("newsletter", logHandle("command-newsletter"), async (ctx) => {
   return ctx.conversation.enter("newsletterConversation");
 });
@@ -91,7 +80,7 @@ feature.command(
   async (ctx) => {
     await ctx.deleteMessage();
     await ctx.replyWithMarkdownV2(
-      `*Всего пользователей:* ${await getTotalUsersCount()}\n*Зашли в нутрицолога:* ${await getUsersJoinedNutrCount()}\n*Оформили подписку:* ${await getSubscribedUsersCount()}`
+      `*Всего пользователей:* ${await getTotalUsersCount()}`
     );
     await getPromocodesMessage().then((message) => {
       ctx.reply(message);

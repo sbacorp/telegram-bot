@@ -84,22 +84,6 @@ export async function getTotalUsersCount(): Promise<number> {
   return UserModel.count();
 }
 
-export async function getSubscribedUsersCount(): Promise<number> {
-  return UserModel.count({
-    where: {
-      sub: true,
-    },
-  });
-}
-
-export async function getUsersJoinedNutrCount(): Promise<number> {
-  return UserModel.count({
-    where: {
-      joinedToNutr: true,
-    },
-  });
-}
-
 export async function createPromoCode(
   code: string,
   discount: number,
@@ -237,24 +221,6 @@ export async function deleteLinkFromDB(
       console.log(error);
       return `Не удалось удалить ссылку ${title}. Возможно такой ссылки не существует`;
     }
-  }
-}
-export async function activateSubscription(userId: number) {
-  try {
-    const user = await UserModel.findOne({
-      where: {
-        chatId: userId.toString(),
-      },
-    });
-    if (user) {
-      user.sub = true;
-      await user.save();
-      return `Подписка для ${userId} обновлена`;
-    }
-    return "Не удалось обновить подписку, возможно такого пользователя не существует";
-  } catch (error) {
-    console.log(error);
-    return "Не удалось обновить подписку, возможно такого пользователя не существует";
   }
 }
 
