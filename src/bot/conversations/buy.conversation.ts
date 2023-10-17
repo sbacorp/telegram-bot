@@ -233,7 +233,7 @@ export async function buyConversation(
     }
   );
   if (paymentMethod.update.callback_query?.data === "card") {
-    const message = await ctx.reply(
+    await ctx.reply(
       `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
       {
         reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
@@ -247,7 +247,12 @@ export async function buyConversation(
       }
     );
   }
-  ctx = await conversation.wait();
+  ctx = await conversation.waitForCallbackQuery("paid", {
+    otherwise: async () =>
+      await ctx.reply("Нажмите сюда пожалуйста", {
+        reply_markup: new InlineKeyboard().text("Проверить "),
+      }),
+  });
   if (ctx.update.callback_query?.data === "paid") {
     const paymentStatus = await conversation
       .external(() =>

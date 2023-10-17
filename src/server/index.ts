@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable func-names */
 import fastify from "fastify";
-import { BotError, GrammyError, webhookCallback } from "grammy";
+import { BotError, GrammyError, InlineKeyboard, webhookCallback } from "grammy";
 import CryptoJS from "crypto-js";
 import type { Bot } from "#root/bot/index.js";
 import { errorHandler } from "#root/bot/handlers/index.js";
@@ -51,28 +51,16 @@ export const createServer = async (bot: Bot) => {
     if (SignatureValue.toString().toUpperCase() !== data.SignatureValue) {
       reply.code(400).send("Invalid signature");
     }
-    await initDB(sequelize);
     const payment = await PaymentModel.findOne({
       where: {
         invoiceId: data.InvId,
-        chatId: data.Shp_chatId,
-        amount: Number(data.OutSum),
       },
     });
     if (payment) {
       payment.status = "paid";
       await payment.save();
-      await bot.api.sendMessage(payment.chatId, "Подтвердите оплату!", {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: "Оплатил",
-                callback_data: "paid",
-              },
-            ],
-          ],
-        },
+      await bot.api.sendMessage(payment.chatId, "Проверка оплаты", {
+        reply_markup: new InlineKeyboard().text("Оплатил(а)", "paid"),
       });
       if (payment.productName === "Консультация") {
         const user = await UserModel.findOne({
