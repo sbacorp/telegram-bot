@@ -33,6 +33,7 @@ try {
     });
   } else if (config.isDev) {
     await initDB(sequelize);
+    bot.api.deleteWebhook();
     runner = run(bot, {
       runner: {
         fetch: {

@@ -78,8 +78,8 @@ export async function buyConversation(
   ctx: Context
 ) {
   const selectedProduct = conversation.session?.selectedProduct;
-  const product = products.find((p) => p.name === selectedProduct);
-  if (!product) {
+  const product = { ...products.find((p) => p.name === selectedProduct) };
+  if (!product || !product.name || !product.price || !product.id) {
     return ctx.reply("Выберите продукт");
   }
   await ctx.reply(
@@ -194,7 +194,7 @@ export async function buyConversation(
       //  @ts-ignore
       promo = await conversation.external(async () => {
         return findPromoCodeByTitleAndProduct(
-          product!.name,
+          product!.name!,
           ctx.message!.text!,
           ctx.chat!.id.toString()
         );
@@ -207,18 +207,20 @@ export async function buyConversation(
   }
   if (promo) {
     await ctx.reply("Промокод принят");
-    product.price -= product.price * (Number(promo.dataValues.discount) / 100);
+    product.price! -=
+      product.price! * (Number(promo.dataValues.discount) / 100);
     await ctx.reply(`Скидка составляет ${promo.dataValues.discount}%
 Итоговая цена: ${product.price} рублей`);
   }
+  const { link, invoiceId } = await conversation.external(() =>
+    //  @ts-ignore
+    createPaymentLink(product, ctx.chat!.id.toString())
+  );
   await ctx.reply("Выберите способ оплаты", {
     reply_markup: new InlineKeyboard()
       .text("Картой", "card")
       .text("СБП/MirPay", "sbp"),
   });
-  const { link, invoiceId } = await conversation.external(() =>
-    createPaymentLink(product, ctx.chat!.id.toString())
-  );
   const paymentMethod = await conversation.waitForCallbackQuery(
     ["card", "sbp"],
     {
