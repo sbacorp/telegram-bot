@@ -12,7 +12,6 @@ export type SessionData = {
     buyDate: string;
     questionsAnswered: number;
     dateString: string;
-    time: string;
     answers: string[];
     messanger: string;
   };
@@ -103,8 +102,6 @@ export interface IConsultationObject {
   day: string;
   date?: Date;
   dateString: string;
-  time: string;
-  consultationTimeKeyboard?: InlineKeyboard;
   year: number;
   month: number;
   calendar?: InlineKeyboard;

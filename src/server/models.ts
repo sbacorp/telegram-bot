@@ -211,9 +211,6 @@ export const ConsultationAppointmentModel =
       date: {
         type: DataTypes.STRING,
       },
-      time: {
-        type: DataTypes.STRING,
-      },
       chatId: {
         type: DataTypes.STRING,
       },

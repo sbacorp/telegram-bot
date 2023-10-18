@@ -18,7 +18,6 @@ export const sessionDataDefaults: SessionData = {
     buyDate: "",
     questionsAnswered: 0,
     dateString: "",
-    time: "",
     answers: [],
     messanger: "",
   },
