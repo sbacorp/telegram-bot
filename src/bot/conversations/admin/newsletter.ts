@@ -39,7 +39,7 @@ export function newsletterConversation() {
             await ctx.api.sendMessage(user.dataValues.chatId, text, {
               parse_mode: "HTML",
             });
-          }, 250);
+          }, 33);
         }
       }
       if (callbackQuery?.data === "paid") {
