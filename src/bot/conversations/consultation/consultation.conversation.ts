@@ -90,7 +90,6 @@ export async function consultationConversation(
   let consultationObject: IConsultationObject = {
     day: conversation.session.consultation.dateString.slice(6, 8) || "",
     dateString: conversation.session.consultation.dateString,
-    time: conversation.session.consultation.time,
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
     phoneNumber: conversation.session.phoneNumber,
@@ -236,13 +235,6 @@ export async function consultationConversation(
     const buyDate = user1?.dataValues.buyDate;
     const consultationDate = user1?.dataValues.consultationDate;
     if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
-      await conversation.external(
-        async () =>
-          await enableConsultationByDateTime(
-            consultationDate,
-            conversation.session.consultation.time
-          )
-      );
       await ctx.reply("Вы не успели выполнить тестирование", {
         reply_markup: new Keyboard()
           .text("📅 выбрать дату")
@@ -374,7 +366,7 @@ export async function consultationConversation(
       year: "numeric",
       month: "long",
       day: "numeric",
-    })} в ${conversation.session.consultation.time}:00
+    })}
 
 Пол: ${
       conversation.session.sex === "child"
@@ -397,12 +389,10 @@ ${answerQuestions}`;
     `
     );
     const date = conversation.session.consultation.dateString;
-    const time = conversation.session.consultation.time;
     await conversation.external(() => {
       ConsultationAppointmentModel.create({
         chatId,
         date,
-        time,
       });
     });
     ctx.chatAction = null;
@@ -418,7 +408,7 @@ ${answerQuestions}`;
       year: "numeric",
       month: "long",
       day: "numeric",
-    })} в ${conversation.session.consultation.time}:00`,
+    })}`,
     {
       reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
     }
