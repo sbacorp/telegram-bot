@@ -43,12 +43,14 @@ export function newsletterConversation() {
         }
       }
       if (callbackQuery?.data === "paid") {
-        const users = await UserModel.findAll({
-          where: {
-            status: "active",
-            boughtProducts: { [Op.notLike]: null },
-          },
-        });
+        const users = await conversation.external(() =>
+          UserModel.findAll({
+            where: {
+              status: "active",
+              boughtProducts: { [Op.notLike]: null },
+            },
+          })
+        );
         for (const user of users) {
           setTimeout(async () => {
             try {
@@ -58,7 +60,7 @@ export function newsletterConversation() {
             } catch (error) {
               console.log(error);
             }
-          }, 250);
+          }, 33);
         }
       }
       if (callbackQuery?.data === "noPaid") {
