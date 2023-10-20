@@ -58,7 +58,7 @@ export function newsletterConversation() {
 
         for (const user of users) {
           setTimeout(async () => {
-            await ctx.api.sendMessage(user.dataValues.chatId, text, {
+            await ctx.api.sendMessage(user.chatId, text, {
               parse_mode: "HTML",
             });
           }, 33);
