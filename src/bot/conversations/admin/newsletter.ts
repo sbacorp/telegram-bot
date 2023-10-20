@@ -43,23 +43,24 @@ export function newsletterConversation() {
         }
       }
       if (callbackQuery?.data === "paid") {
-        const users = await conversation.external(() =>
+        let users = await conversation.external(() =>
           UserModel.findAll({
             where: {
               status: "active",
-              boughtProducts: { [Op.notLike]: null },
+              boughtProducts: {
+                [Op.iLike]: "%Групповое ведение%",
+              },
             },
           })
         );
+        users = users.map((u) => u.dataValues);
+        console.log(users);
+
         for (const user of users) {
           setTimeout(async () => {
-            try {
-              await ctx.api.sendMessage(user.dataValues.chatId, text, {
-                parse_mode: "HTML",
-              });
-            } catch (error) {
-              console.log(error);
-            }
+            await ctx.api.sendMessage(user.dataValues.chatId, text, {
+              parse_mode: "HTML",
+            });
           }, 33);
         }
       }
