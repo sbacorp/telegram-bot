@@ -87,7 +87,7 @@ export const createServer = async (bot: Bot) => {
     reply.code(200).send(`OK${paymentParameters.InvId}`);
   });
 
-  server.post(`/bot/${bot.token}`, webhookCallback(bot, "fastify"));
+  // server.post(`/bot/${bot.token}`, webhookCallback(bot, "fastify"));
 
   return server;
 };
