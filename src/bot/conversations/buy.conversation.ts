@@ -250,7 +250,7 @@ export async function buyConversation(
   ctx = await conversation.waitForCallbackQuery("paid", {
     otherwise: async () =>
       await ctx.reply("Нажмите сюда пожалуйста", {
-        reply_markup: new InlineKeyboard().text("Проверить "),
+        reply_markup: new InlineKeyboard().text("Проверить", "paid"),
       }),
   });
   if (ctx.update.callback_query?.data === "paid") {
