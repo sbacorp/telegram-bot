@@ -190,7 +190,7 @@ export async function BuyConsultationConversation(
       }
     );
   }
-  ctx = await conversation.waitFor("callback_query:data");
+  ctx = await conversation.wait();
   if (ctx.update.callback_query?.data === "toDate") {
     conversation.session.consultationStep = 2;
     return "change date";
