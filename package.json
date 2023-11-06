@@ -45,7 +45,7 @@
     "pg-hstore": "^2.3.4",
     "pino": "8.15.1",
     "pino-pretty": "10.2.0",
-    "sequelize": "^6.33.0",
+    "sequelize": "^6.34.0",
     "telegram-inline-calendar": "^1.6.4",
     "tsx": "3.12.10",
     "zod": "3.22.2"
