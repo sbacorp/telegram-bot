@@ -13,6 +13,7 @@ import {
   getPromocodesMessage,
   getTotalUsersCount,
 } from "#root/server/utils.js";
+import { PaymentModel } from "#root/server/models.js";
 import {
   SETPROMO_CONVERSATION,
   CREATELINK_CONVERSATION,
@@ -73,6 +74,42 @@ feature.command(
     return ctx.conversation.enter("changeShedule");
   }
 );
+const getPayments = async () => {
+  const consultations = await PaymentModel.findAll({
+    where: {
+      productName: "Консультация",
+      status: "paid",
+    },
+  });
+  const consultCount = consultations.length;
+  const group = await PaymentModel.findAll({
+    where: {
+      productName: "Групповое ведение",
+      status: "paid",
+    },
+  });
+  const groupCount = group.length;
+  const individuals = await PaymentModel.findAll({
+    where: {
+      productName: "Индивидуальное введение",
+      status: "paid",
+    },
+  });
+  const individualsCount = individuals.length;
+  const others = await PaymentModel.findAll({
+    where: {
+      productName: "Индивидуальное введение",
+      status: "paid",
+    },
+  });
+  const othersCount = others.length;
+  const message = `
+групповое ведение ${groupCount}
+Индивидуальное ведение ${individualsCount}
+Консультация ${consultCount}
+Продукты ${othersCount}
+    `;
+};
 feature.command(
   "statistics",
   logHandle("command-statistics"),
