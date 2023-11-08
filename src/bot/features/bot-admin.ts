@@ -109,6 +109,7 @@ const getPayments = async () => {
 Консультация ${consultCount}
 Продукты ${othersCount}
     `;
+  return message;
 };
 feature.command(
   "statistics",
@@ -120,6 +121,9 @@ feature.command(
       `*Всего пользователей:* ${await getTotalUsersCount()}`
     );
     await getPromocodesMessage().then((message) => {
+      ctx.reply(message);
+    });
+    await getPayments().then((message) => {
       ctx.reply(message);
     });
     await getLinksMessage().then((message) => {
