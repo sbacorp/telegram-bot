@@ -36,9 +36,13 @@ export function newsletterConversation() {
         });
         for (const user of users) {
           setTimeout(async () => {
-            await ctx.api.sendMessage(user.dataValues.chatId, text, {
-              parse_mode: "HTML",
-            });
+            try {
+              await ctx.api.sendMessage(user.dataValues.chatId, text, {
+                parse_mode: "HTML",
+              });
+            } catch (error) {
+              console.log(error);
+            }
           }, 33);
         }
       }
