@@ -365,18 +365,18 @@ export function createBot(token: string, options: Options = {}) {
     );
   });
   bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
-    // await ctx.reply("Карманный нутрициолог", {
-    //   reply_markup: {
-    //     inline_keyboard: [
-    //       [
-    //         {
-    //           text: "Перейти в бота 🤖 ",
-    //           url: "https://t.me/Tvoi_Nutriciolog_bot",
-    //         },
-    //       ],
-    //     ],
-    //   },
-    // });
+    await ctx.reply("Карманный нутрициолог", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Перейти в бота 🤖 ",
+              url: "https://t.me/Tvoi_Nutriciolog_bot?start=Vbote",
+            },
+          ],
+        ],
+      },
+    });
     await ctx.deleteMessage();
     return ctx.reply("⏳ Скоро будет доступен");
   });
