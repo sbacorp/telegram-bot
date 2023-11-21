@@ -96,18 +96,32 @@ const getPayments = async () => {
     },
   });
   const individualsCount = individuals.length;
-  const others = await PaymentModel.findAll({
+  const others1 = await PaymentModel.findAll({
     where: {
-      productName: "Индивидуальное введение",
+      productName: "Методичка по работе с желчью",
       status: "paid",
     },
   });
-  const othersCount = others.length;
+    const others2 = await PaymentModel.findAll({
+      where: {
+        productName: "Детское здоровье",
+        status: "paid",
+      },
+    });
+      const others3 = await PaymentModel.findAll({
+        where: {
+          productName: "Гайд Аптечка для детей и взрослых",
+          status: "paid",
+        },
+      });
+
   const message = `
 групповое ведение ${groupCount}
 Индивидуальное ведение ${individualsCount}
 Консультация ${consultCount}
-Продукты ${othersCount}
+Детское здоровье ${others2.length}
+Методичка по работе с желчью ${others1.length}
+Гайд Аптечка для детей и взрослых ${others3.length}
     `;
   return message;
 };
