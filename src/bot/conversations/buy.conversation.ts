@@ -82,6 +82,9 @@ export async function buyConversation(
   if (!product || !product.name || !product.price || !product.id) {
     return ctx.reply("Выберите продукт");
   }
+  if (product.name === "Групповое ведение") {
+    return ctx.reply("Запись на групповое ведение оконена!");
+  }
   await ctx.reply(
     `Продукт : <b>${product.name}</b> \nЦена : <b>${product.price}</b> рублей`
   );
