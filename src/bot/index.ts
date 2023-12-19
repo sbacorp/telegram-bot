@@ -140,7 +140,16 @@ export function createBot(token: string, options: Options = {}) {
         .url("Сотрудничество", "https://t.me/osmanovpr"),
     });
   });
-
+  bot.on("message", async (ctx: Context) => {
+    const user = await UserModel.findOne({
+      where: {
+        chatId: ctx.chat?.id.toString(),
+      },
+    });
+    if (!user) {
+      ctx.reply("Нажмите пожалуйста /start");
+    }
+  });
   //* connect plugin conversations
   bot.use(conversations());
   //* setting commands conversations
