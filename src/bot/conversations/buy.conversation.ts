@@ -48,7 +48,7 @@ export const products: IProduct[] = [
   {
     id: 4,
     name: "Групповое ведение",
-    price: 5_000,
+    price: 5000,
     type: "link",
     answer:
       "<a href='https://t.me/+suSr69nc3pQxMTY6'>Закрытый телеграм чат</a>",
