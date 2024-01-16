@@ -37,7 +37,7 @@ export const toProjectsMenu = new Menu<Context>("to-projects").submenu(
 export const groupProject = new Menu<Context>("group-project")
   .url("Перейти на сайт", "https://achekanova.ru")
   .row()
-  .text("Купить - 10000р", async (ctx) => {
+  .text("Купить - 5000р", async (ctx) => {
     ctx.session.selectedProduct = "Групповое ведение";
     await ctx.conversation.enter(BUY_CONVERSATION);
   });
