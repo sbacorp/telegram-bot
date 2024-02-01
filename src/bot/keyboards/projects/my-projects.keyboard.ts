@@ -25,7 +25,7 @@ export const projectZhkt = new Menu<Context>("project-zhkt")
 export const guideAptechka = new Menu<Context>("guide-aptechka")
   .url("Перейти на сайт", "https://achekanova.ru")
   .row()
-  .text("Купить - 5000р", async (ctx) => {
+  .text("Купить - 3000р", async (ctx) => {
     ctx.session.selectedProduct = "Гайд Аптечка для детей и взрослых";
     await ctx.conversation.enter(BUY_CONVERSATION);
   });
