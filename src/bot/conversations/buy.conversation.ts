@@ -234,42 +234,21 @@ export async function buyConversation(
   );
   if (paymentMethod.update.callback_query?.data === "card") {
     await ctx.reply(
-      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
+      `<b>Можете приступать к оплате.</b>
+       <i> После оплаты ты автоматически получите доступ к продукту.</i>
+        Номер заказа: #${invoiceId}`,
       {
         reply_markup: new InlineKeyboard().webApp("💰 Оплатить", link).row(),
       }
     );
   } else {
-    const message = await ctx.reply(
-      `<b>Можете приступать к оплате. Номер заказа: #${invoiceId}</b>`,
+    await ctx.reply(
+      `<b>Можете приступать к оплате.
+        После оплаты ты автоматически получите доступ к продукту
+       Номер заказа: #${invoiceId}</b>`,
       {
         reply_markup: new InlineKeyboard().url("💰 Оплатить", link).row(),
       }
     );
-  }
-  ctx = await conversation.waitForCallbackQuery("paid", {
-    otherwise: async () =>
-      await ctx.reply("Нажмите сюда пожалуйста", {
-        reply_markup: new InlineKeyboard().text("Проверить", "paid"),
-      }),
-  });
-  if (ctx.update.callback_query?.data === "paid") {
-    const paymentStatus = await conversation
-      .external(() =>
-        PaymentModel.findOne({
-          where: { invoiceId },
-        })
-      )
-      .then((res) => res?.dataValues.status);
-
-    if (paymentStatus !== "paid") {
-      return ctx.reply("Оплата не прошла, попробуйте позже");
-    }
-    await ctx.reply("<b>Оплата прошла успешно</b>");
-    return product?.type === "doc"
-      ? ctx.replyWithDocument(product.docId!, {
-          reply_markup: cancel,
-        })
-      : ctx.reply(product!.answer!);
   }
 }

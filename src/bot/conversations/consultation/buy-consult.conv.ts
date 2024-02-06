@@ -8,64 +8,15 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "#root/bot/context.js";
-import {
-  editUserAttribute,
-  fetchUser,
-  findPromoCodeByTitleAndProduct,
-  updateUserPhone,
-} from "#root/server/utils.js";
-import {
-  ConsultationModel,
-  PaymentModel,
-  UserModel,
-} from "#root/server/models.js";
-import { IConsultationObject } from "#root/typing.js";
+import { editUserAttribute } from "#root/server/utils.js";
+import { PaymentModel } from "#root/server/models.js";
 import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../../keyboards/cancel.keyboard.js";
-import { consultationConversation } from "./consultation.conversation.js";
-
-type TimeAttributeType =
-  | "time10"
-  | "time11"
-  | "time12"
-  | "time13"
-  | "time14"
-  | "time15"
-  | "time16"
-  | "time17"
-  | "time18"
-  | "time19"
-  | "time20";
-
-const disableConsultationByDateTime = async (date: string, time: string) => {
-  const timeAttribute: TimeAttributeType = `time${
-    time.split(":")[0]
-  }` as TimeAttributeType;
-  const consultation = await ConsultationModel.findOne({ where: { date } });
-  if (consultation) {
-    consultation[timeAttribute] = false;
-    await consultation.save();
-  }
-};
-export const enableConsultationByDateTime = async (
-  date: string,
-  time: string
-) => {
-  const timeAttribute: TimeAttributeType = `time${
-    time.split(":")[0]
-  }` as TimeAttributeType;
-  const consultation = await ConsultationModel.findOne({ where: { date } });
-  if (consultation) {
-    consultation[timeAttribute] = true;
-    await consultation.save();
-  }
-};
 
 export async function BuyConsultationConversation(
   conversation: Conversation<Context>,
   ctx: Context,
-  message: any,
-  consultationObject: IConsultationObject
+  message: any
 ) {
   const product = {
     id: 5,

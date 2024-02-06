@@ -59,9 +59,6 @@ export const createServer = async (bot: Bot) => {
     if (payment) {
       payment.status = "paid";
       await payment.save();
-      await bot.api.sendMessage(payment.chatId, "Проверка оплаты", {
-        reply_markup: new InlineKeyboard().text("Оплатил(а)", "paid"),
-      });
       if (payment.productName === "Консультация") {
         const user = await UserModel.findOne({
           where: {
@@ -72,6 +69,9 @@ export const createServer = async (bot: Bot) => {
           user.consultationPaidStatus = true;
           await user.save();
         }
+        await bot.api.sendMessage(payment.chatId, "Проверка оплаты", {
+          reply_markup: new InlineKeyboard().text("Оплатил(а)", "paid"),
+        });
       } else {
         const user = await UserModel.findOne({
           where: {
@@ -81,6 +81,34 @@ export const createServer = async (bot: Bot) => {
         if (user) {
           user.boughtProducts += `${payment.productName},`;
           await user.save();
+          if (payment.productName === "Групповое ведение") {
+            await bot.api.sendMessage(
+              payment.chatId,
+              `<b>Оплата прошла успешно</b>
+
+                <a href='https://t.me/+kd2XH1FzNlQ2NmEy'>Вход в закрытый телеграм чат</a>
+              `
+            );
+          } else if (
+            payment.productName === "Гайд Аптечка для детей и взрослых"
+          ) {
+            await bot.api.sendDocument(
+              payment.chatId,
+              "BQACAgIAAxkBAAIKC2UC8f8ZEsvBZSaSqspiHMhcUOlWAAIfMQACS5AZSKRoICkE24x8MAQ"
+            );
+          } else if (payment.productName === "Методичка по работе с желчью") {
+            await bot.api.sendDocument(
+              payment.chatId,
+              "BQACAgIAAxkBAAIKDWUC8jktsNfxpSEiNv-uL8ynPL0lAAIkMQACS5AZSK4WXfoa1B_oMAQ"
+            );
+          } else if (payment.productName === "Детское здоровье") {
+            await bot.api.sendMessage(
+              payment.chatId,
+              `<b>Оплата прошла успешно</b>
+
+              <a href='https://t.me/+y34BKRWT_R0wM2I6'>Ссылка на закрытый телеграм канал</a>`
+            );
+          }
         }
       }
     }
