@@ -15,7 +15,7 @@ import {
   findPromoCodeByTitleAndProduct,
   updateUserPhone,
 } from "#root/server/utils.js";
-import { IProduct, IPromocodeModel } from "#root/typing.js";
+import { IProduct } from "#root/typing.js";
 import { PaymentModel } from "#root/server/models.js";
 import { createPaymentLink } from "#root/server/creat-pay-link.js";
 import { cancel } from "../keyboards/cancel.keyboard.js";
@@ -40,7 +40,7 @@ export const products: IProduct[] = [
   {
     id: 3,
     name: "Гайд Аптечка для детей и взрослых",
-    price: 5000,
+    price: 3000,
     type: "doc",
     docId:
       "BQACAgIAAxkBAAIKC2UC8f8ZEsvBZSaSqspiHMhcUOlWAAIfMQACS5AZSKRoICkE24x8MAQ",
