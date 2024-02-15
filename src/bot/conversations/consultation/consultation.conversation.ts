@@ -101,6 +101,7 @@ export async function consultationConversation(
     let message = await ctx.reply("Запись на консультацию", {
         reply_markup: cancel,
     });
+
     if (conversation.session.consultationStep < 1) {
         message = await ctx.reply(
             "Перед тем, как записаться ко мне на консультацию, необходимо ознакомиться с условиями",
@@ -178,6 +179,7 @@ export async function consultationConversation(
             conversation.session.consultationStep = 1;
             return consultationConversation(conversation, ctx);
         }
+        consultationObject = response;
         conversation.session.consultationStep = 3;
     }
     if (
@@ -199,13 +201,11 @@ export async function consultationConversation(
             return;
         }
     }
-
     if (conversation.session.sex === "") {
         conversation.session.consultationStep = 1;
         await ctx.reply("Вы не выбрали пол");
         return consultationConversation(conversation, ctx);
     }
-
     if (
         conversation.session.consultationStep < 5 &&
         ((conversation.session.sex === "male" &&
@@ -232,6 +232,7 @@ export async function consultationConversation(
             async () => await fetchUser(chatId)
         );
         const buyDate = user1?.dataValues.buyDate;
+        const consultationDate = user1?.dataValues.consultationDate;
         if (buyDate !== new Date().getDate() + new Date().getMonth().toString()) {
             await ctx.reply("Вы не успели выполнить тестирование", {
                 reply_markup: new Keyboard()
