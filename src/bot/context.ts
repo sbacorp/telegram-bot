@@ -1,63 +1,71 @@
-import { Update, UserFromGetMe } from "@grammyjs/types";
-import { Context as DefaultContext, SessionFlavor, type Api } from "grammy";
-import type { AutoChatActionFlavor } from "@grammyjs/auto-chat-action";
-import type { HydrateFlavor } from "@grammyjs/hydrate";
-import type { ParseModeFlavor } from "@grammyjs/parse-mode";
-import type { ConversationFlavor } from "@grammyjs/conversations";
-import type { Logger } from "#root/logger.js";
-import { SessionData } from "#root/typing.js";
+import {Update, UserFromGetMe} from "@grammyjs/types";
+import {Context as DefaultContext, SessionFlavor, type Api} from "grammy";
+import type {AutoChatActionFlavor} from "@grammyjs/auto-chat-action";
+import type {HydrateFlavor} from "@grammyjs/hydrate";
+import type {ParseModeFlavor} from "@grammyjs/parse-mode";
+import type {ConversationFlavor} from "@grammyjs/conversations";
+import type {Logger} from "#root/logger.js";
+import {SessionData} from "#root/typing.js";
 
 export const sessionDataDefaults: SessionData = {
-  selectedProduct: "",
-  subscribedToChannel: false,
-  phoneNumber: "",
-  fio: "",
-  sex: "",
-  consultationStep: 0,
-  consultation: {
-    buyDate: "",
-    questionsAnswered: 0,
-    dateString: "",
-    answers: [],
-    messanger: "",
-  },
-  individual: {
-    individualSex: "",
-    individualStep: 0,
-    questionsAnswered: 0,
-    answers: [],
-    messanger: "",
-  },
+    selectedProduct: "",
+    subscribedToChannel: false,
+    phoneNumber: "",
+    fio: "",
+    sex: "",
+    consultationStep: 0,
+    consultation: {
+        buyDate: "",
+        questionsAnswered: 0,
+        dateString: "",
+        answers: [],
+        messanger: "",
+    },
+    individual: {
+        individualSex: "",
+        individualStep: 0,
+        questionsAnswered: 0,
+        answers: [],
+        messanger: "",
+    },
+    group: {
+        sex: "",
+        name: "",
+        questionsAnswered: 0,
+        answers: [],
+        number: ""
+
+    }
 };
 
 type ExtendedContextFlavor = {
-  logger: Logger;
+    logger: Logger;
 };
 
 export type Context = ParseModeFlavor<
-  HydrateFlavor<
-    DefaultContext &
-      ExtendedContextFlavor &
-      SessionFlavor<SessionData> &
-      ConversationFlavor &
-      AutoChatActionFlavor
-  >
+    HydrateFlavor<
+        DefaultContext &
+        ExtendedContextFlavor &
+        SessionFlavor<SessionData> &
+        ConversationFlavor &
+        AutoChatActionFlavor
+    >
 >;
 
 interface Dependencies {
-  logger: Logger;
+    logger: Logger;
 }
 
-export function createContextConstructor({ logger }: Dependencies) {
-  return class extends DefaultContext implements ExtendedContextFlavor {
-    logger: Logger;
+export function createContextConstructor({logger}: Dependencies) {
+    return class extends DefaultContext implements ExtendedContextFlavor {
+        logger: Logger;
 
-    constructor(update: Update, api: Api, me: UserFromGetMe) {
-      super(update, api, me);
+        constructor(update: Update, api: Api, me: UserFromGetMe) {
+            super(update, api, me);
 
-      this.logger = logger.child({
-        update_id: this.update.update_id,
-      });
-    }
-  } as unknown as new (update: Update, api: Api, me: UserFromGetMe) => Context;
+            this.logger = logger.child({
+                update_id: this.update.update_id,
+            });
+        }
+    } as unknown as new (update: Update, api: Api, me: UserFromGetMe) => Context;
 }
