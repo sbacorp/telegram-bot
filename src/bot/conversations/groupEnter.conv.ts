@@ -1,11 +1,20 @@
 ﻿import type {Conversation} from "@grammyjs/conversations";
 import {Context} from "#root/bot/context.js";
-import {InlineKeyboard, Keyboard} from "grammy";
-import {editUserAttribute} from "#root/server/utils.js";
-import {briefMaleConversation} from "#root/bot/conversations/consultation/brief-male.conv.js";
-import {briefFemaleConversation} from "#root/bot/conversations/consultation/brief-female.conv.js";
-import {briefChildConversation} from "#root/bot/conversations/consultation/brief-child.conv.js";
-import {WebsitePaymentModel} from "#root/server/models.js";
+import {InlineKeyboard, InputFile, Keyboard} from "grammy";
+import {
+    briefMaleConversation,
+    questions as maleQuestions
+} from "#root/bot/conversations/consultation/brief-male.conv.js";
+import {
+    briefFemaleConversation,
+    questions as femaleQuestions
+} from "#root/bot/conversations/consultation/brief-female.conv.js";
+import {
+    briefChildConversation,
+    questions as childQuestions
+} from "#root/bot/conversations/consultation/brief-child.conv.js";
+import {ConsultationAppointmentModel, WebsitePaymentModel} from "#root/server/models.js";
+import fs from "node:fs";
 
 export async function GroupEnterConv(
     conversation: Conversation<Context>,
@@ -31,7 +40,7 @@ export async function GroupEnterConv(
             phoneNumber: ctx.message?.contact?.phone_number
         }
     }))
-    if(!payment) return ctx.reply("Оплата по этому номеру не найдена")
+    if (!payment) return ctx.reply("Оплата по этому номеру не найдена")
 
 
     await ctx.reply("Пожалуйста, укажите кто проходит ведение?", {
@@ -97,5 +106,131 @@ export async function GroupEnterConv(
         }
     }
 
+    await ctx.reply(
+        `Благодарю вас за проделанную работу.`
+    );
+    let address: string = "";
+    await ctx.reply("Хотели бы сдать анализы с 20% скидкой?", {
+        reply_markup: new InlineKeyboard().text("Да", "yes").text("Нет", "no"),
+    });
+    ctx = await conversation.waitForCallbackQuery(["yes", "no"], {
+        otherwise: async () => {
+            await ctx.reply("Используйте кнопки", {
+                reply_markup: new InlineKeyboard()
+                    .text("Да", "yes")
+                    .text("Нет", "no"),
+            });
+        },
+    });
+    if (ctx.update.callback_query?.data === "yes") {
+        await ctx.reply("Введите адрес ближайшей к вам лаборатории Invitro");
+        address = await conversation.form.text();
+        if (address) {
+            await ctx.reply("Спасибо, в день консультации алла вышлет вам скидку!");
+        }
+    }
+    await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
+    let answerQuestions: string = "";
+    ctx.chatAction = "typing";
 
+    switch (conversation.session.group.sex) {
+        case "male": {
+            answerQuestions = conversation.session.consultation.answers
+                .map((answer, index: number) => {
+                    return `Вопрос :${maleQuestions[index].text}
+Ответ: ${answer}
+      `;
+                })
+                .join("\n");
+
+            break;
+        }
+        case "female": {
+            answerQuestions = conversation.session.consultation.answers
+                .map((answer, index: number) => {
+                    return `
+        
+Вопрос :${femaleQuestions[index].text}
+Ответ: ${answer}
+      `;
+                })
+                .join("\n");
+
+            break;
+        }
+        case "child": {
+            answerQuestions = conversation.session.consultation.answers
+                .map((answer, index: number) => {
+                    return `
+        
+Вопрос :${childQuestions[index].text}
+Ответ: ${answer}
+      `;
+                })
+                .join("\n");
+
+            break;
+        }
+    }
+    const fileName = `${conversation.session.fio.split(" ")[0]}_${
+        conversation.session.fio.split(" ")[1]
+    }_${conversation.session.fio.split(" ")[2]}_${
+        conversation.session.phoneNumber
+    }_${conversation.session.consultation.dateString}.txt`;
+    const filePath = `./${fileName}`;
+
+    let fileContent: string;
+    fileContent = `
+Новая запись на Групповое ведение:
+Имя: ${conversation.session.fio}
+Телефон: ${conversation.session.phoneNumber}
+Хочет скидку : ${address ? `Да, адресс ${address}` : "Нет"}
+
+Пол: ${
+        conversation.session.sex === "child"
+            ? "Ребенок"
+            : conversation.session.sex === "male"
+                ? "Мужчина"
+                : "Женщина"
+    }
+Тестирование :
+
+${answerQuestions}`;
+    fs.writeFileSync(filePath, fileContent);
+    await ctx.api.sendDocument("-1001833847819", new InputFile(filePath));
+    await ctx.api.sendMessage(
+        "-1001833847819",
+        `Групповое ведение
+        Контакт пользователя: ${
+            conversation.session.consultation.messanger === "Пользователь предпочел скрыть никнейм"
+                ? conversation.session.phoneNumber
+                : conversation.session.consultation.messanger
+        }
+    `
+    );
+    const date = conversation.session.consultation.dateString;
+    await conversation.external(() => {
+        ConsultationAppointmentModel.create({
+            chatId,
+            date,
+        });
+    });
+    ctx.chatAction = null;
 }
+
+//     await ctx.reply(
+//         `Запись на консультацию прошла успешно!
+// Ожидайте моего сообщения ${new Date(
+//             Number(conversation.session.consultation.dateString.slice(0, 4)),
+//             Number(conversation.session.consultation.dateString.slice(4, 6)) - 1,
+//             Number(conversation.session.consultation.dateString.slice(6, 8))
+//         ).toLocaleDateString("ru-RU", {
+//             weekday: "long",
+//             year: "numeric",
+//             month: "long",
+//             day: "numeric",
+//         })}`,
+//         {
+//             reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
+//         }
+//     );

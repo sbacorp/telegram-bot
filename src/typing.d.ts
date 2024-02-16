@@ -23,7 +23,7 @@ export type SessionData = {
         messanger: string;
     };
     group: {
-        sex?: "male" | "female" | "child" | "";
+        sex: "male" | "female" | "child" | "";
         name?: string;
         questionsAnswered?: number;
         answers?: string[];
