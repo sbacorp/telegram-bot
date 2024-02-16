@@ -153,6 +153,11 @@ export async function consultationConversation(
             }
             case "female": {
                 conversation.session.sex = "female";
+                conversation.session.consultation.messanger = `${
+                    ctx.update.callback_query.from.username
+                        ? `https://t.me/${ctx.update.callback_query.from.username}`
+                        : ""
+                }}`;
                 await conversation.external(
                     async () => await editUserAttribute(chatId, "sex", "female")
                 );
@@ -160,6 +165,11 @@ export async function consultationConversation(
             }
             case "child": {
                 conversation.session.sex = "child";
+                 conversation.session.consultation.messanger = `${
+                    ctx.update.callback_query.from.username
+                        ? `https://t.me/${ctx.update.callback_query.from.username}`
+                        : ""
+                }}`;
                 await conversation.external(
                     async () => await editUserAttribute(chatId, "sex", "child")
                 );

@@ -5,6 +5,7 @@ import {editUserAttribute} from "#root/server/utils.js";
 import {briefMaleConversation} from "#root/bot/conversations/consultation/brief-male.conv.js";
 import {briefFemaleConversation} from "#root/bot/conversations/consultation/brief-female.conv.js";
 import {briefChildConversation} from "#root/bot/conversations/consultation/brief-child.conv.js";
+import {WebsitePaymentModel} from "#root/server/models.js";
 
 export async function GroupEnterConv(
     conversation: Conversation<Context>,
@@ -24,6 +25,15 @@ export async function GroupEnterConv(
         );
         ctx = await conversation.wait();
     } while (!ctx.message?.contact?.phone_number);
+
+    const payment = await conversation.external(() => WebsitePaymentModel.findOne({
+        where: {
+            phoneNumber: ctx.message?.contact?.phone_number
+        }
+    }))
+    if(!payment) return ctx.reply("Оплата по этому номеру не найдена")
+
+
     await ctx.reply("Пожалуйста, укажите кто проходит ведение?", {
         reply_markup: new InlineKeyboard()
             .text("Мужчины", "male")
@@ -66,7 +76,7 @@ export async function GroupEnterConv(
     }
     conversation.session.consultation.answers = []
     conversation.session.consultation.questionsAnswered = 0
-    switch (conversation.session.sex) {
+    switch (conversation.session.group.sex) {
         case "male": {
             await briefMaleConversation(conversation, ctx);
             break;
@@ -86,6 +96,6 @@ export async function GroupEnterConv(
             break;
         }
     }
-    
+
 
 }
