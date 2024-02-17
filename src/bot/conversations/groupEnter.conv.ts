@@ -13,10 +13,11 @@ import {
     briefChildConversation,
     questions as childQuestions
 } from "#root/bot/conversations/consultation/brief-child.conv.js";
-import {ConsultationAppointmentModel, WebsitePaymentModel} from "#root/server/models.js";
+import {WebsitePaymentModel} from "#root/server/models.js";
 import fs from "node:fs";
 
-export async function GroupEnterConv(
+
+export async function CheckGroupPayment(
     conversation: Conversation<Context>,
     ctx: Context
 ) {
@@ -41,8 +42,13 @@ export async function GroupEnterConv(
         }
     }))
     if (!payment) return ctx.reply("Оплата по этому номеру не найдена")
+    return ctx.conversation.enter("groupEnter");
+}
 
-
+export async function GroupEnterConv(
+    conversation: Conversation<Context>,
+    ctx: Context
+) {
     await ctx.reply("Пожалуйста, укажите кто проходит ведение?", {
         reply_markup: new InlineKeyboard()
             .text("Мужчины", "male")
@@ -182,14 +188,14 @@ export async function GroupEnterConv(
     let fileContent: string;
     fileContent = `
 Новая запись на Групповое ведение:
-Имя: ${conversation.session.fio}
-Телефон: ${conversation.session.phoneNumber}
+Имя: ${conversation.session.fio || ""}
+Телефон: ${conversation.session.group.number}
 Хочет скидку : ${address ? `Да, адресс ${address}` : "Нет"}
 
-Пол: ${
-        conversation.session.sex === "child"
+Для кого: ${
+        conversation.session.group.sex === "child"
             ? "Ребенок"
-            : conversation.session.sex === "male"
+            : conversation.session.group.sex === "male"
                 ? "Мужчина"
                 : "Женщина"
     }
@@ -208,29 +214,5 @@ ${answerQuestions}`;
         }
     `
     );
-    const date = conversation.session.consultation.dateString;
-    await conversation.external(() => {
-        ConsultationAppointmentModel.create({
-            chatId,
-            date,
-        });
-    });
     ctx.chatAction = null;
 }
-
-//     await ctx.reply(
-//         `Запись на консультацию прошла успешно!
-// Ожидайте моего сообщения ${new Date(
-//             Number(conversation.session.consultation.dateString.slice(0, 4)),
-//             Number(conversation.session.consultation.dateString.slice(4, 6)) - 1,
-//             Number(conversation.session.consultation.dateString.slice(6, 8))
-//         ).toLocaleDateString("ru-RU", {
-//             weekday: "long",
-//             year: "numeric",
-//             month: "long",
-//             day: "numeric",
-//         })}`,
-//         {
-//             reply_markup: new Keyboard().text("🏠 Главное меню").resized(),
-//         }
-//     );

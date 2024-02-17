@@ -10,13 +10,14 @@ import {
 import {cancel} from "../keyboards/cancel.keyboard.js";
 import {individualMenu} from "../keyboards/individual-menu.keyboard.js";
 import {createConversation} from "@grammyjs/conversations";
-import {GroupEnterConv} from "#root/bot/conversations/groupEnter.conv.js";
+import {CheckGroupPayment, GroupEnterConv} from "#root/bot/conversations/groupEnter.conv.js";
 
 const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
 feature.use(createConversation(GroupEnterConv, "groupEnter"))
+feature.use(createConversation(CheckGroupPayment, "checkPayment"))
 feature.command("start", logHandle("command-start"), async (ctx) => {
     await ctx.conversation.exit();
     const chatId = ctx.chat.id;
@@ -92,12 +93,12 @@ feature.command("start", logHandle("command-start"), async (ctx) => {
             }
         );
     }
-    if (ctx.message?.text?.split(" ")[1] === "websiteRefGroup"){
-        return ctx.conversation.enter("groupEnter")
-        
+    if (ctx.message?.text?.split(" ")[1] === "websiteRefGroup") {
+        return ctx.conversation.enter("checkPayment")
+
     }
-        return ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
-            reply_markup: mainMenu,
-        });
+    return ctx.replyWithMarkdownV2("*Выберите то, что вам нужно*", {
+        reply_markup: mainMenu,
+    });
 });
 export {composer as welcomeFeature};
