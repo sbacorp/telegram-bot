@@ -292,6 +292,11 @@ export function createBot(token: string, options: Options = {}) {
 
     //* duagnostic menu
     bot.use(diagnosticMenu);
+    
+    bot.hears('Send message to chat', async (ctx: Context) => {
+        
+        }
+    )
 
     //* hears handlers
     bot.hears("🌐 Сайт", async (ctx: Context) => {
@@ -373,6 +378,7 @@ export function createBot(token: string, options: Options = {}) {
             }
         );
     });
+    
     bot.hears("🤖 Карманный нутрициолог", async (ctx: Context) => {
         await ctx.reply("Карманный нутрициолог", {
             reply_markup: {

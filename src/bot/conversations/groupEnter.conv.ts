@@ -207,9 +207,9 @@ export async function GroupEnterConv(
 
 ${answerQuestions}`;
     fs.writeFileSync(filePath, fileContent);
-    await ctx.api.sendDocument("-1001833847819", new InputFile(filePath));
+    await ctx.api.sendDocument("-1002113959805", new InputFile(filePath));
     await ctx.api.sendMessage(
-        "-1001833847819",
+        "-1002113959805",
         `Групповое ведение
         Контакт пользователя: ${
             conversation.session.consultation.messanger === "Пользователь предпочел скрыть никнейм"
