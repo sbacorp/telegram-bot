@@ -60,6 +60,10 @@ export async function GroupEnterConv(
         await ctx.answerCallbackQuery("Используйте кнопки");
         ctx = await conversation.wait();
     }
+    conversation.session.group = {
+        sex: ""
+    }
+
     switch (ctx.update.callback_query?.data) {
         case "male": {
             conversation.session.group.sex = "male";
