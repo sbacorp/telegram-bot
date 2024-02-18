@@ -455,14 +455,14 @@ export function createBot(token: string, options: Options = {}) {
     bot.filter(
         (ctx) => ctx.update.callback_query?.data === "male",
         async (ctx) => {
-            await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
+            await ctx.answerCallbackQuery("Вы выбрали консультацию для мужчины");
             ctx.session.sex = "male";
         }
     );
     bot.filter(
         (ctx) => ctx.update.callback_query?.data === "female",
         async (ctx) => {
-            await ctx.answerCallbackQuery("Вы выбрали консультацию для ребенка");
+            await ctx.answerCallbackQuery("Вы выбрали консультацию для женщины");
             ctx.session.sex = "female";
         }
     );

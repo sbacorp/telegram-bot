@@ -139,7 +139,7 @@ export async function GroupEnterConv(
             await ctx.reply("Спасибо, в день консультации алла вышлет вам скидку!");
         }
     }
-    await ctx.reply("Пожалуйста подождите, идет запись на консультацию...");
+    await ctx.reply("Пожалуйста подождите, идет запись на ведение...");
     let answerQuestions: string = "";
     ctx.chatAction = "typing";
 
